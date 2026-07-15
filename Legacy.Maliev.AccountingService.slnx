@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Legacy.Maliev.AccountingService.Api/Legacy.Maliev.AccountingService.Api.csproj" />
+  <Project Path="Legacy.Maliev.AccountingService.Application/Legacy.Maliev.AccountingService.Application.csproj" />
+  <Project Path="Legacy.Maliev.AccountingService.Data/Legacy.Maliev.AccountingService.Data.csproj" />
+  <Project Path="Legacy.Maliev.AccountingService.Domain/Legacy.Maliev.AccountingService.Domain.csproj" />
+  <Project Path="Legacy.Maliev.AccountingService.Tests/Legacy.Maliev.AccountingService.Tests.csproj" />
+</Solution>
