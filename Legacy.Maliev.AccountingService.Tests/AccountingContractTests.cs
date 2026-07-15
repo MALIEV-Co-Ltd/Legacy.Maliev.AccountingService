@@ -77,6 +77,7 @@ public sealed class AccountingContractTests
                 || path.EndsWith(".csproj", StringComparison.OrdinalIgnoreCase))
             .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase)
                 && !path.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase)
+                && !path.Contains($"{Path.DirectorySeparatorChar}.dependencies{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase)
                 && !path.Contains($"{Path.DirectorySeparatorChar}Legacy.Maliev.AccountingService.Tests{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase));
         var text = string.Join('\n', files.Select(File.ReadAllText));
 
