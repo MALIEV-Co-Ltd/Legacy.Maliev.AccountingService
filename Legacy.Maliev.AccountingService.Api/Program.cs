@@ -33,6 +33,11 @@ builder.Services.AddScoped<IReceiptWorkflowStore, ReceiptWorkflowStore>();
 builder.Services.AddScoped<IReceiptOperationLock, PostgresReceiptOperationLock>();
 builder.Services.AddScoped<IReceiptOperationJournal, ReceiptOperationJournal>();
 builder.Services.AddScoped<IReceiptWorkflow, ReceiptWorkflowService>();
+builder.Services.AddScoped<IInvoiceCreationStore, InvoiceCreationStore>();
+builder.Services.AddScoped<IInvoiceCreationJournal, InvoiceCreationJournal>();
+builder.Services.AddScoped<IInvoiceCreationLock, PostgresInvoiceCreationLock>();
+builder.Services.AddScoped<IInvoiceCreationSource, InvoiceCreationSourceClient>();
+builder.Services.AddScoped<IInvoiceCreationWorkflow, InvoiceCreationWorkflowService>();
 builder.Services.AddHttpClient<IReceiptDocumentClient, ReceiptDocumentClient>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["Services:Document"]
@@ -65,6 +70,30 @@ builder.Services.AddHttpClient<IReceiptSignatureClient, ReceiptSignatureClient>(
         ?? "https+http://legacy-maliev-employee-service");
     client.Timeout = TimeSpan.FromSeconds(30);
 }).AddServiceDiscovery().AddLegacyServiceAuthentication();
+builder.Services.AddHttpClient<IInvoiceCreationDocumentClient, InvoiceCreationDocumentClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["Services:Document"] ?? "https+http://legacy-maliev-document-service");
+    client.Timeout = TimeSpan.FromSeconds(30);
+}).AddServiceDiscovery().AddLegacyServiceAuthentication();
+builder.Services.AddHttpClient<IInvoiceCreationFileClient, ReceiptFileClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["Services:File"] ?? "https+http://legacy-maliev-file-service");
+    client.Timeout = TimeSpan.FromMinutes(5);
+}).AddServiceDiscovery().AddLegacyServiceAuthentication();
+builder.Services.AddHttpClient<IInvoiceCreationNotificationClient, ReceiptNotificationClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["Services:Notification"] ?? "https+http://legacy-maliev-notification-service");
+    client.Timeout = TimeSpan.FromSeconds(30);
+}).AddServiceDiscovery().AddLegacyServiceAuthentication();
+builder.Services.AddHttpClient<IInvoiceQuotationCompletionClient, InvoiceQuotationCompletionClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["Services:Quotation"] ?? "https+http://legacy-maliev-quotation-service");
+    client.Timeout = TimeSpan.FromSeconds(30);
+}).AddServiceDiscovery().AddLegacyServiceAuthentication();
+AddInvoiceSourceClient(InvoiceCreationSourceClient.QuotationClient, "Services:Quotation", "https+http://legacy-maliev-quotation-service");
+AddInvoiceSourceClient(InvoiceCreationSourceClient.CustomerClient, "Services:Customer", "https+http://legacy-maliev-customer-service");
+AddInvoiceSourceClient(InvoiceCreationSourceClient.EmployeeClient, "Services:Employee", "https+http://legacy-maliev-employee-service");
+AddInvoiceSourceClient(InvoiceCreationSourceClient.CatalogClient, "Services:Catalog", "https+http://legacy-maliev-catalog-service");
 
 var app = builder.Build();
 app.UseStandardMiddleware();
@@ -75,5 +104,14 @@ app.MapDefaultEndpoints("accounting");
 app.MapControllers();
 app.MapApiDocumentation(servicePrefix: "accounting");
 await app.RunAsync();
+
+void AddInvoiceSourceClient(string name, string configurationKey, string fallback)
+{
+    builder.Services.AddHttpClient(name, client =>
+    {
+        client.BaseAddress = new Uri(builder.Configuration[configurationKey] ?? fallback);
+        client.Timeout = TimeSpan.FromSeconds(30);
+    }).AddServiceDiscovery().AddLegacyServiceAuthentication();
+}
 
 public partial class Program;

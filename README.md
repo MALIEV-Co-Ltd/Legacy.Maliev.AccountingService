@@ -26,6 +26,14 @@ employee signature from EmployeeService, then downloads only the malware-scanned
 bounded Google Cloud Storage signed URL. Workload authentication uses the shared ServiceDefaults
 token exchange and never forwards an inbound user bearer token.
 
+Quotation-to-invoice creation is likewise server owned. The preview route derives customer,
+employee, currency, addresses, totals, withholding tax, and immutable line items from their source
+services. Creation accepts only editable invoice fields plus a caller-stable UUID, atomically writes
+the existing Invoice and OrderItem tables, accepts and links the quotation, renders the QuestPDF
+invoice, stores it through FileService, and optionally sends it through NotificationService. Redis
+replay protection and a PostgreSQL advisory lock reconcile interrupted requests without a database
+schema change; a reconciled invoice is not automatically re-emailed when delivery outcome is unknown.
+
 ## Data boundaries
 
 - Planned `legacy-postgres-accounting` cluster in namespace `maliev-legacy`, using the existing

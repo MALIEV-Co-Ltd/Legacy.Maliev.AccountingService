@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Legacy.Maliev.AccountingService.Application.Interfaces;
 using Legacy.Maliev.AccountingService.Application.Models;
+using Legacy.Maliev.AccountingService.Domain.Invoice;
 using Legacy.Maliev.AccountingService.Domain.Receipt;
 
 namespace Legacy.Maliev.AccountingService.Data;
@@ -111,7 +112,7 @@ public sealed class ReceiptDocumentClient(HttpClient httpClient) : IReceiptDocum
 }
 
 /// <summary>Authenticated client for malware-scanned receipt storage.</summary>
-public sealed class ReceiptFileClient(HttpClient httpClient, IHttpClientFactory httpClientFactory) : IReceiptFileClient
+public sealed class ReceiptFileClient(HttpClient httpClient, IHttpClientFactory httpClientFactory) : IReceiptFileClient, IInvoiceCreationFileClient
 {
     public const string ObjectDownloadClientName = "ReceiptObjectDownload";
     private const int MaximumMetadataBytes = 64 * 1024;
@@ -170,6 +171,12 @@ public sealed class ReceiptFileClient(HttpClient httpClient, IHttpClientFactory 
         var stored = result?.Object?.SingleOrDefault()
             ?? throw new ReceiptWorkflowDependencyException("FileService returned an invalid upload response.");
         return new ReceiptStoredFile(stored.Bucket, stored.ObjectName);
+    }
+
+    async Task<InvoiceCreationStoredFile> IInvoiceCreationFileClient.UploadAsync(string bucket, string path, string fileName, byte[] content, Guid operationId, CancellationToken cancellationToken)
+    {
+        var stored = await UploadAsync(bucket, path, fileName, content, operationId, cancellationToken);
+        return new InvoiceCreationStoredFile(stored.Bucket, stored.ObjectName);
     }
 
     /// <inheritdoc />
@@ -354,7 +361,7 @@ public sealed class ReceiptSignatureClient(HttpClient httpClient, IReceiptFileCl
 }
 
 /// <summary>Authenticated client for idempotent receipt email delivery.</summary>
-public sealed class ReceiptNotificationClient(HttpClient httpClient) : IReceiptNotificationClient
+public sealed class ReceiptNotificationClient(HttpClient httpClient) : IReceiptNotificationClient, IInvoiceCreationNotificationClient
 {
     private const int MaximumResponseBytes = 32 * 1024;
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web)
@@ -420,4 +427,33 @@ public sealed class ReceiptNotificationClient(HttpClient httpClient) : IReceiptN
     }
 
     private sealed record NotificationResult(string? ProviderMessageId);
+
+    async Task<string?> IInvoiceCreationNotificationClient.SendAsync(string email, string customerName, Invoice invoice, byte[] pdf, Guid operationId, CancellationToken cancellationToken)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Post, "/notifications/v1/email/Info")
+        {
+            Content = JsonContent.Create(new
+            {
+                to = email,
+                subject = $"Invoice for your quotation [Invoice no. {invoice.Number}]",
+                body = InvoiceBody(customerName),
+                bcc = new[] { "mail-tracking@maliev.com" },
+                attachments = new[] { new { fileName = $"invoice_{invoice.Number}.pdf", contentType = MediaTypeNames.Application.Pdf, content = pdf } },
+            }),
+        };
+        request.Headers.Add("Idempotency-Key", operationId.ToString("D"));
+        using var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+        if (!response.IsSuccessStatusCode) throw new InvoiceCreationDependencyException($"NotificationService rejected the invoice operation with status {(int)response.StatusCode}.");
+        var bytes = await ReceiptDocumentClient.ReadBoundedAsync(response.Content, MaximumResponseBytes, "NotificationService", cancellationToken);
+        return JsonSerializer.Deserialize<NotificationResult>(bytes, Json)?.ProviderMessageId;
+    }
+
+    private static string InvoiceBody(string customerName)
+    {
+        var name = WebUtility.HtmlEncode(customerName);
+        return $"<div>Hello {name},</div><div>&nbsp;</div><div>Thank you for accepting our quoted amount.</div>" +
+            "<div>You'll find the payable invoice for your orders attached with this email.</div><div>&nbsp;</div>" +
+            "<div>The production of your orders will start as soon as the payable amount is received.</div>" +
+            "<div>&nbsp;</div><div>Best regards,</div><div>Maliev Co., Ltd.</div>";
+    }
 }
