@@ -23,21 +23,14 @@ public sealed class InvoicesController(IAccountingService service, IIdempotencyS
             return await Get(id, cancellationToken);
         }
 
-        var page = await Service.GetInvoicesAsync(null, invoice, 1, 2, cancellationToken);
+        var page = await Service.GetInvoicesAsync(null, null, invoice, null, 1, 2, cancellationToken);
         var match = page?.Items.SingleOrDefault(value => string.Equals(value.Number, invoice, StringComparison.OrdinalIgnoreCase));
         return match is null ? NotFound() : match;
     }
     [HttpGet, HttpGet("customers/{customerId:int}"), RequirePermission(AccountingPermissions.Read, RequireLiveCheck = true)]
-    public async Task<ActionResult<PaginatedResponse<Domain.Invoice.Invoice>>> GetPaginatedAsync(int? customerId, string? sort, string? search, int? index, int? size, bool? paid, CancellationToken cancellationToken)
+    public async Task<ActionResult<PaginatedResponse<Domain.Invoice.Invoice>>> GetPaginatedAsync(int? customerId, InvoiceSortType? sort, string? search, int? index, int? size, bool? paid, CancellationToken cancellationToken)
     {
-        _ = sort;
-        var value = await Service.GetInvoicesAsync(customerId, search, index ?? 1, size ?? 20, cancellationToken);
-        if (value is not null && paid is not null)
-        {
-            var filtered = value.Items.Where(invoice => invoice.IsPaid == paid).ToList();
-            value = new PaginatedResponse<Domain.Invoice.Invoice>(filtered, value.PageIndex, value.TotalPages, filtered.Count);
-        }
-
+        var value = await Service.GetInvoicesAsync(customerId, sort, search, paid, index ?? 1, size ?? 20, cancellationToken);
         return value is null ? NotFound() : value;
     }
     [HttpPut("{id:int}"), RequirePermission(AccountingPermissions.Update, RequireLiveCheck = true)]
