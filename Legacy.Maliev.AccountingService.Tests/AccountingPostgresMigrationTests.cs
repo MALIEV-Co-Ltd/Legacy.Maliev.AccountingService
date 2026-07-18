@@ -217,6 +217,29 @@ public sealed class AccountingPostgresMigrationTests : IAsyncLifetime
         await using var secondLease = await secondLock.AcquireAsync(42, CancellationToken.None);
     }
 
+    [Fact]
+    public async Task InvoiceCreationStore_AtomicallyCreatesItemsAndReusesExistingFileLinkWithoutSchemaChange()
+    {
+        await using var context = InvoiceContext();
+        await context.Database.MigrateAsync();
+        var store = new InvoiceCreationStore(context, TimeProvider.System);
+        var marker = $"CREATE-{Guid.NewGuid():N}";
+
+        var invoice = await store.CreateAsync(
+            new Invoice { Number = marker, CustomerId = 42, Currency = "THB", Total = 107m },
+            [new InvoiceOrderItem { Description = "Thai fixture", Quantity = 2, UnitPrice = 50m }],
+            CancellationToken.None);
+        await store.LinkFileAsync(invoice.Id, "maliev.com", $"invoices/{invoice.Id}/invoice_{marker}.pdf", CancellationToken.None);
+        await store.LinkFileAsync(invoice.Id, "maliev.com", $"invoices/{invoice.Id}/invoice_{marker}.pdf", CancellationToken.None);
+        context.ChangeTracker.Clear();
+
+        var found = await store.FindByNumberAsync(marker, CancellationToken.None);
+        Assert.Equal(invoice.Id, found?.Id);
+        Assert.Single(await context.Items.Where(value => value.InvoiceId == invoice.Id).ToListAsync());
+        Assert.Single(await context.Files.Where(value => value.InvoiceId == invoice.Id).ToListAsync());
+        Assert.Equal(3, await TableCount(context));
+    }
+
     private static async Task<int> TableCount(DbContext context) =>
         await context.Database.SqlQueryRaw<int>("SELECT COUNT(*)::int AS \"Value\" FROM information_schema.tables WHERE table_schema = 'public' AND table_name <> '__EFMigrationsHistory'").SingleAsync();
 

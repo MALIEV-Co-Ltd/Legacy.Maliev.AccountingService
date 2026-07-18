@@ -61,7 +61,7 @@ public sealed class ReceiptWorkflowControllerContractTests
     {
         var program = File.ReadAllText(FindRepositoryFile("Legacy.Maliev.AccountingService.Api", "Program.cs"));
         Assert.Contains("AddLegacyAuthServiceTokenExchange", program, StringComparison.Ordinal);
-        Assert.Equal(5, Count(program, ".AddLegacyServiceAuthentication()"));
+        Assert.Equal(10, Count(program, ".AddLegacyServiceAuthentication()"));
         Assert.DoesNotContain("Authorization =", program, StringComparison.Ordinal);
     }
 
