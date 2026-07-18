@@ -10,6 +10,14 @@ idempotency, conditional updates, and local .NET logging focused on warnings and
 amounts retain decimal precision; invoice/receipt line subtotals and receipt amount paid remain
 database-generated values.
 
+## Architecture
+
+The service uses clean dependency direction: `Api` calls `Application`, domain rules live in
+`Domain`, and PostgreSQL/Redis adapters live in `Data`. It depends only on the public
+`Legacy.Maliev.ServiceDefaults` and `Legacy.Maliev.CompatibilityContracts` source repositories
+during CI and image builds, so the legacy runtime does not consume new-platform shared-library
+source or private package credentials.
+
 ## Data boundaries
 
 - Planned `legacy-postgres-accounting` cluster in namespace `maliev-legacy`, using the existing
