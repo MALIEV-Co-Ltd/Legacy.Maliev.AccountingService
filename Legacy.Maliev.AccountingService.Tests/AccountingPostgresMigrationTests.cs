@@ -156,6 +156,67 @@ public sealed class AccountingPostgresMigrationTests : IAsyncLifetime
         Assert.Equal(created[1].Id, Assert.Single(byReceipt!.Items).Id);
     }
 
+    [Fact]
+    public async Task ReceiptWorkflowStore_ReconcilesAcrossExistingInvoiceAndReceiptSchemasWithoutMigration()
+    {
+        await using var invoiceContext = InvoiceContext();
+        await using var receiptContext = ReceiptContext();
+        await Task.WhenAll(invoiceContext.Database.MigrateAsync(), receiptContext.Database.MigrateAsync());
+        var marker = $"WF-{Guid.NewGuid():N}";
+        var invoice = new Invoice
+        {
+            Number = marker,
+            CustomerId = 42,
+            Currency = "THB",
+            IsPaid = true,
+            PaymentDate = new DateTime(2026, 7, 18, 0, 0, 0, DateTimeKind.Utc),
+            Subtotal = 100m,
+            Vat = 7m,
+            Total = 107m,
+            Outstanding = 107m,
+        };
+        invoiceContext.Add(invoice);
+        await invoiceContext.SaveChangesAsync();
+        invoiceContext.Add(new InvoiceOrderItem { InvoiceId = invoice.Id, Description = "Print", Quantity = 1, UnitPrice = 100m });
+        await invoiceContext.SaveChangesAsync();
+        var store = new ReceiptWorkflowStore(invoiceContext, receiptContext, TimeProvider.System);
+
+        var before = await store.GetAsync(invoice.Id, CancellationToken.None);
+        var receipt = await store.CreateReceiptAsync(before.Invoice, before.InvoiceItems, "paid", CancellationToken.None);
+        await store.LinkInvoiceAsync(invoice.Id, receipt.Id, CancellationToken.None);
+        await store.LinkFileAsync(receipt.Id, "maliev.com", $"receipts/{receipt.Id}/receipt_{receipt.Id}.pdf", CancellationToken.None);
+        await store.LinkFileAsync(receipt.Id, "maliev.com", $"receipts/{receipt.Id}/receipt_{receipt.Id}.pdf", CancellationToken.None);
+
+        var reconciled = await store.GetAsync(invoice.Id, CancellationToken.None);
+        Assert.Equal(receipt.Id, reconciled.Invoice.ReceiptId);
+        Assert.Single(reconciled.ReceiptItems);
+        Assert.Single(reconciled.ReceiptFiles);
+
+        await store.DeleteReceiptAsync(receipt.Id, CancellationToken.None);
+        await store.UnlinkInvoiceAsync(invoice.Id, receipt.Id, CancellationToken.None);
+        var removed = await store.GetAsync(invoice.Id, CancellationToken.None);
+        Assert.Null(removed.Invoice.ReceiptId);
+        Assert.Null(removed.Receipt);
+    }
+
+    [Fact]
+    public async Task ReceiptOperationLock_SerializesTheSameInvoiceAcrossDatabaseConnections()
+    {
+        await using var firstContext = InvoiceContext();
+        await using var secondContext = InvoiceContext();
+        await firstContext.Database.MigrateAsync();
+        var firstLock = new PostgresReceiptOperationLock(firstContext);
+        var secondLock = new PostgresReceiptOperationLock(secondContext);
+
+        var firstLease = await firstLock.AcquireAsync(42, CancellationToken.None);
+        using var blockedAttempt = new CancellationTokenSource(TimeSpan.FromMilliseconds(250));
+        await Assert.ThrowsAsync<ReceiptWorkflowDependencyException>(async () =>
+            await secondLock.AcquireAsync(42, blockedAttempt.Token));
+
+        await firstLease.DisposeAsync();
+        await using var secondLease = await secondLock.AcquireAsync(42, CancellationToken.None);
+    }
+
     private static async Task<int> TableCount(DbContext context) =>
         await context.Database.SqlQueryRaw<int>("SELECT COUNT(*)::int AS \"Value\" FROM information_schema.tables WHERE table_schema = 'public' AND table_name <> '__EFMigrationsHistory'").SingleAsync();
 
