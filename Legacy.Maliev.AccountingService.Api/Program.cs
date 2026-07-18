@@ -1,11 +1,13 @@
 using System.Text.Json.Serialization;
 using Legacy.Maliev.AccountingService.Application.Interfaces;
+using Legacy.Maliev.AccountingService.Application.Services;
 using Legacy.Maliev.AccountingService.Data;
 using Maliev.Aspire.ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 builder.AddDefaultApiVersioning();
+builder.AddLegacyAuthServiceTokenExchange();
 builder.AddPostgresDbContext<PaymentDbContext>(connectionName: "PaymentDbContext");
 builder.AddPostgresDbContext<InvoiceDbContext>(connectionName: "InvoiceDbContext");
 builder.AddPostgresDbContext<ReceiptDbContext>(connectionName: "ReceiptDbContext");
@@ -27,6 +29,42 @@ builder.Services.AddScoped<DistributedAccountingCache>();
 builder.Services.AddScoped<IAccountingCache>(provider => provider.GetRequiredService<DistributedAccountingCache>());
 builder.Services.AddScoped<IIdempotencyStore>(provider => provider.GetRequiredService<DistributedAccountingCache>());
 builder.Services.AddScoped<IAccountingService, AccountingRepository>();
+builder.Services.AddScoped<IReceiptWorkflowStore, ReceiptWorkflowStore>();
+builder.Services.AddScoped<IReceiptOperationLock, PostgresReceiptOperationLock>();
+builder.Services.AddScoped<IReceiptOperationJournal, ReceiptOperationJournal>();
+builder.Services.AddScoped<IReceiptWorkflow, ReceiptWorkflowService>();
+builder.Services.AddHttpClient<IReceiptDocumentClient, ReceiptDocumentClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["Services:Document"]
+        ?? "https+http://legacy-maliev-document-service");
+    client.Timeout = TimeSpan.FromSeconds(30);
+}).AddServiceDiscovery().AddLegacyServiceAuthentication();
+builder.Services.AddHttpClient<IReceiptFileClient, ReceiptFileClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["Services:File"]
+        ?? "https+http://legacy-maliev-file-service");
+    client.Timeout = TimeSpan.FromMinutes(5);
+}).AddServiceDiscovery().AddLegacyServiceAuthentication();
+builder.Services.AddHttpClient(ReceiptFileClient.ObjectDownloadClientName)
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false });
+builder.Services.AddHttpClient<IReceiptNotificationClient, ReceiptNotificationClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["Services:Notification"]
+        ?? "https+http://legacy-maliev-notification-service");
+    client.Timeout = TimeSpan.FromSeconds(30);
+}).AddServiceDiscovery().AddLegacyServiceAuthentication();
+builder.Services.AddHttpClient<IReceiptCustomerClient, ReceiptCustomerClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["Services:Customer"]
+        ?? "https+http://legacy-maliev-customer-service");
+    client.Timeout = TimeSpan.FromSeconds(30);
+}).AddServiceDiscovery().AddLegacyServiceAuthentication();
+builder.Services.AddHttpClient<IReceiptSignatureClient, ReceiptSignatureClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["Services:Employee"]
+        ?? "https+http://legacy-maliev-employee-service");
+    client.Timeout = TimeSpan.FromSeconds(30);
+}).AddServiceDiscovery().AddLegacyServiceAuthentication();
 
 var app = builder.Build();
 app.UseStandardMiddleware();

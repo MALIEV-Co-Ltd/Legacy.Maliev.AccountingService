@@ -15,6 +15,8 @@ public sealed class ReceiptWorkflowService(
     IReceiptDocumentClient documents,
     IReceiptFileClient files,
     IReceiptNotificationClient notifications,
+    IReceiptCustomerClient customers,
+    IReceiptSignatureClient signatures,
     IReceiptOperationJournal journal,
     IReceiptOperationLock operationLock) : IReceiptWorkflow
 {
@@ -28,6 +30,7 @@ public sealed class ReceiptWorkflowService(
         CancellationToken cancellationToken)
     {
         ValidateOperation(invoiceId, operationId);
+        ValidateEmployee(request.EmployeeId);
         var scope = $"create:{invoiceId}";
         var replay = await journal.GetAsync(scope, operationId, cancellationToken);
         if (replay is not null)
@@ -58,24 +61,30 @@ public sealed class ReceiptWorkflowService(
             receipt,
             receiptItems,
             snapshot.ReceiptFiles,
-            request.Signature,
+            request.EmployeeId,
+            operationId,
             cancellationToken);
 
         var emailState = ReceiptEmailState.NotRequested;
         string? messageId = null;
         if (request.SendEmail)
         {
-            RequireRecipient(request.CustomerEmail, request.CustomerName);
             if (reconciled)
             {
                 emailState = ReceiptEmailState.ExplicitRetryRequired;
             }
             else
             {
-                pdf ??= await documents.RenderAsync(receipt, receiptItems, request.Signature, cancellationToken);
+                var customer = await customers.GetAsync(snapshot.Invoice.CustomerId, cancellationToken);
+                if (pdf is null)
+                {
+                    var signature = await signatures.GetAsync(request.EmployeeId, cancellationToken);
+                    pdf = await documents.RenderAsync(receipt, receiptItems, signature, cancellationToken);
+                }
+
                 messageId = await notifications.SendAsync(
-                    request.CustomerEmail!,
-                    request.CustomerName!,
+                    customer.Email,
+                    customer.Name,
                     receipt,
                     pdf,
                     operationId,
@@ -148,7 +157,7 @@ public sealed class ReceiptWorkflowService(
         CancellationToken cancellationToken)
     {
         ValidateOperation(invoiceId, operationId);
-        RequireRecipient(request.CustomerEmail, request.CustomerName);
+        ValidateEmployee(request.EmployeeId);
         var scope = $"email:{invoiceId}";
         var replay = await journal.GetAsync(scope, operationId, cancellationToken);
         if (replay is not null)
@@ -165,10 +174,12 @@ public sealed class ReceiptWorkflowService(
 
         var snapshot = await store.GetAsync(invoiceId, cancellationToken);
         var receipt = snapshot.Receipt ?? throw new ReceiptWorkflowNotFoundException("Invoice has no receipt to send.");
-        var pdf = await documents.RenderAsync(receipt, snapshot.ReceiptItems, request.Signature, cancellationToken);
+        var signature = await signatures.GetAsync(request.EmployeeId, cancellationToken);
+        var customer = await customers.GetAsync(snapshot.Invoice.CustomerId, cancellationToken);
+        var pdf = await documents.RenderAsync(receipt, snapshot.ReceiptItems, signature, cancellationToken);
         var messageId = await notifications.SendAsync(
-            request.CustomerEmail,
-            request.CustomerName,
+            customer.Email,
+            customer.Name,
             receipt,
             pdf,
             operationId,
@@ -187,7 +198,8 @@ public sealed class ReceiptWorkflowService(
         Receipt receipt,
         IReadOnlyList<ReceiptOrderItem> receiptItems,
         IReadOnlyList<ReceiptFile> linkedFiles,
-        byte[]? signature,
+        int employeeId,
+        Guid operationId,
         CancellationToken cancellationToken)
     {
         var path = $"receipts/{receipt.Id}";
@@ -201,6 +213,7 @@ public sealed class ReceiptWorkflowService(
             return (new ReceiptStoredFile(linked.Bucket, linked.ObjectName), null);
         }
 
+        var signature = await signatures.GetAsync(employeeId, cancellationToken);
         var pdf = await documents.RenderAsync(receipt, receiptItems, signature, cancellationToken);
         ReceiptStoredFile stored;
         if (await files.ExistsAsync(Bucket, objectName, cancellationToken))
@@ -209,7 +222,7 @@ public sealed class ReceiptWorkflowService(
         }
         else
         {
-            stored = await files.UploadAsync(Bucket, path, fileName, pdf, cancellationToken);
+            stored = await files.UploadAsync(Bucket, path, fileName, pdf, operationId, cancellationToken);
             if (!string.Equals(stored.Bucket, Bucket, StringComparison.Ordinal) ||
                 !string.Equals(stored.ObjectName, objectName, StringComparison.Ordinal))
             {
@@ -233,14 +246,6 @@ public sealed class ReceiptWorkflowService(
             ModifiedDate = item.ModifiedDate,
         }).ToArray();
 
-    private static void RequireRecipient(string? email, string? name)
-    {
-        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(name))
-        {
-            throw new ArgumentException("Customer email and name are required when sending a receipt.");
-        }
-    }
-
     private static void ValidateOperation(int invoiceId, Guid operationId)
     {
         if (invoiceId <= 0)
@@ -251,6 +256,14 @@ public sealed class ReceiptWorkflowService(
         if (operationId == Guid.Empty)
         {
             throw new ArgumentException("A stable operation UUID is required.", nameof(operationId));
+        }
+    }
+
+    private static void ValidateEmployee(int employeeId)
+    {
+        if (employeeId <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(employeeId), "A trusted employee identifier is required.");
         }
     }
 }

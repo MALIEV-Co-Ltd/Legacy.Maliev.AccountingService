@@ -24,9 +24,9 @@ public sealed class AccountingContractTests
             .Where(method => method.GetCustomAttributes<HttpMethodAttribute>().Any())
             .ToArray();
 
-        Assert.Equal(13, controllers.Length);
-        Assert.Equal(66, actions.Length);
-        Assert.Equal(67, actions.Sum(method => method.GetCustomAttributes<HttpMethodAttribute>().Count()));
+        Assert.Equal(14, controllers.Length);
+        Assert.Equal(69, actions.Length);
+        Assert.Equal(70, actions.Sum(method => method.GetCustomAttributes<HttpMethodAttribute>().Count()));
         Assert.All(controllers, type => Assert.NotNull(type.GetCustomAttribute<AuthorizeAttribute>()));
     }
 
