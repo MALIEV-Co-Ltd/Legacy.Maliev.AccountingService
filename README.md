@@ -1,7 +1,7 @@
 # Legacy.Maliev.AccountingService
 
 Public, sanitized .NET 10 extraction of the private legacy Payment, Invoice, and Receipt APIs. It
-preserves 66 controller actions and 67 route templates across `/payments`, `/invoices`, and
+preserves the extracted controller contracts across `/payments`, `/invoices`, and
 `/receipts`, while deliberately excluding payment-provider execution. The future Omise/Opn
 implementation remains owned by the separate new `Maliev.PaymentService`.
 
@@ -17,6 +17,14 @@ The service uses clean dependency direction: `Api` calls `Application`, domain r
 `Legacy.Maliev.ServiceDefaults` and `Legacy.Maliev.CompatibilityContracts` source repositories
 during CI and image builds, so the legacy runtime does not consume new-platform shared-library
 source or private package credentials.
+
+Receipt creation, reconciliation, removal, and explicit email delivery are owned by Accounting at
+`/invoices/{invoiceId}/receipt`. Mutations require a caller-stable UUID `Idempotency-Key`; create
+and email also require the BFF-derived `X-Legacy-Employee-Id`. Recipient and signature data are
+never accepted from WASM: Accounting resolves the invoice customer from CustomerService and the
+employee signature from EmployeeService, then downloads only the malware-scanned object through a
+bounded Google Cloud Storage signed URL. Workload authentication uses the shared ServiceDefaults
+token exchange and never forwards an inbound user bearer token.
 
 ## Data boundaries
 

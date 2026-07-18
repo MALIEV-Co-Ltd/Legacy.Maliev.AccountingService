@@ -7,15 +7,13 @@ namespace Legacy.Maliev.AccountingService.Application.Models;
 public sealed record CreateReceiptRequest(
     string? Comment,
     bool SendEmail,
-    string? CustomerEmail,
-    string? CustomerName,
-    byte[]? Signature);
+    int EmployeeId);
 
 /// <summary>Server-owned input for an explicit receipt email retry.</summary>
-public sealed record SendReceiptEmailRequest(
-    string CustomerEmail,
-    string CustomerName,
-    byte[]? Signature);
+public sealed record SendReceiptEmailRequest(int EmployeeId);
+
+/// <summary>Customer contact resolved from the invoice-owned customer identifier.</summary>
+public sealed record ReceiptCustomerContact(string Email, string Name);
 
 /// <summary>Observable receipt workflow state.</summary>
 public enum ReceiptWorkflowState
@@ -65,3 +63,6 @@ public sealed class ReceiptWorkflowDependencyException(string message, Exception
 /// <summary>Signals that the requested invoice or receipt does not exist.</summary>
 public sealed class ReceiptWorkflowNotFoundException(string message) : Exception(message);
 
+/// <summary>Signals that required coordination or workload authentication is temporarily unavailable.</summary>
+public sealed class ReceiptWorkflowUnavailableException(string message, Exception? innerException = null)
+    : Exception(message, innerException);

@@ -45,9 +45,25 @@ public interface IReceiptFileClient
     /// <summary>Checks whether deterministic clean-object metadata already exists.</summary>
     Task<bool> ExistsAsync(string bucket, string objectName, CancellationToken cancellationToken);
     /// <summary>Uploads one PDF through quarantine and malware scanning.</summary>
-    Task<ReceiptStoredFile> UploadAsync(string bucket, string path, string fileName, byte[] content, CancellationToken cancellationToken);
+    Task<ReceiptStoredFile> UploadAsync(string bucket, string path, string fileName, byte[] content, Guid operationId, CancellationToken cancellationToken);
     /// <summary>Deletes an object or reconciles an already-missing object as success.</summary>
     Task DeleteAsync(string bucket, string objectName, CancellationToken cancellationToken);
+    /// <summary>Downloads a clean object through a bounded, non-authenticated signed URL.</summary>
+    Task<byte[]> DownloadAsync(string bucket, string objectName, int maximumBytes, CancellationToken cancellationToken);
+}
+
+/// <summary>Resolves receipt-delivery contact from CustomerService.</summary>
+public interface IReceiptCustomerClient
+{
+    /// <summary>Gets the authoritative contact for an invoice-owned customer.</summary>
+    Task<ReceiptCustomerContact> GetAsync(int customerId, CancellationToken cancellationToken);
+}
+
+/// <summary>Resolves the authenticated employee's current signature from owned metadata.</summary>
+public interface IReceiptSignatureClient
+{
+    /// <summary>Gets a bounded clean signature, or null when the employee has no signature.</summary>
+    Task<byte[]?> GetAsync(int employeeId, CancellationToken cancellationToken);
 }
 
 /// <summary>Transactional receipt email boundary.</summary>
@@ -72,4 +88,3 @@ public interface IReceiptOperationJournal
     /// <summary>Stores a completed operation response.</summary>
     Task SetAsync(string scope, Guid operationId, ReceiptWorkflowResult result, CancellationToken cancellationToken);
 }
-

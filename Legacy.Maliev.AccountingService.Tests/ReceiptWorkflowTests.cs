@@ -29,17 +29,19 @@ public sealed class ReceiptWorkflowTests
             .ReturnsAsync(new byte[] { 1, 2, 3 });
         var files = new Mock<IReceiptFileClient>(MockBehavior.Strict);
         files.Setup(value => value.ExistsAsync("maliev.com", "receipts/91/receipt_91.pdf", It.IsAny<CancellationToken>())).ReturnsAsync(false);
-        files.Setup(value => value.UploadAsync("maliev.com", "receipts/91", "receipt_91.pdf", new byte[] { 1, 2, 3 }, It.IsAny<CancellationToken>()))
+        files.Setup(value => value.UploadAsync("maliev.com", "receipts/91", "receipt_91.pdf", new byte[] { 1, 2, 3 }, OperationId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ReceiptStoredFile("maliev.com", "receipts/91/receipt_91.pdf"));
         var notifications = new Mock<IReceiptNotificationClient>(MockBehavior.Strict);
         notifications.Setup(value => value.SendAsync(
                 "customer@example.com", "Customer", receipt, new byte[] { 1, 2, 3 }, OperationId, It.IsAny<CancellationToken>()))
             .ReturnsAsync("message-id");
         var journal = Journal();
+        var customers = Customer();
+        var signatures = Signature();
 
-        var result = await Workflow(store, documents, files, notifications, journal).CreateAsync(
+        var result = await Workflow(store, documents, files, notifications, journal, customers, signatures).CreateAsync(
             42,
-            new CreateReceiptRequest("paid", true, "customer@example.com", "Customer", [7]),
+            new CreateReceiptRequest("paid", true, 12),
             OperationId,
             CancellationToken.None);
 
@@ -66,16 +68,16 @@ public sealed class ReceiptWorkflowTests
         files.Setup(value => value.ExistsAsync("maliev.com", "receipts/91/receipt_91.pdf", It.IsAny<CancellationToken>())).ReturnsAsync(true);
         var notifications = new Mock<IReceiptNotificationClient>(MockBehavior.Strict);
 
-        var result = await Workflow(store, documents, files, notifications, Journal()).CreateAsync(
+        var result = await Workflow(store, documents, files, notifications, Journal(), Customer(), Signature()).CreateAsync(
             42,
-            new CreateReceiptRequest("paid", true, "customer@example.com", "Customer", [7]),
+            new CreateReceiptRequest("paid", true, 12),
             OperationId,
             CancellationToken.None);
 
         Assert.Equal(ReceiptWorkflowState.Reconciled, result.State);
         Assert.Equal(ReceiptEmailState.ExplicitRetryRequired, result.EmailState);
         notifications.VerifyNoOtherCalls();
-        files.Verify(value => value.UploadAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<byte[]>(), It.IsAny<CancellationToken>()), Times.Never);
+        files.Verify(value => value.UploadAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<byte[]>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -91,7 +93,7 @@ public sealed class ReceiptWorkflowTests
         var files = new Mock<IReceiptFileClient>(MockBehavior.Strict);
         files.Setup(value => value.DeleteAsync("maliev.com", "receipts/91/receipt_91.pdf", It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
-        var result = await Workflow(store, new(), files, new(), Journal()).RemoveAsync(42, OperationId, CancellationToken.None);
+        var result = await Workflow(store, new(), files, new(), Journal(), new(), new()).RemoveAsync(42, OperationId, CancellationToken.None);
 
         Assert.Equal(ReceiptWorkflowState.Removed, result.State);
         store.VerifyAll();
@@ -102,8 +104,25 @@ public sealed class ReceiptWorkflowTests
         Mock<IReceiptDocumentClient> documents,
         Mock<IReceiptFileClient> files,
         Mock<IReceiptNotificationClient> notifications,
-        Mock<IReceiptOperationJournal> journal) =>
-        new(store.Object, documents.Object, files.Object, notifications.Object, journal.Object, new NoopLock());
+        Mock<IReceiptOperationJournal> journal,
+        Mock<IReceiptCustomerClient> customers,
+        Mock<IReceiptSignatureClient> signatures) =>
+        new(store.Object, documents.Object, files.Object, notifications.Object, customers.Object, signatures.Object, journal.Object, new NoopLock());
+
+    private static Mock<IReceiptCustomerClient> Customer()
+    {
+        var customer = new Mock<IReceiptCustomerClient>(MockBehavior.Strict);
+        customer.Setup(value => value.GetAsync(7, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ReceiptCustomerContact("customer@example.com", "Customer"));
+        return customer;
+    }
+
+    private static Mock<IReceiptSignatureClient> Signature()
+    {
+        var signature = new Mock<IReceiptSignatureClient>(MockBehavior.Strict);
+        signature.Setup(value => value.GetAsync(12, It.IsAny<CancellationToken>())).ReturnsAsync(new byte[] { 7 });
+        return signature;
+    }
 
     private static Mock<IReceiptOperationJournal> Journal()
     {

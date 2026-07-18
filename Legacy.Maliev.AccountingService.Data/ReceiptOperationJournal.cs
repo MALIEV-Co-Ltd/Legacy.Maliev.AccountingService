@@ -21,20 +21,45 @@ public sealed class ReceiptOperationJournal(IDistributedCache cache) : IReceiptO
         Guid operationId,
         CancellationToken cancellationToken)
     {
-        var value = await cache.GetAsync(Key(scope, operationId), cancellationToken);
-        return value is null ? null : JsonSerializer.Deserialize<ReceiptWorkflowResult>(value, JsonOptions);
+        try
+        {
+            var value = await cache.GetAsync(Key(scope, operationId), cancellationToken);
+            return value is null ? null : JsonSerializer.Deserialize<ReceiptWorkflowResult>(value, JsonOptions);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception exception)
+        {
+            throw new ReceiptWorkflowUnavailableException("Receipt operation replay protection is unavailable.", exception);
+        }
     }
 
     /// <inheritdoc />
-    public Task SetAsync(
+    public async Task SetAsync(
         string scope,
         Guid operationId,
         ReceiptWorkflowResult result,
-        CancellationToken cancellationToken) => cache.SetAsync(
-            Key(scope, operationId),
-            JsonSerializer.SerializeToUtf8Bytes(result, JsonOptions),
-            new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(7) },
-            cancellationToken);
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await cache.SetAsync(
+                Key(scope, operationId),
+                JsonSerializer.SerializeToUtf8Bytes(result, JsonOptions),
+                new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(7) },
+                cancellationToken);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception exception)
+        {
+            throw new ReceiptWorkflowUnavailableException("Receipt operation replay protection is unavailable.", exception);
+        }
+    }
 
     private static string Key(string scope, Guid operationId)
     {
@@ -42,4 +67,3 @@ public sealed class ReceiptOperationJournal(IDistributedCache cache) : IReceiptO
         return $"receipt-operation:{scope}:{hash}";
     }
 }
-
