@@ -1,4 +1,5 @@
 using Legacy.Maliev.AccountingService.Application.Interfaces;
+using Legacy.Maliev.AccountingService.Application.Models;
 using Legacy.Maliev.AccountingService.Data;
 using Legacy.Maliev.AccountingService.Domain.Invoice;
 using Legacy.Maliev.AccountingService.Domain.Payment;
@@ -96,6 +97,63 @@ public sealed class AccountingPostgresMigrationTests : IAsyncLifetime
         Assert.Equal(6, await TableCount(paymentContext));
         Assert.Equal(3, await TableCount(invoiceContext));
         Assert.Equal(3, await TableCount(receiptContext));
+    }
+
+    [Fact]
+    public async Task InvoiceQuery_AppliesPaidSearchAndSortBeforePagination()
+    {
+        await using var paymentContext = PaymentContext();
+        await using var invoiceContext = InvoiceContext();
+        await using var receiptContext = ReceiptContext();
+        await Task.WhenAll(
+            paymentContext.Database.MigrateAsync(),
+            invoiceContext.Database.MigrateAsync(),
+            receiptContext.Database.MigrateAsync());
+        var repository = Repository(paymentContext, invoiceContext, receiptContext);
+        var marker = $"PAGE-{Guid.NewGuid():N}";
+        var created = new[]
+        {
+            new Invoice { Number = $"{marker}-A", CustomerId = 42, IsPaid = true, ReceiptId = 910001, CreatedDate = new DateTime(2026, 1, 3, 0, 0, 0, DateTimeKind.Utc) },
+            new Invoice { Number = $"{marker}-B", CustomerId = 42, IsPaid = false, ReceiptId = 910002, CreatedDate = new DateTime(2026, 1, 2, 0, 0, 0, DateTimeKind.Utc) },
+            new Invoice { Number = $"{marker}-C", CustomerId = 42, IsPaid = true, ReceiptId = 910003, CreatedDate = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+            new Invoice { Number = $"{marker}-D", CustomerId = 42, IsPaid = true, ReceiptId = 910004, CreatedDate = new DateTime(2026, 1, 2, 0, 0, 0, DateTimeKind.Utc) },
+        };
+        invoiceContext.Invoices.AddRange(created);
+        await invoiceContext.SaveChangesAsync();
+        invoiceContext.ChangeTracker.Clear();
+
+        var first = await repository.GetInvoicesAsync(
+            42,
+            InvoiceSortType.InvoiceCreatedDate_Ascending,
+            marker,
+            true,
+            1,
+            2,
+            CancellationToken.None);
+        var second = await repository.GetInvoicesAsync(
+            42,
+            InvoiceSortType.InvoiceCreatedDate_Ascending,
+            marker,
+            true,
+            2,
+            2,
+            CancellationToken.None);
+        var byReceipt = await repository.GetInvoicesAsync(
+            null,
+            null,
+            "910002",
+            null,
+            1,
+            10,
+            CancellationToken.None);
+
+        Assert.NotNull(first);
+        Assert.Equal(3, first.TotalRecords);
+        Assert.Equal(2, first.TotalPages);
+        Assert.Equal([created[2].Id, created[3].Id], first.Items.Select(invoice => invoice.Id));
+        Assert.NotNull(second);
+        Assert.Equal([created[0].Id], second.Items.Select(invoice => invoice.Id));
+        Assert.Equal(created[1].Id, Assert.Single(byReceipt!.Items).Id);
     }
 
     private static async Task<int> TableCount(DbContext context) =>
