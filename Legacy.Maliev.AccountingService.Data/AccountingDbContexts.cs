@@ -42,8 +42,7 @@ public sealed class InvoiceDbContext(DbContextOptions<InvoiceDbContext> options)
         modelBuilder.Entity<InvoiceOrderItem>().Property(value => value.UnitPrice).HasPrecision(18, 2);
         modelBuilder.Entity<InvoiceOrderItem>().Property(value => value.Subtotal).HasPrecision(18, 2)
             .HasComputedColumnSql("(\"UnitPrice\" * \"Quantity\")::numeric(18,2)", stored: true);
-        modelBuilder.Entity<Invoice>().Property(value => value.Fob).HasColumnName("FOB");
-        modelBuilder.Entity<Invoice>().Property(value => value.Vat).HasColumnName("VAT").HasPrecision(18, 2);
+        modelBuilder.Entity<Invoice>().Property(value => value.Vat).HasPrecision(18, 2);
         modelBuilder.Entity<Invoice>().Property(value => value.Subtotal).HasPrecision(18, 2);
         modelBuilder.Entity<Invoice>().Property(value => value.Total).HasPrecision(18, 2);
         modelBuilder.Entity<Invoice>().Property(value => value.WithholdingTax).HasPrecision(18, 2);
@@ -103,8 +102,8 @@ file static class ModelRules
 
                 if (property.Name is "CreatedDate" or "ModifiedDate")
                 {
-                    property.SetColumnType("timestamp with time zone");
-                    property.SetDefaultValueSql("CURRENT_TIMESTAMP");
+                    property.SetColumnType("timestamp without time zone");
+                    property.SetDefaultValueSql("CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
                 }
             }
         }

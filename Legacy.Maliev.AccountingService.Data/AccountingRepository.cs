@@ -87,7 +87,8 @@ public sealed class AccountingRepository(
         SetDate(existing, "ModifiedDate", Now());
         if (expected is not null && context.Entry(existing).Metadata.FindProperty("ModifiedDate") is not null)
         {
-            context.Entry(existing).Property("ModifiedDate").OriginalValue = expected.Value.UtcDateTime;
+            context.Entry(existing).Property("ModifiedDate").OriginalValue =
+                DateTime.SpecifyKind(expected.Value.UtcDateTime, DateTimeKind.Unspecified);
         }
 
         try
@@ -364,7 +365,10 @@ public sealed class AccountingRepository(
         return (currentStart, currentEnd, previousStart, currentStart);
     }
 
-    private DateTime Now() => clock.GetUtcNow().UtcDateTime;
+    // CreatedDate/ModifiedDate are "timestamp without time zone" wall-clock columns storing the
+    // UTC instant with Kind stripped (matching the column's own CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+    // default); Npgsql rejects Kind=Utc values for that column type.
+    private DateTime Now() => DateTime.SpecifyKind(clock.GetUtcNow().UtcDateTime, DateTimeKind.Unspecified);
 
     private static string CacheKey<T>(int id) => $"{typeof(T).Name.ToLowerInvariant()}:{id}";
 

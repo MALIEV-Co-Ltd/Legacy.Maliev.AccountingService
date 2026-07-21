@@ -3,17 +3,20 @@ using System;
 using Legacy.Maliev.AccountingService.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Legacy.Maliev.AccountingService.Data.Migrations.Invoice
+namespace Legacy.Maliev.AccountingService.Data.Migrations.Receipt
 {
-    [DbContext(typeof(InvoiceDbContext))]
-    partial class InvoiceDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(ReceiptDbContext))]
+    [Migration("20260721024327_FixTimestampColumnType")]
+    partial class FixTimestampColumnType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,7 +25,7 @@ namespace Legacy.Maliev.AccountingService.Data.Migrations.Invoice
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Legacy.Maliev.AccountingService.Domain.Invoice.Invoice", b =>
+            modelBuilder.Entity("Legacy.Maliev.AccountingService.Domain.Receipt.Receipt", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -30,6 +33,12 @@ namespace Legacy.Maliev.AccountingService.Data.Migrations.Invoice
                         .HasColumnName("ID");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal?>("AmountPaid")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasComputedColumnSql("(\"Total\" - COALESCE(\"WithholdingTax\", 0))::numeric(18,2)", true);
 
                     b.Property<string>("BillingAddressBuilding")
                         .HasColumnType("text");
@@ -72,18 +81,12 @@ namespace Legacy.Maliev.AccountingService.Data.Migrations.Invoice
                     b.Property<string>("Currency")
                         .HasColumnType("text");
 
-                    b.Property<int>("CustomerId")
+                    b.Property<int?>("CustomerId")
                         .HasColumnType("integer")
                         .HasColumnName("CustomerID");
 
-                    b.Property<string>("Fob")
+                    b.Property<string>("InvoiceNumber")
                         .HasColumnType("text");
-
-                    b.Property<string>("InternalComment")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsPaid")
-                        .HasColumnType("boolean");
 
                     b.Property<DateTime?>("ModifiedDate")
                         .IsConcurrencyToken()
@@ -91,79 +94,24 @@ namespace Legacy.Maliev.AccountingService.Data.Migrations.Invoice
                         .HasColumnType("timestamp without time zone")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
 
-                    b.Property<string>("Number")
-                        .HasColumnType("text");
-
-                    b.Property<decimal?>("Outstanding")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
-
-                    b.Property<DateTime?>("PaymentDate")
+                    b.Property<DateTime>("PaymentDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("PurchaseOrderNumber")
-                        .HasColumnType("text");
-
-                    b.Property<int?>("ReceiptId")
-                        .HasColumnType("integer")
-                        .HasColumnName("ReceiptID");
-
-                    b.Property<string>("Requisitioner")
-                        .HasColumnType("text");
-
-                    b.Property<string>("SalesPerson")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ShippedVia")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ShippingAddressBuilding")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ShippingAddressCity")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ShippingAddressCompany")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ShippingAddressCountry")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ShippingAddressLine1")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ShippingAddressLine2")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ShippingAddressPostalCode")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ShippingAddressRecipient")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ShippingAddressRecipientTelephone")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ShippingAddressState")
-                        .HasColumnType("text");
-
-                    b.Property<decimal?>("Subtotal")
+                    b.Property<decimal>("Subtotal")
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)");
 
                     b.Property<string>("TaxIdentification")
                         .HasColumnType("text");
 
-                    b.Property<string>("Terms")
-                        .HasColumnType("text");
-
-                    b.Property<decimal?>("Total")
+                    b.Property<decimal>("Total")
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)");
 
-                    b.Property<decimal?>("Vat")
+                    b.Property<decimal>("Vat")
                         .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("VAT");
 
                     b.Property<decimal?>("WithholdingTax")
                         .HasPrecision(18, 2)
@@ -171,10 +119,10 @@ namespace Legacy.Maliev.AccountingService.Data.Migrations.Invoice
 
                     b.HasKey("Id");
 
-                    b.ToTable("Invoice");
+                    b.ToTable("Receipt");
                 });
 
-            modelBuilder.Entity("Legacy.Maliev.AccountingService.Domain.Invoice.InvoiceFile", b =>
+            modelBuilder.Entity("Legacy.Maliev.AccountingService.Domain.Receipt.ReceiptFile", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -191,10 +139,6 @@ namespace Legacy.Maliev.AccountingService.Data.Migrations.Invoice
                         .HasColumnType("timestamp without time zone")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
 
-                    b.Property<int>("InvoiceId")
-                        .HasColumnType("integer")
-                        .HasColumnName("InvoiceID");
-
                     b.Property<DateTime?>("ModifiedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
@@ -203,14 +147,18 @@ namespace Legacy.Maliev.AccountingService.Data.Migrations.Invoice
                     b.Property<string>("ObjectName")
                         .HasColumnType("text");
 
+                    b.Property<int>("ReceiptId")
+                        .HasColumnType("integer")
+                        .HasColumnName("ReceiptID");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("InvoiceId");
+                    b.HasIndex("ReceiptId");
 
-                    b.ToTable("InvoiceFile");
+                    b.ToTable("ReceiptFile");
                 });
 
-            modelBuilder.Entity("Legacy.Maliev.AccountingService.Domain.Invoice.InvoiceOrderItem", b =>
+            modelBuilder.Entity("Legacy.Maliev.AccountingService.Domain.Receipt.ReceiptOrderItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -227,10 +175,6 @@ namespace Legacy.Maliev.AccountingService.Data.Migrations.Invoice
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<int?>("InvoiceId")
-                        .HasColumnType("integer")
-                        .HasColumnName("InvoiceID");
-
                     b.Property<DateTime?>("ModifiedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
@@ -238,6 +182,10 @@ namespace Legacy.Maliev.AccountingService.Data.Migrations.Invoice
 
                     b.Property<int?>("Quantity")
                         .HasColumnType("integer");
+
+                    b.Property<int?>("ReceiptId")
+                        .HasColumnType("integer")
+                        .HasColumnName("ReceiptID");
 
                     b.Property<decimal?>("Subtotal")
                         .ValueGeneratedOnAddOrUpdate()
@@ -251,39 +199,39 @@ namespace Legacy.Maliev.AccountingService.Data.Migrations.Invoice
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InvoiceId");
+                    b.HasIndex("ReceiptId");
 
                     b.ToTable("OrderItem", (string)null);
                 });
 
-            modelBuilder.Entity("Legacy.Maliev.AccountingService.Domain.Invoice.InvoiceFile", b =>
+            modelBuilder.Entity("Legacy.Maliev.AccountingService.Domain.Receipt.ReceiptFile", b =>
                 {
-                    b.HasOne("Legacy.Maliev.AccountingService.Domain.Invoice.Invoice", "Invoice")
-                        .WithMany("InvoiceFiles")
-                        .HasForeignKey("InvoiceId")
+                    b.HasOne("Legacy.Maliev.AccountingService.Domain.Receipt.Receipt", "Receipt")
+                        .WithMany("ReceiptFile")
+                        .HasForeignKey("ReceiptId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired()
-                        .HasConstraintName("FK_InvoiceFile_Invoice");
+                        .HasConstraintName("FK_ReceiptFile_Receipt");
 
-                    b.Navigation("Invoice");
+                    b.Navigation("Receipt");
                 });
 
-            modelBuilder.Entity("Legacy.Maliev.AccountingService.Domain.Invoice.InvoiceOrderItem", b =>
+            modelBuilder.Entity("Legacy.Maliev.AccountingService.Domain.Receipt.ReceiptOrderItem", b =>
                 {
-                    b.HasOne("Legacy.Maliev.AccountingService.Domain.Invoice.Invoice", "Invoice")
-                        .WithMany("InvoiceOrderItems")
-                        .HasForeignKey("InvoiceId")
+                    b.HasOne("Legacy.Maliev.AccountingService.Domain.Receipt.Receipt", "Receipt")
+                        .WithMany("ReceiptOrderItem")
+                        .HasForeignKey("ReceiptId")
                         .OnDelete(DeleteBehavior.NoAction)
-                        .HasConstraintName("FK_OrderItem_Invoice");
+                        .HasConstraintName("FK_OrderItem_Receipt");
 
-                    b.Navigation("Invoice");
+                    b.Navigation("Receipt");
                 });
 
-            modelBuilder.Entity("Legacy.Maliev.AccountingService.Domain.Invoice.Invoice", b =>
+            modelBuilder.Entity("Legacy.Maliev.AccountingService.Domain.Receipt.Receipt", b =>
                 {
-                    b.Navigation("InvoiceFiles");
+                    b.Navigation("ReceiptFile");
 
-                    b.Navigation("InvoiceOrderItems");
+                    b.Navigation("ReceiptOrderItem");
                 });
 #pragma warning restore 612, 618
         }
