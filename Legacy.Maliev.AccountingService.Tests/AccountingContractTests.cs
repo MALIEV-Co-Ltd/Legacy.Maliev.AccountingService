@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text.Json;
 using Legacy.Maliev.AccountingService.Data;
+using Legacy.Maliev.AccountingService.Application.Models;
 using Legacy.Maliev.AccountingService.Domain.Invoice;
 using Legacy.Maliev.AccountingService.Domain.Payment;
 using Legacy.Maliev.AccountingService.Domain.Receipt;
@@ -23,10 +24,25 @@ public sealed class AccountingContractTests
             .Where(method => method.GetCustomAttributes<HttpMethodAttribute>().Any())
             .ToArray();
 
-        Assert.Equal(13, controllers.Length);
-        Assert.Equal(66, actions.Length);
-        Assert.Equal(67, actions.Sum(method => method.GetCustomAttributes<HttpMethodAttribute>().Count()));
+        Assert.Equal(15, controllers.Length);
+        Assert.Equal(71, actions.Length);
+        Assert.Equal(72, actions.Sum(method => method.GetCustomAttributes<HttpMethodAttribute>().Count()));
         Assert.All(controllers, type => Assert.NotNull(type.GetCustomAttribute<AuthorizeAttribute>()));
+    }
+
+    [Fact]
+    public void InvoicePagination_PreservesTheTypedLegacySortContract()
+    {
+        var controller = typeof(Program).Assembly.GetType(
+            "Legacy.Maliev.AccountingService.Api.Controllers.Invoice.InvoicesController")!;
+        var action = controller.GetMethod("GetPaginatedAsync", BindingFlags.Instance | BindingFlags.Public)!;
+        var parameters = action.GetParameters();
+
+        Assert.Equal(typeof(InvoiceSortType?), parameters.Single(parameter => parameter.Name == "sort").ParameterType);
+        Assert.Equal(
+            ["InvoiceId_Ascending", "InvoiceId_Descending", "InvoiceCreatedDate_Ascending", "InvoiceCreatedDate_Descending", "InvoicePaymentDate_Ascending", "InvoicePaymentDate_Descending"],
+            Enum.GetNames<InvoiceSortType>());
+        Assert.Equal(2, action.GetCustomAttributes<HttpGetAttribute>().Count());
     }
 
     [Fact]

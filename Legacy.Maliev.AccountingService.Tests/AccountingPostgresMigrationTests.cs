@@ -1,4 +1,5 @@
 using Legacy.Maliev.AccountingService.Application.Interfaces;
+using Legacy.Maliev.AccountingService.Application.Models;
 using Legacy.Maliev.AccountingService.Data;
 using Legacy.Maliev.AccountingService.Domain.Invoice;
 using Legacy.Maliev.AccountingService.Domain.Payment;
@@ -96,6 +97,147 @@ public sealed class AccountingPostgresMigrationTests : IAsyncLifetime
         Assert.Equal(6, await TableCount(paymentContext));
         Assert.Equal(3, await TableCount(invoiceContext));
         Assert.Equal(3, await TableCount(receiptContext));
+    }
+
+    [Fact]
+    public async Task InvoiceQuery_AppliesPaidSearchAndSortBeforePagination()
+    {
+        await using var paymentContext = PaymentContext();
+        await using var invoiceContext = InvoiceContext();
+        await using var receiptContext = ReceiptContext();
+        await Task.WhenAll(
+            paymentContext.Database.MigrateAsync(),
+            invoiceContext.Database.MigrateAsync(),
+            receiptContext.Database.MigrateAsync());
+        var repository = Repository(paymentContext, invoiceContext, receiptContext);
+        var marker = $"PAGE-{Guid.NewGuid():N}";
+        var created = new[]
+        {
+            new Invoice { Number = $"{marker}-A", CustomerId = 42, IsPaid = true, ReceiptId = 910001, CreatedDate = new DateTime(2026, 1, 3, 0, 0, 0, DateTimeKind.Utc) },
+            new Invoice { Number = $"{marker}-B", CustomerId = 42, IsPaid = false, ReceiptId = 910002, CreatedDate = new DateTime(2026, 1, 2, 0, 0, 0, DateTimeKind.Utc) },
+            new Invoice { Number = $"{marker}-C", CustomerId = 42, IsPaid = true, ReceiptId = 910003, CreatedDate = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+            new Invoice { Number = $"{marker}-D", CustomerId = 42, IsPaid = true, ReceiptId = 910004, CreatedDate = new DateTime(2026, 1, 2, 0, 0, 0, DateTimeKind.Utc) },
+        };
+        invoiceContext.Invoices.AddRange(created);
+        await invoiceContext.SaveChangesAsync();
+        invoiceContext.ChangeTracker.Clear();
+
+        var first = await repository.GetInvoicesAsync(
+            42,
+            InvoiceSortType.InvoiceCreatedDate_Ascending,
+            marker,
+            true,
+            1,
+            2,
+            CancellationToken.None);
+        var second = await repository.GetInvoicesAsync(
+            42,
+            InvoiceSortType.InvoiceCreatedDate_Ascending,
+            marker,
+            true,
+            2,
+            2,
+            CancellationToken.None);
+        var byReceipt = await repository.GetInvoicesAsync(
+            null,
+            null,
+            "910002",
+            null,
+            1,
+            10,
+            CancellationToken.None);
+
+        Assert.NotNull(first);
+        Assert.Equal(3, first.TotalRecords);
+        Assert.Equal(2, first.TotalPages);
+        Assert.Equal([created[2].Id, created[3].Id], first.Items.Select(invoice => invoice.Id));
+        Assert.NotNull(second);
+        Assert.Equal([created[0].Id], second.Items.Select(invoice => invoice.Id));
+        Assert.Equal(created[1].Id, Assert.Single(byReceipt!.Items).Id);
+    }
+
+    [Fact]
+    public async Task ReceiptWorkflowStore_ReconcilesAcrossExistingInvoiceAndReceiptSchemasWithoutMigration()
+    {
+        await using var invoiceContext = InvoiceContext();
+        await using var receiptContext = ReceiptContext();
+        await Task.WhenAll(invoiceContext.Database.MigrateAsync(), receiptContext.Database.MigrateAsync());
+        var marker = $"WF-{Guid.NewGuid():N}";
+        var invoice = new Invoice
+        {
+            Number = marker,
+            CustomerId = 42,
+            Currency = "THB",
+            IsPaid = true,
+            PaymentDate = new DateTime(2026, 7, 18, 0, 0, 0, DateTimeKind.Utc),
+            Subtotal = 100m,
+            Vat = 7m,
+            Total = 107m,
+            Outstanding = 107m,
+        };
+        invoiceContext.Add(invoice);
+        await invoiceContext.SaveChangesAsync();
+        invoiceContext.Add(new InvoiceOrderItem { InvoiceId = invoice.Id, Description = "Print", Quantity = 1, UnitPrice = 100m });
+        await invoiceContext.SaveChangesAsync();
+        var store = new ReceiptWorkflowStore(invoiceContext, receiptContext, TimeProvider.System);
+
+        var before = await store.GetAsync(invoice.Id, CancellationToken.None);
+        var receipt = await store.CreateReceiptAsync(before.Invoice, before.InvoiceItems, "paid", CancellationToken.None);
+        await store.LinkInvoiceAsync(invoice.Id, receipt.Id, CancellationToken.None);
+        await store.LinkFileAsync(receipt.Id, "maliev.com", $"receipts/{receipt.Id}/receipt_{receipt.Id}.pdf", CancellationToken.None);
+        await store.LinkFileAsync(receipt.Id, "maliev.com", $"receipts/{receipt.Id}/receipt_{receipt.Id}.pdf", CancellationToken.None);
+
+        var reconciled = await store.GetAsync(invoice.Id, CancellationToken.None);
+        Assert.Equal(receipt.Id, reconciled.Invoice.ReceiptId);
+        Assert.Single(reconciled.ReceiptItems);
+        Assert.Single(reconciled.ReceiptFiles);
+
+        await store.DeleteReceiptAsync(receipt.Id, CancellationToken.None);
+        await store.UnlinkInvoiceAsync(invoice.Id, receipt.Id, CancellationToken.None);
+        var removed = await store.GetAsync(invoice.Id, CancellationToken.None);
+        Assert.Null(removed.Invoice.ReceiptId);
+        Assert.Null(removed.Receipt);
+    }
+
+    [Fact]
+    public async Task ReceiptOperationLock_SerializesTheSameInvoiceAcrossDatabaseConnections()
+    {
+        await using var firstContext = InvoiceContext();
+        await using var secondContext = InvoiceContext();
+        await firstContext.Database.MigrateAsync();
+        var firstLock = new PostgresReceiptOperationLock(firstContext);
+        var secondLock = new PostgresReceiptOperationLock(secondContext);
+
+        var firstLease = await firstLock.AcquireAsync(42, CancellationToken.None);
+        using var blockedAttempt = new CancellationTokenSource(TimeSpan.FromMilliseconds(250));
+        await Assert.ThrowsAsync<ReceiptWorkflowDependencyException>(async () =>
+            await secondLock.AcquireAsync(42, blockedAttempt.Token));
+
+        await firstLease.DisposeAsync();
+        await using var secondLease = await secondLock.AcquireAsync(42, CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task InvoiceCreationStore_AtomicallyCreatesItemsAndReusesExistingFileLinkWithoutSchemaChange()
+    {
+        await using var context = InvoiceContext();
+        await context.Database.MigrateAsync();
+        var store = new InvoiceCreationStore(context, TimeProvider.System);
+        var marker = $"CREATE-{Guid.NewGuid():N}";
+
+        var invoice = await store.CreateAsync(
+            new Invoice { Number = marker, CustomerId = 42, Currency = "THB", Total = 107m },
+            [new InvoiceOrderItem { Description = "Thai fixture", Quantity = 2, UnitPrice = 50m }],
+            CancellationToken.None);
+        await store.LinkFileAsync(invoice.Id, "maliev.com", $"invoices/{invoice.Id}/invoice_{marker}.pdf", CancellationToken.None);
+        await store.LinkFileAsync(invoice.Id, "maliev.com", $"invoices/{invoice.Id}/invoice_{marker}.pdf", CancellationToken.None);
+        context.ChangeTracker.Clear();
+
+        var found = await store.FindByNumberAsync(marker, CancellationToken.None);
+        Assert.Equal(invoice.Id, found?.Id);
+        Assert.Single(await context.Items.Where(value => value.InvoiceId == invoice.Id).ToListAsync());
+        Assert.Single(await context.Files.Where(value => value.InvoiceId == invoice.Id).ToListAsync());
+        Assert.Equal(3, await TableCount(context));
     }
 
     private static async Task<int> TableCount(DbContext context) =>

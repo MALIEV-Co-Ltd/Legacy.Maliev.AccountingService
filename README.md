@@ -1,7 +1,7 @@
 # Legacy.Maliev.AccountingService
 
 Public, sanitized .NET 10 extraction of the private legacy Payment, Invoice, and Receipt APIs. It
-preserves 66 controller actions and 67 route templates across `/payments`, `/invoices`, and
+preserves the extracted controller contracts across `/payments`, `/invoices`, and
 `/receipts`, while deliberately excluding payment-provider execution. The future Omise/Opn
 implementation remains owned by the separate new `Maliev.PaymentService`.
 
@@ -9,6 +9,30 @@ The service uses Scalar/OpenAPI, JWT permission checks, Redis read caching, SHA-
 idempotency, conditional updates, and local .NET logging focused on warnings and failures. Financial
 amounts retain decimal precision; invoice/receipt line subtotals and receipt amount paid remain
 database-generated values.
+
+## Architecture
+
+The service uses clean dependency direction: `Api` calls `Application`, domain rules live in
+`Domain`, and PostgreSQL/Redis adapters live in `Data`. It depends only on the public
+`Legacy.Maliev.ServiceDefaults` and `Legacy.Maliev.CompatibilityContracts` source repositories
+during CI and image builds, so the legacy runtime does not consume new-platform shared-library
+source or private package credentials.
+
+Receipt creation, reconciliation, removal, and explicit email delivery are owned by Accounting at
+`/invoices/{invoiceId}/receipt`. Mutations require a caller-stable UUID `Idempotency-Key`; create
+and email also require the BFF-derived `X-Legacy-Employee-Id`. Recipient and signature data are
+never accepted from WASM: Accounting resolves the invoice customer from CustomerService and the
+employee signature from EmployeeService, then downloads only the malware-scanned object through a
+bounded Google Cloud Storage signed URL. Workload authentication uses the shared ServiceDefaults
+token exchange and never forwards an inbound user bearer token.
+
+Quotation-to-invoice creation is likewise server owned. The preview route derives customer,
+employee, currency, addresses, totals, withholding tax, and immutable line items from their source
+services. Creation accepts only editable invoice fields plus a caller-stable UUID, atomically writes
+the existing Invoice and OrderItem tables, accepts and links the quotation, renders the QuestPDF
+invoice, stores it through FileService, and optionally sends it through NotificationService. Redis
+replay protection and a PostgreSQL advisory lock reconcile interrupted requests without a database
+schema change; a reconciled invoice is not automatically re-emailed when delivery outcome is unknown.
 
 ## Data boundaries
 
