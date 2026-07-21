@@ -23,7 +23,7 @@ public sealed class InvoiceCreationStore(InvoiceDbContext context, TimeProvider 
     public async Task LinkFileAsync(int invoiceId, string bucket, string objectName, CancellationToken cancellationToken)
     {
         if (await context.Files.AnyAsync(value => value.InvoiceId == invoiceId && value.Bucket == bucket && value.ObjectName == objectName, cancellationToken)) return;
-        var now = timeProvider.GetUtcNow().UtcDateTime;
+        var now = DateTime.SpecifyKind(timeProvider.GetUtcNow().UtcDateTime, DateTimeKind.Unspecified);
         context.Files.Add(new InvoiceFile { InvoiceId = invoiceId, Bucket = bucket, ObjectName = objectName, CreatedDate = now, ModifiedDate = now });
         await context.SaveChangesAsync(cancellationToken);
     }

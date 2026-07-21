@@ -85,7 +85,7 @@ public sealed class ReceiptWorkflowStore(
             return existing[0];
         }
 
-        var now = timeProvider.GetUtcNow().UtcDateTime;
+        var now = Now();
         var receipt = new Receipt
         {
             CustomerId = invoice.CustomerId,
@@ -133,7 +133,7 @@ public sealed class ReceiptWorkflowStore(
     /// <inheritdoc />
     public async Task LinkInvoiceAsync(int invoiceId, int receiptId, CancellationToken cancellationToken)
     {
-        var modified = timeProvider.GetUtcNow().UtcDateTime;
+        var modified = Now();
         var updated = await invoices.Invoices
             .Where(value => value.Id == invoiceId && (value.ReceiptId == null || value.ReceiptId == receiptId))
             .ExecuteUpdateAsync(
@@ -169,7 +169,7 @@ public sealed class ReceiptWorkflowStore(
             return;
         }
 
-        var now = timeProvider.GetUtcNow().UtcDateTime;
+        var now = Now();
         receipts.Files.Add(new ReceiptFile
         {
             ReceiptId = receiptId,
@@ -194,7 +194,7 @@ public sealed class ReceiptWorkflowStore(
     /// <inheritdoc />
     public async Task UnlinkInvoiceAsync(int invoiceId, int receiptId, CancellationToken cancellationToken)
     {
-        var modified = timeProvider.GetUtcNow().UtcDateTime;
+        var modified = Now();
         await invoices.Invoices
             .Where(value => value.Id == invoiceId && value.ReceiptId == receiptId)
             .ExecuteUpdateAsync(
@@ -203,4 +203,8 @@ public sealed class ReceiptWorkflowStore(
                     .SetProperty(value => value.ModifiedDate, modified),
                 cancellationToken);
     }
+
+    // CreatedDate/ModifiedDate are "timestamp without time zone" wall-clock columns storing the
+    // UTC instant with Kind stripped; Npgsql rejects Kind=Utc values for that column type.
+    private DateTime Now() => DateTime.SpecifyKind(timeProvider.GetUtcNow().UtcDateTime, DateTimeKind.Unspecified);
 }

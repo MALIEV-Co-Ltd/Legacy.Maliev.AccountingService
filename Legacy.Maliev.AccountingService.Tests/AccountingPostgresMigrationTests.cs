@@ -113,10 +113,10 @@ public sealed class AccountingPostgresMigrationTests : IAsyncLifetime
         var marker = $"PAGE-{Guid.NewGuid():N}";
         var created = new[]
         {
-            new Invoice { Number = $"{marker}-A", CustomerId = 42, IsPaid = true, ReceiptId = 910001, CreatedDate = new DateTime(2026, 1, 3, 0, 0, 0, DateTimeKind.Utc) },
-            new Invoice { Number = $"{marker}-B", CustomerId = 42, IsPaid = false, ReceiptId = 910002, CreatedDate = new DateTime(2026, 1, 2, 0, 0, 0, DateTimeKind.Utc) },
-            new Invoice { Number = $"{marker}-C", CustomerId = 42, IsPaid = true, ReceiptId = 910003, CreatedDate = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
-            new Invoice { Number = $"{marker}-D", CustomerId = 42, IsPaid = true, ReceiptId = 910004, CreatedDate = new DateTime(2026, 1, 2, 0, 0, 0, DateTimeKind.Utc) },
+            new Invoice { Number = $"{marker}-A", CustomerId = 42, IsPaid = true, ReceiptId = 910001, CreatedDate = new DateTime(2026, 1, 3, 0, 0, 0, DateTimeKind.Unspecified) },
+            new Invoice { Number = $"{marker}-B", CustomerId = 42, IsPaid = false, ReceiptId = 910002, CreatedDate = new DateTime(2026, 1, 2, 0, 0, 0, DateTimeKind.Unspecified) },
+            new Invoice { Number = $"{marker}-C", CustomerId = 42, IsPaid = true, ReceiptId = 910003, CreatedDate = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Unspecified) },
+            new Invoice { Number = $"{marker}-D", CustomerId = 42, IsPaid = true, ReceiptId = 910004, CreatedDate = new DateTime(2026, 1, 2, 0, 0, 0, DateTimeKind.Unspecified) },
         };
         invoiceContext.Invoices.AddRange(created);
         await invoiceContext.SaveChangesAsync();

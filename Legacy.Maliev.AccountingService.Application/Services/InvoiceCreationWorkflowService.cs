@@ -55,11 +55,11 @@ public sealed class InvoiceCreationWorkflowService(
             }
 
             invoice = existing;
-            items = MapItems(snapshot.OrderItems, existing.Id, timeProvider.GetUtcNow().UtcDateTime);
+            items = MapItems(snapshot.OrderItems, existing.Id, Now());
         }
         else
         {
-            invoice = MapInvoice(preview, request, timeProvider.GetUtcNow().UtcDateTime);
+            invoice = MapInvoice(preview, request, Now());
             items = MapItems(snapshot.OrderItems, null, invoice.CreatedDate!.Value);
             invoice = await store.CreateAsync(invoice, items, cancellationToken);
             foreach (var item in items) item.InvoiceId = invoice.Id;
@@ -179,6 +179,10 @@ public sealed class InvoiceCreationWorkflowService(
         CreatedDate = now,
         ModifiedDate = now,
     }).ToArray();
+
+    // CreatedDate/ModifiedDate are "timestamp without time zone" wall-clock columns storing the
+    // UTC instant with Kind stripped; Npgsql rejects Kind=Utc values for that column type.
+    private DateTime Now() => DateTime.SpecifyKind(timeProvider.GetUtcNow().UtcDateTime, DateTimeKind.Unspecified);
 
     private static string? First(params string?[] values) => values.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value));
     private static string SafeFilePart(string value) => string.Concat(value.Select(character => char.IsLetterOrDigit(character) || character is '-' or '_' ? character : '_'));
