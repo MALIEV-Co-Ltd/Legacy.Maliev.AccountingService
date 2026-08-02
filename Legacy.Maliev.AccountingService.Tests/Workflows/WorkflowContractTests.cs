@@ -120,7 +120,7 @@ public sealed class WorkflowContractTests
 
 internal static partial class WorkflowContractValidator
 {
-    private const string CheckoutAction = "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0";
+    private const string CheckoutAction = "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1";
     private const string SharedValidationAction = "MALIEV-Co-Ltd/Legacy.Maliev.Workflows/actions/dotnet-validate@f7bafd4ba7e8e6e92a0b7d853150f3ca60e1eae6";
 
     public static void Validate(string workflow)

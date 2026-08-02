@@ -5,6 +5,7 @@ using Legacy.Maliev.AccountingService.Domain.Invoice;
 using Legacy.Maliev.AccountingService.Domain.Payment;
 using Legacy.Maliev.AccountingService.Domain.Receipt;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Time.Testing;
 using Moq;
 using Testcontainers.PostgreSql;
 
@@ -246,7 +247,12 @@ public sealed class AccountingPostgresMigrationTests : IAsyncLifetime
     private static AccountingRepository Repository(PaymentDbContext payment, InvoiceDbContext invoice, ReceiptDbContext receipt)
     {
         var cache = new Mock<IAccountingCache>();
-        return new AccountingRepository(payment, invoice, receipt, cache.Object, TimeProvider.System);
+        return new AccountingRepository(
+            payment,
+            invoice,
+            receipt,
+            cache.Object,
+            new FakeTimeProvider(new DateTimeOffset(2026, 7, 20, 0, 0, 0, TimeSpan.Zero)));
     }
 
     private PaymentDbContext PaymentContext() => new(new DbContextOptionsBuilder<PaymentDbContext>().UseNpgsql(paymentPostgres.GetConnectionString()).Options);
