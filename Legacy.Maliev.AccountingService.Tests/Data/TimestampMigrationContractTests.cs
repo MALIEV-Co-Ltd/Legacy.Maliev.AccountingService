@@ -30,6 +30,23 @@ public sealed class TimestampMigrationContractTests
         }
     }
 
+    [Fact]
+    public void InvoiceMigration_RenamesOnlyVatAndFobColumnsWithoutChangingValues()
+    {
+        var source = File.ReadAllText(FindRepositoryFile(
+            "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/20260721024204_FixTimestampAndInvoiceColumnCasing.cs"));
+
+        Assert.Equal(4, Regex.Matches(source, "migrationBuilder.RenameColumn\\(").Count);
+        Assert.Contains("name: \"VAT\"", source, StringComparison.Ordinal);
+        Assert.Contains("newName: \"Vat\"", source, StringComparison.Ordinal);
+        Assert.Contains("name: \"FOB\"", source, StringComparison.Ordinal);
+        Assert.Contains("newName: \"Fob\"", source, StringComparison.Ordinal);
+        Assert.Contains("name: \"Vat\"", source, StringComparison.Ordinal);
+        Assert.Contains("newName: \"VAT\"", source, StringComparison.Ordinal);
+        Assert.Contains("name: \"Fob\"", source, StringComparison.Ordinal);
+        Assert.Contains("newName: \"FOB\"", source, StringComparison.Ordinal);
+    }
+
     private static string FindRepositoryFile(string relativePath, [CallerFilePath] string sourceFile = "")
     {
         foreach (var start in new[] { new DirectoryInfo(Path.GetDirectoryName(sourceFile)!), new DirectoryInfo(Directory.GetCurrentDirectory()), new DirectoryInfo(AppContext.BaseDirectory) })
