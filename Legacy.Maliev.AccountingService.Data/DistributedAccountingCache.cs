@@ -21,7 +21,7 @@ public sealed class DistributedAccountingCache(
             var bytes = await cache.GetAsync(key, cancellationToken);
             return bytes is null ? default : JsonSerializer.Deserialize<T>(bytes, JsonOptions);
         }
-        catch (Exception exception)
+        catch (Exception exception) when (exception is not OperationCanceledException)
         {
             logger.LogWarning(exception, "Accounting cache read failed; using PostgreSQL");
             return default;
@@ -35,7 +35,7 @@ public sealed class DistributedAccountingCache(
             await cache.SetAsync(key, JsonSerializer.SerializeToUtf8Bytes(value, JsonOptions),
                 new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = lifetime }, cancellationToken);
         }
-        catch (Exception exception)
+        catch (Exception exception) when (exception is not OperationCanceledException)
         {
             logger.LogWarning(exception, "Accounting cache write failed; continuing without cache");
         }
@@ -47,7 +47,7 @@ public sealed class DistributedAccountingCache(
         {
             await cache.RemoveAsync(key, cancellationToken);
         }
-        catch (Exception exception)
+        catch (Exception exception) when (exception is not OperationCanceledException)
         {
             logger.LogWarning(exception, "Accounting cache invalidation failed");
         }
