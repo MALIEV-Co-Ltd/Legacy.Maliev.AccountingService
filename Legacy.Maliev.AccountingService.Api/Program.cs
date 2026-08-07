@@ -51,7 +51,8 @@ builder.Services.AddHttpClient<IReceiptFileClient, ReceiptFileClient>(client =>
     client.Timeout = TimeSpan.FromMinutes(5);
 }).AddServiceDiscovery().AddLegacyServiceAuthentication();
 builder.Services.AddHttpClient(ReceiptFileClient.ObjectDownloadClientName)
-    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false });
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false })
+    .AddLegacyStandardResilienceHandler();
 builder.Services.AddHttpClient<IReceiptNotificationClient, ReceiptNotificationClient>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["Services:Notification"]
@@ -63,13 +64,13 @@ builder.Services.AddHttpClient<IReceiptCustomerClient, ReceiptCustomerClient>(cl
     client.BaseAddress = new Uri(builder.Configuration["Services:Customer"]
         ?? "https+http://legacy-maliev-customer-service");
     client.Timeout = TimeSpan.FromSeconds(30);
-}).AddServiceDiscovery().AddLegacyServiceAuthentication();
+}).AddServiceDiscovery().AddLegacyServiceAuthentication().AddLegacyStandardResilienceHandler();
 builder.Services.AddHttpClient<IReceiptSignatureClient, ReceiptSignatureClient>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["Services:Employee"]
         ?? "https+http://legacy-maliev-employee-service");
     client.Timeout = TimeSpan.FromSeconds(30);
-}).AddServiceDiscovery().AddLegacyServiceAuthentication();
+}).AddServiceDiscovery().AddLegacyServiceAuthentication().AddLegacyStandardResilienceHandler();
 builder.Services.AddHttpClient<IInvoiceCreationDocumentClient, InvoiceCreationDocumentClient>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["Services:Document"] ?? "https+http://legacy-maliev-document-service");
@@ -111,7 +112,7 @@ void AddInvoiceSourceClient(string name, string configurationKey, string fallbac
     {
         client.BaseAddress = new Uri(builder.Configuration[configurationKey] ?? fallback);
         client.Timeout = TimeSpan.FromSeconds(30);
-    }).AddServiceDiscovery().AddLegacyServiceAuthentication();
+    }).AddServiceDiscovery().AddLegacyServiceAuthentication().AddLegacyStandardResilienceHandler();
 }
 
 public partial class Program;
