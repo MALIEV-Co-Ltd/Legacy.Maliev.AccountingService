@@ -158,6 +158,53 @@ public sealed class AccountingPostgresMigrationTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task InvoiceQuery_DescendingDates_PutNullsLastAndBreakTiesByDescendingId()
+    {
+        await using var paymentContext = PaymentContext();
+        await using var invoiceContext = InvoiceContext();
+        await using var receiptContext = ReceiptContext();
+        await invoiceContext.Database.MigrateAsync();
+        var repository = Repository(paymentContext, invoiceContext, receiptContext);
+        var marker = $"PAYMENT-SORT-{Guid.NewGuid():N}";
+        var paidAt = new DateTime(2030, 7, 20, 12, 0, 0, DateTimeKind.Utc);
+        var created = new[]
+        {
+            new Invoice { Number = $"{marker}-UNPAID-A", CustomerId = 42, PaymentDate = null, CreatedDate = null },
+            new Invoice { Number = $"{marker}-PAID-A", CustomerId = 42, PaymentDate = paidAt, CreatedDate = new DateTime(2030, 7, 2, 0, 0, 0, DateTimeKind.Unspecified) },
+            new Invoice { Number = $"{marker}-PAID-B", CustomerId = 42, PaymentDate = paidAt, CreatedDate = new DateTime(2030, 7, 2, 0, 0, 0, DateTimeKind.Unspecified) },
+            new Invoice { Number = $"{marker}-UNPAID-B", CustomerId = 42, PaymentDate = null, CreatedDate = null },
+        };
+        invoiceContext.Invoices.AddRange(created);
+        await invoiceContext.SaveChangesAsync();
+        await invoiceContext.Invoices
+            .Where(invoice => invoice.Id == created[0].Id || invoice.Id == created[3].Id)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(invoice => invoice.CreatedDate, (DateTime?)null));
+        invoiceContext.ChangeTracker.Clear();
+
+        var byPayment = await repository.GetInvoicesAsync(
+            42,
+            InvoiceSortType.InvoicePaymentDate_Descending,
+            marker,
+            null,
+            1,
+            2,
+            CancellationToken.None);
+        var byCreation = await repository.GetInvoicesAsync(
+            42,
+            InvoiceSortType.InvoiceCreatedDate_Descending,
+            marker,
+            null,
+            1,
+            2,
+            CancellationToken.None);
+
+        Assert.NotNull(byPayment);
+        Assert.Equal([created[2].Id, created[1].Id], byPayment.Items.Select(invoice => invoice.Id));
+        Assert.NotNull(byCreation);
+        Assert.Equal([created[2].Id, created[1].Id], byCreation.Items.Select(invoice => invoice.Id));
+    }
+
+    [Fact]
     public async Task ReceiptWorkflowStore_ReconcilesAcrossExistingInvoiceAndReceiptSchemasWithoutMigration()
     {
         await using var invoiceContext = InvoiceContext();

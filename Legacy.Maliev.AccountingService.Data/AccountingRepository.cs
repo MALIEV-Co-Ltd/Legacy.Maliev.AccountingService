@@ -140,9 +140,15 @@ public sealed class AccountingRepository(
             InvoiceSortType.InvoiceId_Ascending => query.OrderBy(invoice => invoice.Id),
             InvoiceSortType.InvoiceId_Descending => query.OrderByDescending(invoice => invoice.Id),
             InvoiceSortType.InvoiceCreatedDate_Ascending => query.OrderBy(invoice => invoice.CreatedDate).ThenBy(invoice => invoice.Id),
-            InvoiceSortType.InvoiceCreatedDate_Descending => query.OrderByDescending(invoice => invoice.CreatedDate).ThenByDescending(invoice => invoice.Id),
+            InvoiceSortType.InvoiceCreatedDate_Descending => query
+                .OrderBy(invoice => invoice.CreatedDate == null)
+                .ThenByDescending(invoice => invoice.CreatedDate)
+                .ThenByDescending(invoice => invoice.Id),
             InvoiceSortType.InvoicePaymentDate_Ascending => query.OrderBy(invoice => invoice.PaymentDate).ThenBy(invoice => invoice.Id),
-            InvoiceSortType.InvoicePaymentDate_Descending => query.OrderByDescending(invoice => invoice.PaymentDate).ThenByDescending(invoice => invoice.Id),
+            InvoiceSortType.InvoicePaymentDate_Descending => query
+                .OrderBy(invoice => invoice.PaymentDate == null)
+                .ThenByDescending(invoice => invoice.PaymentDate)
+                .ThenByDescending(invoice => invoice.Id),
             _ => query.OrderBy(invoice => invoice.Id),
         };
         return await PageAsync(query, page, size, cancellationToken);
