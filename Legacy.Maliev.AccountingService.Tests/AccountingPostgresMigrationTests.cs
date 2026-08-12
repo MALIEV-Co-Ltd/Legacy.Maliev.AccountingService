@@ -158,6 +158,40 @@ public sealed class AccountingPostgresMigrationTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task InvoiceQuery_PaymentDescending_PutsNullsLastAndBreaksTiesByDescendingId()
+    {
+        await using var paymentContext = PaymentContext();
+        await using var invoiceContext = InvoiceContext();
+        await using var receiptContext = ReceiptContext();
+        await invoiceContext.Database.MigrateAsync();
+        var repository = Repository(paymentContext, invoiceContext, receiptContext);
+        var marker = $"PAYMENT-SORT-{Guid.NewGuid():N}";
+        var paidAt = new DateTime(2030, 7, 20, 12, 0, 0, DateTimeKind.Utc);
+        var created = new[]
+        {
+            new Invoice { Number = $"{marker}-UNPAID-A", CustomerId = 42, PaymentDate = null, CreatedDate = new DateTime(2030, 7, 20, 0, 0, 0, DateTimeKind.Unspecified) },
+            new Invoice { Number = $"{marker}-PAID-A", CustomerId = 42, PaymentDate = paidAt, CreatedDate = new DateTime(2030, 7, 1, 0, 0, 0, DateTimeKind.Unspecified) },
+            new Invoice { Number = $"{marker}-PAID-B", CustomerId = 42, PaymentDate = paidAt, CreatedDate = new DateTime(2030, 7, 2, 0, 0, 0, DateTimeKind.Unspecified) },
+            new Invoice { Number = $"{marker}-UNPAID-B", CustomerId = 42, PaymentDate = null, CreatedDate = new DateTime(2030, 7, 19, 0, 0, 0, DateTimeKind.Unspecified) },
+        };
+        invoiceContext.Invoices.AddRange(created);
+        await invoiceContext.SaveChangesAsync();
+        invoiceContext.ChangeTracker.Clear();
+
+        var result = await repository.GetInvoicesAsync(
+            42,
+            InvoiceSortType.InvoicePaymentDate_Descending,
+            marker,
+            null,
+            1,
+            2,
+            CancellationToken.None);
+
+        Assert.NotNull(result);
+        Assert.Equal([created[2].Id, created[1].Id], result.Items.Select(invoice => invoice.Id));
+    }
+
+    [Fact]
     public async Task ReceiptWorkflowStore_ReconcilesAcrossExistingInvoiceAndReceiptSchemasWithoutMigration()
     {
         await using var invoiceContext = InvoiceContext();
