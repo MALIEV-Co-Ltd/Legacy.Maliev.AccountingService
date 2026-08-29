@@ -103,6 +103,36 @@ public sealed class AccountingContractTests
         Assert.DoesNotContain("Stripe", text, StringComparison.OrdinalIgnoreCase);
     }
 
+    [Fact]
+    public void ReadOnlyDownstreamClients_UseLegacyResiliencePipeline()
+    {
+        var program = File.ReadAllText(Path.Combine(
+            FindRepositoryRoot(),
+            "Legacy.Maliev.AccountingService.Api",
+            "Program.cs"));
+
+        var objectDownload = Slice(
+            program,
+            "AddHttpClient(ReceiptFileClient.ObjectDownloadClientName)",
+            "AddHttpClient<IReceiptNotificationClient");
+        Assert.Contains("AddLegacyStandardResilienceHandler", objectDownload, StringComparison.Ordinal);
+
+        var customer = Slice(
+            program,
+            "AddHttpClient<IReceiptCustomerClient, ReceiptCustomerClient>",
+            "AddHttpClient<IReceiptSignatureClient, ReceiptSignatureClient>");
+        Assert.Contains("AddLegacyStandardResilienceHandler", customer, StringComparison.Ordinal);
+
+        var signature = Slice(
+            program,
+            "AddHttpClient<IReceiptSignatureClient, ReceiptSignatureClient>",
+            "AddHttpClient<IInvoiceCreationDocumentClient, InvoiceCreationDocumentClient>");
+        Assert.Contains("AddLegacyStandardResilienceHandler", signature, StringComparison.Ordinal);
+
+        var sourceClients = Slice(program, "void AddInvoiceSourceClient", "public partial class Program;");
+        Assert.Contains("AddLegacyStandardResilienceHandler", sourceClients, StringComparison.Ordinal);
+    }
+
     private static DbContextOptions<PaymentDbContext> PaymentOptions() =>
         new DbContextOptionsBuilder<PaymentDbContext>().UseNpgsql("Host=localhost;Database=accounting_test;Username=test;Password=test").Options;
 
@@ -126,5 +156,14 @@ public sealed class AccountingContractTests
         }
 
         throw new DirectoryNotFoundException("Repository root was not found.");
+    }
+
+    private static string Slice(string source, string start, string end)
+    {
+        var startIndex = source.IndexOf(start, StringComparison.Ordinal);
+        Assert.True(startIndex >= 0, $"Missing source boundary '{start}'.");
+        var endIndex = source.IndexOf(end, startIndex + start.Length, StringComparison.Ordinal);
+        Assert.True(endIndex > startIndex, $"Missing source boundary '{end}'.");
+        return source[startIndex..endIndex];
     }
 }

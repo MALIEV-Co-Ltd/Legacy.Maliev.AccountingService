@@ -1,283 +1,56 @@
-﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Legacy.Maliev.AccountingService.Data.Migrations.Payment
+namespace Legacy.Maliev.AccountingService.Data.Migrations.Payment;
+
+/// <inheritdoc />
+public partial class FixTimestampColumnType : Migration
 {
     /// <inheritdoc />
-    public partial class FixTimestampColumnType : Migration
+    protected override void Up(MigrationBuilder migrationBuilder) =>
+        ConvertUtcTimestampColumns(migrationBuilder, toTimestampWithoutTimeZone: true);
+
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder) =>
+        ConvertUtcTimestampColumns(migrationBuilder, toTimestampWithoutTimeZone: false);
+
+    private static void ConvertUtcTimestampColumns(MigrationBuilder migrationBuilder, bool toTimestampWithoutTimeZone)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
+        var targetType = toTimestampWithoutTimeZone
+            ? "timestamp without time zone"
+            : "timestamp with time zone";
+        var defaultSql = toTimestampWithoutTimeZone
+            ? "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"
+            : "CURRENT_TIMESTAMP";
+
+        foreach (var (table, column) in UtcTimestampColumns)
         {
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "ModifiedDate",
-                table: "PaymentType",
-                type: "timestamp without time zone",
-                nullable: true,
-                defaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'",
-                oldClrType: typeof(DateTime),
-                oldType: "timestamp with time zone",
-                oldNullable: true,
-                oldDefaultValueSql: "CURRENT_TIMESTAMP");
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "CreatedDate",
-                table: "PaymentType",
-                type: "timestamp without time zone",
-                nullable: true,
-                defaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'",
-                oldClrType: typeof(DateTime),
-                oldType: "timestamp with time zone",
-                oldNullable: true,
-                oldDefaultValueSql: "CURRENT_TIMESTAMP");
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "ModifiedDate",
-                table: "PaymentMethod",
-                type: "timestamp without time zone",
-                nullable: true,
-                defaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'",
-                oldClrType: typeof(DateTime),
-                oldType: "timestamp with time zone",
-                oldNullable: true,
-                oldDefaultValueSql: "CURRENT_TIMESTAMP");
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "CreatedDate",
-                table: "PaymentMethod",
-                type: "timestamp without time zone",
-                nullable: true,
-                defaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'",
-                oldClrType: typeof(DateTime),
-                oldType: "timestamp with time zone",
-                oldNullable: true,
-                oldDefaultValueSql: "CURRENT_TIMESTAMP");
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "ModifiedDate",
-                table: "PaymentFile",
-                type: "timestamp without time zone",
-                nullable: true,
-                defaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'",
-                oldClrType: typeof(DateTime),
-                oldType: "timestamp with time zone",
-                oldNullable: true,
-                oldDefaultValueSql: "CURRENT_TIMESTAMP");
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "CreatedDate",
-                table: "PaymentFile",
-                type: "timestamp without time zone",
-                nullable: true,
-                defaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'",
-                oldClrType: typeof(DateTime),
-                oldType: "timestamp with time zone",
-                oldNullable: true,
-                oldDefaultValueSql: "CURRENT_TIMESTAMP");
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "ModifiedDate",
-                table: "PaymentDirection",
-                type: "timestamp without time zone",
-                nullable: true,
-                defaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'",
-                oldClrType: typeof(DateTime),
-                oldType: "timestamp with time zone",
-                oldNullable: true,
-                oldDefaultValueSql: "CURRENT_TIMESTAMP");
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "CreatedDate",
-                table: "PaymentDirection",
-                type: "timestamp without time zone",
-                nullable: true,
-                defaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'",
-                oldClrType: typeof(DateTime),
-                oldType: "timestamp with time zone",
-                oldNullable: true,
-                oldDefaultValueSql: "CURRENT_TIMESTAMP");
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "ModifiedDate",
-                table: "Payment",
-                type: "timestamp without time zone",
-                nullable: true,
-                defaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'",
-                oldClrType: typeof(DateTime),
-                oldType: "timestamp with time zone",
-                oldNullable: true,
-                oldDefaultValueSql: "CURRENT_TIMESTAMP");
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "CreatedDate",
-                table: "Payment",
-                type: "timestamp without time zone",
-                nullable: true,
-                defaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'",
-                oldClrType: typeof(DateTime),
-                oldType: "timestamp with time zone",
-                oldNullable: true,
-                oldDefaultValueSql: "CURRENT_TIMESTAMP");
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "ModifiedDate",
-                table: "Account",
-                type: "timestamp without time zone",
-                nullable: true,
-                defaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'",
-                oldClrType: typeof(DateTime),
-                oldType: "timestamp with time zone",
-                oldNullable: true,
-                oldDefaultValueSql: "CURRENT_TIMESTAMP");
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "CreatedDate",
-                table: "Account",
-                type: "timestamp without time zone",
-                nullable: true,
-                defaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'",
-                oldClrType: typeof(DateTime),
-                oldType: "timestamp with time zone",
-                oldNullable: true,
-                oldDefaultValueSql: "CURRENT_TIMESTAMP");
-        }
-
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "ModifiedDate",
-                table: "PaymentType",
-                type: "timestamp with time zone",
-                nullable: true,
-                defaultValueSql: "CURRENT_TIMESTAMP",
-                oldClrType: typeof(DateTime),
-                oldType: "timestamp without time zone",
-                oldNullable: true,
-                oldDefaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "CreatedDate",
-                table: "PaymentType",
-                type: "timestamp with time zone",
-                nullable: true,
-                defaultValueSql: "CURRENT_TIMESTAMP",
-                oldClrType: typeof(DateTime),
-                oldType: "timestamp without time zone",
-                oldNullable: true,
-                oldDefaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "ModifiedDate",
-                table: "PaymentMethod",
-                type: "timestamp with time zone",
-                nullable: true,
-                defaultValueSql: "CURRENT_TIMESTAMP",
-                oldClrType: typeof(DateTime),
-                oldType: "timestamp without time zone",
-                oldNullable: true,
-                oldDefaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "CreatedDate",
-                table: "PaymentMethod",
-                type: "timestamp with time zone",
-                nullable: true,
-                defaultValueSql: "CURRENT_TIMESTAMP",
-                oldClrType: typeof(DateTime),
-                oldType: "timestamp without time zone",
-                oldNullable: true,
-                oldDefaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "ModifiedDate",
-                table: "PaymentFile",
-                type: "timestamp with time zone",
-                nullable: true,
-                defaultValueSql: "CURRENT_TIMESTAMP",
-                oldClrType: typeof(DateTime),
-                oldType: "timestamp without time zone",
-                oldNullable: true,
-                oldDefaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "CreatedDate",
-                table: "PaymentFile",
-                type: "timestamp with time zone",
-                nullable: true,
-                defaultValueSql: "CURRENT_TIMESTAMP",
-                oldClrType: typeof(DateTime),
-                oldType: "timestamp without time zone",
-                oldNullable: true,
-                oldDefaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "ModifiedDate",
-                table: "PaymentDirection",
-                type: "timestamp with time zone",
-                nullable: true,
-                defaultValueSql: "CURRENT_TIMESTAMP",
-                oldClrType: typeof(DateTime),
-                oldType: "timestamp without time zone",
-                oldNullable: true,
-                oldDefaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "CreatedDate",
-                table: "PaymentDirection",
-                type: "timestamp with time zone",
-                nullable: true,
-                defaultValueSql: "CURRENT_TIMESTAMP",
-                oldClrType: typeof(DateTime),
-                oldType: "timestamp without time zone",
-                oldNullable: true,
-                oldDefaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "ModifiedDate",
-                table: "Payment",
-                type: "timestamp with time zone",
-                nullable: true,
-                defaultValueSql: "CURRENT_TIMESTAMP",
-                oldClrType: typeof(DateTime),
-                oldType: "timestamp without time zone",
-                oldNullable: true,
-                oldDefaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "CreatedDate",
-                table: "Payment",
-                type: "timestamp with time zone",
-                nullable: true,
-                defaultValueSql: "CURRENT_TIMESTAMP",
-                oldClrType: typeof(DateTime),
-                oldType: "timestamp without time zone",
-                oldNullable: true,
-                oldDefaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "ModifiedDate",
-                table: "Account",
-                type: "timestamp with time zone",
-                nullable: true,
-                defaultValueSql: "CURRENT_TIMESTAMP",
-                oldClrType: typeof(DateTime),
-                oldType: "timestamp without time zone",
-                oldNullable: true,
-                oldDefaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "CreatedDate",
-                table: "Account",
-                type: "timestamp with time zone",
-                nullable: true,
-                defaultValueSql: "CURRENT_TIMESTAMP",
-                oldClrType: typeof(DateTime),
-                oldType: "timestamp without time zone",
-                oldNullable: true,
-                oldDefaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
+            migrationBuilder.Sql($"""
+                ALTER TABLE "{table}"
+                ALTER COLUMN "{column}" DROP DEFAULT;
+                ALTER TABLE "{table}"
+                ALTER COLUMN "{column}" TYPE {targetType}
+                USING "{column}" AT TIME ZONE 'UTC';
+                ALTER TABLE "{table}"
+                ALTER COLUMN "{column}" SET DEFAULT {defaultSql};
+                """);
         }
     }
+
+    private static readonly (string Table, string Column)[] UtcTimestampColumns =
+    [
+        ("PaymentType", "ModifiedDate"),
+        ("PaymentType", "CreatedDate"),
+        ("PaymentMethod", "ModifiedDate"),
+        ("PaymentMethod", "CreatedDate"),
+        ("PaymentFile", "ModifiedDate"),
+        ("PaymentFile", "CreatedDate"),
+        ("PaymentDirection", "ModifiedDate"),
+        ("PaymentDirection", "CreatedDate"),
+        ("Payment", "ModifiedDate"),
+        ("Payment", "CreatedDate"),
+        ("Account", "ModifiedDate"),
+        ("Account", "CreatedDate")
+    ];
 }
