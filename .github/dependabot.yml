@@ -1,13 +1,26 @@
 version: 2
 updates:
   - package-ecosystem: nuget
-    directory: /
+    # The API graph switches to an unpublished ServiceDefaults PackageReference
+    # inside Dependabot's GitHub Actions environment. Scan only project graphs
+    # that restore independently until shared source dependencies are published.
+    directories:
+      - /Legacy.Maliev.AccountingService.Application
+      - /Legacy.Maliev.AccountingService.Data
+      - /Legacy.Maliev.AccountingService.Domain
     schedule:
       interval: weekly
     open-pull-requests-limit: 10
     ignore:
       - dependency-name: Legacy.Maliev.ServiceDefaults
       - dependency-name: Legacy.Maliev.CompatibilityContracts
+      # EF/Npgsql must move with the pinned shared ServiceDefaults runtime graph.
+      # Tracking: MALIEV-Co-Ltd/Legacy.Maliev.ServiceDefaults#30.
+      - dependency-name: Microsoft.EntityFrameworkCore
+      - dependency-name: Microsoft.EntityFrameworkCore.Abstractions
+      - dependency-name: Microsoft.EntityFrameworkCore.Design
+      - dependency-name: Microsoft.EntityFrameworkCore.Relational
+      - dependency-name: Npgsql.EntityFrameworkCore.PostgreSQL
     groups:
       nuget-dependencies:
         applies-to: version-updates

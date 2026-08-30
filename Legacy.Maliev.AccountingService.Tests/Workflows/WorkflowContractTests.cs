@@ -18,6 +18,50 @@ public sealed class WorkflowContractTests
     }
 
     [Fact]
+    public void DependabotConfiguration_ScansOnlyIndependentlyResolvableProjectDirectories()
+    {
+        var source = File.ReadAllText(FindRepositoryFile(".github", "dependabot.yml"));
+        var yaml = new YamlStream();
+        yaml.Load(new StringReader(source));
+
+        var root = Assert.IsType<YamlMappingNode>(Assert.Single(yaml.Documents).RootNode);
+        var updates = Assert.IsType<YamlSequenceNode>(ReadNode(root, "updates"));
+        var nuget = updates.Children
+            .Select(Assert.IsType<YamlMappingNode>)
+            .Single(update => ReadScalar(update, "package-ecosystem") == "nuget");
+        var directories = Assert.IsType<YamlSequenceNode>(ReadNode(nuget, "directories"));
+
+        Assert.Equal(
+            [
+                "/Legacy.Maliev.AccountingService.Application",
+                "/Legacy.Maliev.AccountingService.Data",
+                "/Legacy.Maliev.AccountingService.Domain",
+            ],
+            directories.Children.Select(Assert.IsType<YamlScalarNode>).Select(node => node.Value));
+        Assert.False(nuget.Children.ContainsKey(new YamlScalarNode("directory")));
+        Assert.False(nuget.Children.ContainsKey(new YamlScalarNode("exclude-paths")));
+    }
+
+    [Fact]
+    public void DependabotConfiguration_DefersSharedEfAndNpgsqlRuntimeGraph()
+    {
+        var source = File.ReadAllText(FindRepositoryFile(".github", "dependabot.yml"));
+
+        Assert.Contains("MALIEV-Co-Ltd/Legacy.Maliev.ServiceDefaults#30", source, StringComparison.Ordinal);
+        foreach (var dependency in new[]
+                 {
+                     "Microsoft.EntityFrameworkCore",
+                     "Microsoft.EntityFrameworkCore.Abstractions",
+                     "Microsoft.EntityFrameworkCore.Design",
+                     "Microsoft.EntityFrameworkCore.Relational",
+                     "Npgsql.EntityFrameworkCore.PostgreSQL",
+                 })
+        {
+            Assert.Contains($"dependency-name: {dependency}", source, StringComparison.Ordinal);
+        }
+    }
+
+    [Fact]
     public void BuildAndTest_RejectsSharedActionMainWithPinnedShaComment()
     {
         AssertMutationRejected(
@@ -97,6 +141,17 @@ public sealed class WorkflowContractTests
         var mutated = Workflow.Replace(original, replacement, StringComparison.Ordinal);
 
         Assert.Throws<InvalidOperationException>(() => WorkflowContractValidator.Validate(mutated));
+    }
+
+    private static YamlNode ReadNode(YamlMappingNode mapping, string key)
+    {
+        return mapping.Children[new YamlScalarNode(key)];
+    }
+
+    private static string ReadScalar(YamlMappingNode mapping, string key)
+    {
+        return Assert.IsType<YamlScalarNode>(ReadNode(mapping, key)).Value
+            ?? throw new InvalidOperationException($"Expected '{key}' to have a scalar value.");
     }
 
     private static string FindRepositoryFile(params string[] segments)
