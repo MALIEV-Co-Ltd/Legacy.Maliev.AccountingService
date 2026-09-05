@@ -47,10 +47,12 @@ public sealed record InvoiceCreationPreview(
     decimal Total,
     decimal AvailableWithholdingTax,
     decimal Outstanding,
-    IReadOnlyList<InvoiceCreationOrderItem> OrderItems);
+    IReadOnlyList<InvoiceCreationOrderItem> OrderItems,
+    int? SourceRequestId = null,
+    Guid? SourceJourneyId = null);
 
 public sealed record InvoiceCreationOrderItem(int Id, int QuotationId, int? OrderId, string? Description, int? Quantity, decimal? UnitPrice, decimal? Subtotal);
-public sealed record InvoiceCreationQuotation(int Id, int? CustomerId, int? EmployeeId, int CurrencyId, decimal Subtotal, decimal Vat, decimal Total, decimal? WithholdingTax, string? Comment, string? Fob, string? ShippedVia, string? Terms, int? InvoiceId);
+public sealed record InvoiceCreationQuotation(int Id, int? CustomerId, int? EmployeeId, int CurrencyId, decimal Subtotal, decimal Vat, decimal Total, decimal? WithholdingTax, string? Comment, string? Fob, string? ShippedVia, string? Terms, int? InvoiceId, int? SourceRequestId = null, Guid? SourceJourneyId = null);
 public sealed record InvoiceCreationCustomer(int Id, string FullName, string Email, string? Mobile, string? Telephone, string? Fax, InvoiceCreationCompany? Company, InvoiceCreationAddress? BillingAddress, InvoiceCreationAddress? ShippingAddress);
 public sealed record InvoiceCreationCompany(string? Name, string? TaxNumber, string? Registrar);
 public sealed record InvoiceCreationAddress(string? Building, string? Line1, string? Line2, string? City, string? State, string? PostalCode, string? Country);

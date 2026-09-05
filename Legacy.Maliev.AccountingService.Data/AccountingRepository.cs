@@ -160,6 +160,49 @@ public sealed class AccountingRepository(
     public async Task<IReadOnlyList<InvoiceFile>> GetInvoiceFilesAsync(int invoiceId, CancellationToken cancellationToken) =>
         await invoices.Files.AsNoTracking().Where(file => file.InvoiceId == invoiceId).OrderBy(file => file.Id).ToListAsync(cancellationToken);
 
+    public async Task<PaidInvoiceOutcomeReadback> GetPaidInvoiceOutcomeReadbackAsync(
+        DateTime fromUtc,
+        DateTime toUtc,
+        CancellationToken cancellationToken)
+    {
+        var paidInvoices = await invoices.Invoices
+            .AsNoTracking()
+            .Where(invoice => invoice.IsPaid
+                && invoice.PaymentDate.HasValue
+                && invoice.PaymentDate.Value >= fromUtc
+                && invoice.PaymentDate.Value < toUtc)
+            .Select(invoice => new
+            {
+                PaidUtc = invoice.PaymentDate!.Value,
+                invoice.Currency,
+                invoice.Total,
+                IsSourceAttributed = invoice.SourceRequestId.HasValue && invoice.SourceJourneyId.HasValue,
+            })
+            .ToListAsync(cancellationToken);
+
+        return new PaidInvoiceOutcomeReadback(
+            fromUtc,
+            toUtc,
+            paidInvoices
+                .GroupBy(invoice => invoice.PaidUtc.Date)
+                .OrderBy(group => group.Key)
+                .Select(group => new PaidInvoiceOutcomeReadbackDay(
+                    DateTime.SpecifyKind(group.Key, DateTimeKind.Utc),
+                    group.Count(),
+                    group.Count(invoice => invoice.IsSourceAttributed),
+                    group.Count(invoice => !invoice.IsSourceAttributed),
+                    group.GroupBy(invoice => string.IsNullOrWhiteSpace(invoice.Currency)
+                            ? "UNSPECIFIED"
+                            : invoice.Currency)
+                        .OrderBy(currency => currency.Key, StringComparer.Ordinal)
+                        .Select(currency => new PaidInvoiceAmountByCurrency(
+                            currency.Key,
+                            currency.Sum(invoice => invoice.Total.GetValueOrDefault()),
+                            currency.Count()))
+                        .ToArray()))
+                .ToArray());
+    }
+
     public async Task<PaginatedResponse<Receipt>?> GetReceiptsAsync(
         string? search,
         int page,

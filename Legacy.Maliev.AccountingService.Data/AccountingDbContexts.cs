@@ -47,6 +47,10 @@ public sealed class InvoiceDbContext(DbContextOptions<InvoiceDbContext> options)
         modelBuilder.Entity<Invoice>().Property(value => value.Total).HasPrecision(18, 2);
         modelBuilder.Entity<Invoice>().Property(value => value.WithholdingTax).HasPrecision(18, 2);
         modelBuilder.Entity<Invoice>().Property(value => value.Outstanding).HasPrecision(18, 2);
+        modelBuilder.Entity<Invoice>().HasIndex(value => value.SourceRequestId)
+            .HasFilter("\"SourceRequestID\" IS NOT NULL");
+        modelBuilder.Entity<Invoice>().HasIndex(value => value.SourceJourneyId)
+            .HasFilter("\"SourceJourneyID\" IS NOT NULL");
         modelBuilder.Entity<Invoice>().Property(value => value.ModifiedDate).IsConcurrencyToken();
         modelBuilder.Entity<InvoiceOrderItem>().HasOne(value => value.Invoice).WithMany(value => value.InvoiceOrderItems)
             .HasForeignKey(value => value.InvoiceId).OnDelete(DeleteBehavior.NoAction).HasConstraintName("FK_OrderItem_Invoice");

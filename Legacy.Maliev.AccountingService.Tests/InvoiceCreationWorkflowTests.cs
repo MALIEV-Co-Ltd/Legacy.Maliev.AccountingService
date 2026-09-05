@@ -33,6 +33,8 @@ public sealed class InvoiceCreationWorkflowTests
         Assert.Equal("Bangkok", preview.BillingAddress.City);
         Assert.Single(preview.OrderItems);
         Assert.Equal("Part one", preview.OrderItems[0].Description);
+        Assert.Equal(701, preview.SourceRequestId);
+        Assert.Equal(Guid.Parse("a3308993-39b9-41fc-bbfd-f3500de40f55"), preview.SourceJourneyId);
     }
 
     [Fact]
@@ -59,7 +61,7 @@ public sealed class InvoiceCreationWorkflowTests
         Assert.Equal(901, result.InvoiceId);
         Assert.Equal(InvoiceCreationState.Completed, result.State);
         store.Verify(value => value.CreateAsync(
-            It.Is<Invoice>(invoice => invoice.CustomerId == 42 && invoice.SalesPerson == "Employee One" && invoice.Currency == "THB" && invoice.Subtotal == 1000.25m && invoice.Vat == 70.02m && invoice.Total == 1070.27m && invoice.WithholdingTax == 0m && invoice.Outstanding == 1070.27m),
+            It.Is<Invoice>(invoice => invoice.CustomerId == 42 && invoice.SalesPerson == "Employee One" && invoice.Currency == "THB" && invoice.Subtotal == 1000.25m && invoice.Vat == 70.02m && invoice.Total == 1070.27m && invoice.WithholdingTax == 0m && invoice.Outstanding == 1070.27m && invoice.SourceRequestId == 701 && invoice.SourceJourneyId == Guid.Parse("a3308993-39b9-41fc-bbfd-f3500de40f55")),
             It.Is<IReadOnlyList<InvoiceOrderItem>>(items => items.Count == 1 && items[0].Description == "Part one"),
             It.IsAny<CancellationToken>()), Times.Once);
         quotation.VerifyAll();
@@ -144,7 +146,7 @@ public sealed class InvoiceCreationWorkflowTests
         "TAX", "REG", deductWithholdingTax, true);
 
     private static InvoiceCreationSourceSnapshot Snapshot() => new(
-        new(84, 42, 7, 1, 1000.25m, 70.02m, 1070.27m, 30m, "quotation", "Bangkok", "Courier", "Net 7", null),
+        new(84, 42, 7, 1, 1000.25m, 70.02m, 1070.27m, 30m, "quotation", "Bangkok", "Courier", "Net 7", null, 701, Guid.Parse("a3308993-39b9-41fc-bbfd-f3500de40f55")),
         new(42, "Customer One", "customer@example.com", "0812345678", null, null,
             new("MALIEV Customer", "TAX", "REG"),
             new("Tower", "Road", null, "Bangkok", "Bangkok", "10110", "Thailand"),
