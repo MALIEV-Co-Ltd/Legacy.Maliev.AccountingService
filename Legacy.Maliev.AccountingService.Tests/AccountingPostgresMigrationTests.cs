@@ -288,6 +288,66 @@ public sealed class AccountingPostgresMigrationTests : IAsyncLifetime
         Assert.Equal(3, await TableCount(context));
     }
 
+    [Fact]
+    public async Task InvoiceAttributionMigration_PreservesKeysAndReturnsPrivacySafeDailyAggregates()
+    {
+        await using var paymentContext = PaymentContext();
+        await using var invoiceContext = InvoiceContext();
+        await using var receiptContext = ReceiptContext();
+        await Task.WhenAll(
+            paymentContext.Database.MigrateAsync(),
+            invoiceContext.Database.MigrateAsync(),
+            receiptContext.Database.MigrateAsync());
+        var repository = Repository(paymentContext, invoiceContext, receiptContext);
+        var journeyId = Guid.Parse("a3308993-39b9-41fc-bbfd-f3500de40f55");
+
+        await repository.CreateAsync(new Invoice
+        {
+            Number = "ATTR-1",
+            CustomerId = 42,
+            Currency = "THB",
+            IsPaid = true,
+            Total = 100m,
+            PaymentDate = new DateTime(2041, 2, 1, 8, 0, 0, DateTimeKind.Utc),
+            SourceRequestId = 91,
+            SourceJourneyId = journeyId,
+        }, CancellationToken.None);
+        await repository.CreateAsync(new Invoice
+        {
+            Number = "ATTR-2",
+            CustomerId = 42,
+            Currency = "THB",
+            IsPaid = true,
+            Total = 25.50m,
+            PaymentDate = new DateTime(2041, 2, 1, 9, 0, 0, DateTimeKind.Utc),
+        }, CancellationToken.None);
+        await repository.CreateAsync(new Invoice
+        {
+            Number = "ATTR-3",
+            CustomerId = 42,
+            Currency = null!,
+            IsPaid = true,
+            Total = 10m,
+            PaymentDate = new DateTime(2041, 2, 2, 9, 0, 0, DateTimeKind.Utc),
+            SourceRequestId = 92,
+            SourceJourneyId = journeyId,
+        }, CancellationToken.None);
+
+        var result = await repository.GetPaidInvoiceOutcomeReadbackAsync(
+            new DateTime(2041, 2, 1, 0, 0, 0, DateTimeKind.Utc),
+            new DateTime(2041, 2, 3, 0, 0, 0, DateTimeKind.Utc),
+            CancellationToken.None);
+
+        Assert.Equal(2, result.Days.Count);
+        Assert.Equal(DateTimeKind.Utc, result.Days[0].DayUtc.Kind);
+        Assert.Equal((2, 1, 1), (result.Days[0].PaidInvoiceCount, result.Days[0].SourceAttributedPaidInvoiceCount, result.Days[0].UnattributedPaidInvoiceCount));
+        var thb = Assert.Single(result.Days[0].PaidInvoiceAmountsByCurrency);
+        Assert.Equal(("THB", 125.50m, 2), (thb.Currency, thb.PaidInvoiceTotal, thb.PaidInvoiceCount));
+        Assert.Equal("UNSPECIFIED", Assert.Single(result.Days[1].PaidInvoiceAmountsByCurrency).Currency);
+        Assert.Equal(2, await invoiceContext.Database.SqlQueryRaw<int>(
+            "SELECT COUNT(*)::int AS \"Value\" FROM pg_indexes WHERE schemaname = 'public' AND indexname IN ('IX_Invoice_SourceRequestID', 'IX_Invoice_SourceJourneyID')").SingleAsync());
+    }
+
     private static async Task<int> TableCount(DbContext context) =>
         await context.Database.SqlQueryRaw<int>("SELECT COUNT(*)::int AS \"Value\" FROM information_schema.tables WHERE table_schema = 'public' AND table_name <> '__EFMigrationsHistory'").SingleAsync();
 

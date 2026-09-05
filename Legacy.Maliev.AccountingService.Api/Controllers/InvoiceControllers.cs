@@ -33,6 +33,22 @@ public sealed class InvoicesController(IAccountingService service, IIdempotencyS
         var value = await Service.GetInvoicesAsync(customerId, sort, search, paid, index ?? 1, size ?? 20, cancellationToken);
         return value is null ? NotFound() : value;
     }
+    [HttpGet("outcomes/readback"), RequirePermission(AccountingPermissions.Read, RequireLiveCheck = true)]
+    public async Task<ActionResult<PaidInvoiceOutcomeReadback>> GetPaidInvoiceOutcomeReadbackAsync(
+        DateTime fromUtc,
+        DateTime toUtc,
+        CancellationToken cancellationToken)
+    {
+        if (fromUtc.Kind != DateTimeKind.Utc
+            || toUtc.Kind != DateTimeKind.Utc
+            || fromUtc >= toUtc
+            || toUtc - fromUtc > TimeSpan.FromDays(31))
+        {
+            return BadRequest();
+        }
+
+        return await Service.GetPaidInvoiceOutcomeReadbackAsync(fromUtc, toUtc, cancellationToken);
+    }
     [HttpPut("{id:int}"), RequirePermission(AccountingPermissions.Update, RequireLiveCheck = true)]
     public Task<IActionResult> UpdateInvoiceAsync(int id, Domain.Invoice.Invoice item, [FromHeader(Name = "If-Unmodified-Since")] DateTimeOffset? expected, CancellationToken cancellationToken) => Update(id, item, expected, cancellationToken);
 }

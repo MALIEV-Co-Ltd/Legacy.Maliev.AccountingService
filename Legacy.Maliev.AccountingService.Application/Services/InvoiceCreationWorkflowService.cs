@@ -116,7 +116,8 @@ public sealed class InvoiceCreationWorkflowService(
         var withholding = q.WithholdingTax ?? 0m;
         return new(q.Id, customer.Id, $"{now:ddMMyy}-{customer.Id}-{q.Id}", value.Employee.FullName, value.Currency.ShortName,
             q.Comment, q.ShippedVia, q.Fob, q.Terms, billing, shipping, customer.Company?.TaxNumber, customer.Company?.Registrar,
-            q.Subtotal, q.Vat, q.Total, withholding, q.Total - withholding, value.OrderItems);
+            q.Subtotal, q.Vat, q.Total, withholding, q.Total - withholding, value.OrderItems,
+            q.SourceRequestId, q.SourceJourneyId);
     }
 
     private static InvoiceAddressInput Address(InvoiceCreationCustomer customer, InvoiceCreationAddress? address, string? telephone)
@@ -167,6 +168,8 @@ public sealed class InvoiceCreationWorkflowService(
         IsPaid = false,
         CreatedDate = now,
         ModifiedDate = now,
+        SourceRequestId = p.SourceRequestId,
+        SourceJourneyId = p.SourceJourneyId,
     };
 
     private static IReadOnlyList<InvoiceOrderItem> MapItems(IReadOnlyList<InvoiceCreationOrderItem> values, int? invoiceId, DateTime now) => values.Select(value => new InvoiceOrderItem

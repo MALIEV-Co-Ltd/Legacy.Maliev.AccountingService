@@ -25,6 +25,12 @@ namespace Legacy.Maliev.AccountingService.Domain.Invoice
         /// </value>
         public int Id { get; set; }
 
+        /// <summary>Gets or sets the persisted quotation-request attribution identifier.</summary>
+        public int? SourceRequestId { get; set; }
+
+        /// <summary>Gets or sets the non-PII source journey identifier.</summary>
+        public Guid? SourceJourneyId { get; set; }
+
         /// <summary>
         /// Gets or sets the number.
         /// </summary>
