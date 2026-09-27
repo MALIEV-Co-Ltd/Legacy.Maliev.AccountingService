@@ -73,7 +73,7 @@ public sealed class ReceiptDbContext(DbContextOptions<ReceiptDbContext> options)
         modelBuilder.Entity<ReceiptOrderItem>().Property(value => value.Subtotal).HasPrecision(18, 2)
             .HasComputedColumnSql("(\"UnitPrice\" * \"Quantity\")::numeric(18,2)", stored: true);
         modelBuilder.Entity<Receipt>().Property(value => value.AmountPaid).HasPrecision(18, 2)
-            .HasComputedColumnSql("(\"Total\" - COALESCE(\"WithholdingTax\", 0))::numeric(18,2)", stored: true);
+            .HasComputedColumnSql("(\"Total\" - \"WithholdingTax\")::numeric(18,2)", stored: true);
         modelBuilder.Entity<Receipt>().Property(value => value.Vat).HasColumnName("VAT").HasPrecision(18, 2);
         modelBuilder.Entity<Receipt>().Property(value => value.Subtotal).HasPrecision(18, 2);
         modelBuilder.Entity<Receipt>().Property(value => value.Total).HasPrecision(18, 2);

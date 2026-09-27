@@ -101,6 +101,74 @@ public sealed class AccountingPostgresMigrationTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task ReceiptAmountPaidMigration_RecomputesExistingNullsRoundsDecimalsAndTracksUpdates()
+    {
+        await using var context = ReceiptContext();
+        await context.Database.MigrateAsync("20260721024327_FixTimestampColumnType");
+        var paymentDate = new DateTime(2026, 7, 15, 0, 0, 0, DateTimeKind.Utc);
+        var withoutTax = new Receipt
+        {
+            InvoiceNumber = "NULL-TAX",
+            PaymentDate = paymentDate,
+            Total = 10.005m,
+        };
+        var withTax = new Receipt
+        {
+            InvoiceNumber = "DECIMAL-TAX",
+            PaymentDate = paymentDate,
+            Total = 10.005m,
+            WithholdingTax = 0.01m,
+        };
+        context.Receipts.AddRange(withoutTax, withTax);
+        await context.SaveChangesAsync();
+        context.ChangeTracker.Clear();
+
+        Assert.Equal(10.01m, (await context.Receipts.SingleAsync(value => value.Id == withoutTax.Id)).AmountPaid);
+
+        await context.Database.MigrateAsync();
+        context.ChangeTracker.Clear();
+        withoutTax = await context.Receipts.SingleAsync(value => value.Id == withoutTax.Id);
+        withTax = await context.Receipts.SingleAsync(value => value.Id == withTax.Id);
+        Assert.Null(withoutTax.AmountPaid);
+        Assert.Equal(10.01m, withTax.Total);
+        Assert.Equal(10.00m, withTax.AmountPaid);
+
+        withoutTax.WithholdingTax = 0.03m;
+        withTax.Total = 20.005m;
+        await context.SaveChangesAsync();
+        context.ChangeTracker.Clear();
+        Assert.Equal(9.98m, (await context.Receipts.SingleAsync(value => value.Id == withoutTax.Id)).AmountPaid);
+        withTax = await context.Receipts.SingleAsync(value => value.Id == withTax.Id);
+        Assert.Equal(20.00m, withTax.AmountPaid);
+
+        withTax.WithholdingTax = null;
+        await context.SaveChangesAsync();
+        context.ChangeTracker.Clear();
+        Assert.Null((await context.Receipts.SingleAsync(value => value.Id == withTax.Id)).AmountPaid);
+
+        await context.Database.MigrateAsync("20260721024327_FixTimestampColumnType");
+        context.ChangeTracker.Clear();
+        Assert.Equal(20.01m, (await context.Receipts.SingleAsync(value => value.Id == withTax.Id)).AmountPaid);
+    }
+
+    [Fact]
+    public async Task ReceiptAmountPaidMigration_RejectsUnexpectedPhysicalExpression()
+    {
+        await using var context = ReceiptContext();
+        await context.Database.MigrateAsync("20260721024327_FixTimestampColumnType");
+        await context.Database.ExecuteSqlRawAsync("""
+            ALTER TABLE "Receipt" ALTER COLUMN "AmountPaid"
+            SET EXPRESSION AS (("Total" + COALESCE("WithholdingTax", 0))::numeric(18,2));
+            """);
+
+        var failure = await Assert.ThrowsAnyAsync<Exception>(() => context.Database.MigrateAsync());
+        Assert.Contains("Receipt.AmountPaid generated-column preimage mismatch", failure.ToString());
+        Assert.DoesNotContain(
+            await context.Database.GetAppliedMigrationsAsync(),
+            name => name.EndsWith("_PreserveNullableAmountPaid", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public async Task InvoiceQuery_AppliesPaidSearchAndSortBeforePagination()
     {
         await using var paymentContext = PaymentContext();
