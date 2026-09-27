@@ -158,7 +158,7 @@ public sealed class AccountingPostgresMigrationTests : IAsyncLifetime
         await context.Database.MigrateAsync("20260721024327_FixTimestampColumnType");
         await context.Database.ExecuteSqlRawAsync("""
             ALTER TABLE "Receipt" ALTER COLUMN "AmountPaid"
-            SET EXPRESSION AS (("Total" + "WithholdingTax")::numeric(18,2));
+            SET EXPRESSION AS (("Total" + COALESCE("WithholdingTax", 0))::numeric(18,2));
             """);
 
         var failure = await Assert.ThrowsAnyAsync<Exception>(() => context.Database.MigrateAsync());

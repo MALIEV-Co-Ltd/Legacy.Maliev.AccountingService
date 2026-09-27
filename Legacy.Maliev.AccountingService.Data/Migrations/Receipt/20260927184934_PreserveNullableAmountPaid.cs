@@ -7,17 +7,21 @@ namespace Legacy.Maliev.AccountingService.Data.Migrations.Receipt;
 /// <inheritdoc />
 public partial class PreserveNullableAmountPaid : Migration
 {
+    // pg_get_expr canonical output on the supported PostgreSQL 18 target.
+    private const string OldExpression = "((\"Total\" - COALESCE(\"WithholdingTax\", (0)::numeric)))::numeric(18,2)";
+    private const string NewExpression = "((\"Total\" - \"WithholdingTax\"))::numeric(18,2)";
+
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder) =>
-        SetExpression(migrationBuilder, expectCoalesce: true,
+        SetExpression(migrationBuilder, OldExpression,
             "(\"Total\" - \"WithholdingTax\")::numeric(18,2)");
 
     /// <inheritdoc />
     protected override void Down(MigrationBuilder migrationBuilder) =>
-        SetExpression(migrationBuilder, expectCoalesce: false,
+        SetExpression(migrationBuilder, NewExpression,
             "(\"Total\" - COALESCE(\"WithholdingTax\", 0))::numeric(18,2)");
 
-    private static void SetExpression(MigrationBuilder migrationBuilder, bool expectCoalesce, string expression)
+    private static void SetExpression(MigrationBuilder migrationBuilder, string expectedExpression, string expression)
     {
         // PostgreSQL 17+ can replace a stored generation expression in place. It rewrites
         // derived values from Total/WithholdingTax without dropping the column or its dependents.
@@ -38,7 +42,7 @@ public partial class PreserveNullableAmountPaid : Migration
                       AND a.attgenerated = 's'
                       AND NOT a.attnotnull
                       AND format_type(a.atttypid, a.atttypmod) = 'numeric(18,2)'
-                      AND (position('COALESCE' IN upper(pg_get_expr(d.adbin, d.adrelid))) > 0) = {expectCoalesce.ToString().ToLowerInvariant()}
+                      AND pg_get_expr(d.adbin, d.adrelid) = '{expectedExpression}'
                 ) THEN
                     RAISE EXCEPTION 'Receipt.AmountPaid generated-column preimage mismatch';
                 END IF;
