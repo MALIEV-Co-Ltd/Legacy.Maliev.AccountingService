@@ -44,17 +44,30 @@ public sealed class InvoiceCreationAdmissionStore(InvoiceDbContext database)
             existing.ServiceSubject != serviceSubject || existing.IntentFingerprint != fingerprint)
             throw new InvoiceCreationConflictException("The operation key is bound to a different invoice-create intent or actor.");
         if (existing.State == "Completed" && existing.ResultJson is not null)
-            return (false, JsonSerializer.Deserialize<InvoiceCreationResult>(existing.ResultJson)
-                ?? throw new InvoiceCreationConflictException("The prior invoice-create result requires reconciliation."));
+        {
+            try
+            {
+                return (false, JsonSerializer.Deserialize<InvoiceCreationResult>(existing.ResultJson)
+                    ?? throw new InvoiceCreationConflictException("The prior invoice-create result requires reconciliation."));
+            }
+            catch (JsonException)
+            {
+                throw new InvoiceCreationConflictException("The prior invoice-create result requires reconciliation.");
+            }
+        }
         throw new InvoiceCreationConflictException("The prior invoice-create outcome is uncertain; reconciliation is required before retry.");
     }
 
-    public Task CompleteAsync(Guid operationId, InvoiceCreationResult result, CancellationToken cancellationToken) =>
-        database.Database.ExecuteSqlInterpolatedAsync($"""
+    public async Task CompleteAsync(Guid operationId, InvoiceCreationResult result, CancellationToken cancellationToken)
+    {
+        var transitioned = await database.Database.ExecuteSqlInterpolatedAsync($"""
             UPDATE "InvoiceCreationAdmission" SET "State" = 'Completed', "ResultJson" = {JsonSerializer.Serialize(result)},
                 "UpdatedAt" = now()
             WHERE "OperationID" = {operationId} AND "State" = 'Pending'
             """, cancellationToken);
+        if (transitioned != 1)
+            throw new InvoiceCreationConflictException("The invoice-create admission requires reconciliation.");
+    }
 
     public Task MarkUncertainAsync(Guid operationId, CancellationToken cancellationToken) =>
         database.Database.ExecuteSqlInterpolatedAsync($"""

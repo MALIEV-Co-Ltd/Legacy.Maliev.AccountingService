@@ -72,6 +72,48 @@ public sealed class InvoiceCreationAdmissionPostgresTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task CompletionWithoutExactlyOnePendingRow_FailsClosed()
+    {
+        var result = new InvoiceCreationResult(901, InvoiceCreationState.Completed,
+            InvoiceCreationEmailState.NotRequested, null, new("maliev.com", "invoice.pdf"));
+        await using var context = Context();
+        var admissions = new InvoiceCreationAdmissionStore(context);
+        var missing = Guid.NewGuid();
+        var missingError = await Assert.ThrowsAsync<InvoiceCreationConflictException>(() =>
+            admissions.CompleteAsync(missing, result, CancellationToken.None));
+        Assert.Equal("The invoice-create admission requires reconciliation.", missingError.Message);
+
+        var uncertain = Guid.NewGuid();
+        await admissions.AdmitAsync(uncertain, 84, "employee:42", "service:legacy-intranet",
+            InvoiceCreationAdmissionStore.Fingerprint(Request()), CancellationToken.None);
+        await admissions.MarkUncertainAsync(uncertain, CancellationToken.None);
+        await Assert.ThrowsAsync<InvoiceCreationConflictException>(() =>
+            admissions.CompleteAsync(uncertain, result, CancellationToken.None));
+        Assert.Equal("NeedsReconciliation", (await context.InvoiceCreationAdmissions.AsNoTracking()
+            .SingleAsync(value => value.OperationId == uncertain)).State);
+    }
+
+    [Fact]
+    public async Task CorruptStoredResult_RequiresReconciliationWithoutEchoingPayload()
+    {
+        var operation = Guid.NewGuid();
+        var fingerprint = InvoiceCreationAdmissionStore.Fingerprint(Request());
+        await using var context = Context();
+        var admissions = new InvoiceCreationAdmissionStore(context);
+        await admissions.AdmitAsync(operation, 84, "employee:42", "service:legacy-intranet", fingerprint, CancellationToken.None);
+        await context.Database.ExecuteSqlInterpolatedAsync($"""
+            UPDATE "InvoiceCreationAdmission" SET "State" = 'Completed', "ResultJson" = {"{private-payload"}
+            WHERE "OperationID" = {operation}
+            """);
+
+        var error = await Assert.ThrowsAsync<InvoiceCreationConflictException>(() =>
+            admissions.AdmitAsync(operation, 84, "employee:42", "service:legacy-intranet", fingerprint, CancellationToken.None));
+
+        Assert.Equal("The prior invoice-create result requires reconciliation.", error.Message);
+        Assert.DoesNotContain("private-payload", error.ToString());
+    }
+
+    [Fact]
     public async Task ConcurrentSameOperation_AdmitsOnlyOneCaller()
     {
         var operation = Guid.NewGuid();
