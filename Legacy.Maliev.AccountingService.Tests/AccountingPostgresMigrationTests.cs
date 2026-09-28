@@ -96,7 +96,7 @@ public sealed class AccountingPostgresMigrationTests : IAsyncLifetime
         Assert.Equal(0.50m, detail.DeltaAmount);
         Assert.Equal(2, (await repository.GetYearlyDetailAsync(true, 2026, null, CancellationToken.None))!.Count);
         Assert.Equal(6, await TableCount(paymentContext));
-        Assert.Equal(3, await TableCount(invoiceContext));
+        Assert.Equal(4, await TableCount(invoiceContext));
         Assert.Equal(3, await TableCount(receiptContext));
     }
 
@@ -353,7 +353,7 @@ public sealed class AccountingPostgresMigrationTests : IAsyncLifetime
         Assert.Equal(invoice.Id, found?.Id);
         Assert.Single(await context.Items.Where(value => value.InvoiceId == invoice.Id).ToListAsync());
         Assert.Single(await context.Files.Where(value => value.InvoiceId == invoice.Id).ToListAsync());
-        Assert.Equal(3, await TableCount(context));
+        Assert.Equal(4, await TableCount(context));
     }
 
     [Fact]

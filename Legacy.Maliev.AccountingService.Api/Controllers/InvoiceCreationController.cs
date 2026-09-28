@@ -1,6 +1,7 @@
 using Legacy.Maliev.AccountingService.Api.Authorization;
 using Legacy.Maliev.AccountingService.Application.Interfaces;
 using Legacy.Maliev.AccountingService.Application.Models;
+using Legacy.Maliev.AccountingService.Data;
 using Maliev.Aspire.ServiceDefaults.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,7 @@ namespace Legacy.Maliev.AccountingService.Api.Controllers.Invoice;
 
 /// <summary>Server-owned quotation-to-invoice preview and creation workflow.</summary>
 [ApiController, Route("invoices/from-quotation"), Authorize]
-public sealed class InvoiceCreationController(IInvoiceCreationWorkflow workflow) : ControllerBase
+public sealed class InvoiceCreationController(IInvoiceCreationWorkflow workflow, InvoiceCreationDelegationVerifier verifier, InvoiceCreationAdmissionStore admissions) : ControllerBase
 {
     [HttpGet("{quotationId:int}/preview"), RequirePermission(AccountingPermissions.Create, RequireLiveCheck = true)]
     public async Task<ActionResult<InvoiceCreationPreview>> PreviewAsync(int quotationId, CancellationToken cancellationToken) =>
@@ -24,7 +25,32 @@ public sealed class InvoiceCreationController(IInvoiceCreationWorkflow workflow)
     {
         if (!Guid.TryParse(operationKey, out var operationId) || operationId == Guid.Empty)
             return BadRequest(Problem(title: "A stable UUID Idempotency-Key is required.", statusCode: StatusCodes.Status400BadRequest));
-        return await ExecuteAsync(() => workflow.CreateAsync(quotationId, request, operationId, cancellationToken));
+        if (!Request.Headers.TryGetValue(InvoiceCreationDelegationVerifier.HeaderName, out var delegation))
+            return await ExecuteAsync(() => workflow.CreateAsync(quotationId, request, operationId, cancellationToken));
+        if (delegation.Count != 1 || operationKey != operationId.ToString("D"))
+            return Unauthorized(Problem(title: "Invalid invoice-create delegation.", statusCode: StatusCodes.Status401Unauthorized));
+        var employee = verifier.Verify(delegation[0], User, quotationId, operationId);
+        if (employee is null)
+            return Unauthorized(Problem(title: "Invalid invoice-create delegation.", statusCode: StatusCodes.Status401Unauthorized));
+        return await ExecuteAsync(async () =>
+        {
+            var fingerprint = InvoiceCreationAdmissionStore.Fingerprint(request);
+            var admission = await admissions.AdmitAsync(operationId, quotationId, employee,
+                InvoiceCreationDelegationVerifier.IntranetSubject, fingerprint, cancellationToken);
+            if (!admission.IsNew) return admission.Completed!;
+            try
+            {
+                var result = await workflow.CreateAsync(quotationId, request, operationId, cancellationToken);
+                await admissions.CompleteAsync(operationId, result, cancellationToken);
+                return result;
+            }
+            catch
+            {
+                try { await admissions.MarkUncertainAsync(operationId, CancellationToken.None); }
+                catch { /* The pending admission itself remains fail-closed. */ }
+                throw;
+            }
+        });
     }
 
     private async Task<ActionResult<T>> ExecuteAsync<T>(Func<Task<T>> execute)

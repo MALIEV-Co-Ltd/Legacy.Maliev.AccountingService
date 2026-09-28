@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using Legacy.Maliev.AccountingService.Application.Interfaces;
 using Legacy.Maliev.AccountingService.Application.Services;
+using Legacy.Maliev.AccountingService.Api.Authorization;
 using Legacy.Maliev.AccountingService.Data;
 using Maliev.Aspire.ServiceDefaults;
 
@@ -38,6 +39,8 @@ builder.Services.AddScoped<IInvoiceCreationJournal, InvoiceCreationJournal>();
 builder.Services.AddScoped<IInvoiceCreationLock, PostgresInvoiceCreationLock>();
 builder.Services.AddScoped<IInvoiceCreationSource, InvoiceCreationSourceClient>();
 builder.Services.AddScoped<IInvoiceCreationWorkflow, InvoiceCreationWorkflowService>();
+builder.Services.AddScoped<InvoiceCreationAdmissionStore>();
+builder.Services.AddSingleton<InvoiceCreationDelegationVerifier>();
 builder.Services.AddHttpClient<IReceiptDocumentClient, ReceiptDocumentClient>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["Services:Document"]

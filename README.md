@@ -31,8 +31,27 @@ employee, currency, addresses, totals, withholding tax, and immutable line items
 services. Creation accepts only editable invoice fields plus a caller-stable UUID, atomically writes
 the existing Invoice and OrderItem tables, accepts and links the quotation, renders the QuestPDF
 invoice, stores it through FileService, and optionally sends it through NotificationService. Redis
-replay protection and a PostgreSQL advisory lock reconcile interrupted requests without a database
-schema change; a reconciled invoice is not automatically re-emailed when delivery outcome is unknown.
+replay protection and a PostgreSQL advisory lock reconcile some interrupted service-only requests;
+a reconciled invoice is not automatically re-emailed when delivery outcome is unknown.
+
+For the opt-in employee-bound path, the trusted Intranet service sends
+`X-Maliev-Employee-Delegation: Bearer <AuthService RS256 JWT>` on the existing create route. The
+normal service bearer still needs `legacy.accounting.create` with its live permission check. The
+delegation must have AuthService issuer, the configured public signing key, only audience
+`legacy-accounting:invoice-create`, `azp=service:legacy-intranet`, scope
+`legacy.accounting.create`, an employee `sub`, and quotation/operation claims matching the route
+and canonical lowercase `Idempotency-Key`. Its signed lifetime is at most 120 seconds. An invalid
+present header is rejected; absence retains the existing service-only, unattributed behavior.
+
+The Invoice database now records a unique operation UUID, employee/service subjects, quotation,
+SHA-256 fingerprint of the bound editable request, state, and bounded terminal result before
+delegated side effects. A completed same-tuple retry returns that result. A conflicting actor,
+quotation, or body is rejected; pending or failed/uncertain operations require manual
+reconciliation and are never automatically replayed. This does not yet implement the issue #23
+status/resume API, lost-response recovery, or NotificationService reconciliation. No delegation
+issuer permission grant or traffic switch is included. Roll out the additive Invoice migration
+first, then Accounting, and only then a separately reviewed Intranet consumer and explicit
+service permission grant.
 
 ## Data boundaries
 

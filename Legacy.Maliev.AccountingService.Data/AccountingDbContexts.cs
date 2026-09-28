@@ -31,6 +31,7 @@ public sealed class PaymentDbContext(DbContextOptions<PaymentDbContext> options)
 
 public sealed class InvoiceDbContext(DbContextOptions<InvoiceDbContext> options) : DbContext(options)
 {
+    public DbSet<InvoiceCreationAdmission> InvoiceCreationAdmissions => Set<InvoiceCreationAdmission>();
     public DbSet<Invoice> Invoices => Set<Invoice>();
     public DbSet<InvoiceOrderItem> Items => Set<InvoiceOrderItem>();
     public DbSet<InvoiceFile> Files => Set<InvoiceFile>();
@@ -38,6 +39,17 @@ public sealed class InvoiceDbContext(DbContextOptions<InvoiceDbContext> options)
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ModelRules.Apply(modelBuilder);
+        modelBuilder.Entity<InvoiceCreationAdmission>(entity =>
+        {
+            entity.HasKey(value => value.OperationId);
+            entity.Property(value => value.OperationId).HasColumnName("OperationID");
+            entity.Property(value => value.QuotationId).HasColumnName("QuotationID");
+            entity.Property(value => value.EmployeeSubject).HasMaxLength(256);
+            entity.Property(value => value.ServiceSubject).HasMaxLength(128);
+            entity.Property(value => value.IntentFingerprint).HasMaxLength(64);
+            entity.Property(value => value.State).HasMaxLength(32);
+            entity.ToTable(table => table.HasCheckConstraint("CK_InvoiceCreationAdmission_Quotation", "\"QuotationID\" > 0"));
+        });
         modelBuilder.Entity<InvoiceOrderItem>().ToTable("OrderItem");
         modelBuilder.Entity<InvoiceOrderItem>().Property(value => value.UnitPrice).HasPrecision(18, 2);
         modelBuilder.Entity<InvoiceOrderItem>().Property(value => value.Subtotal).HasPrecision(18, 2)
