@@ -14,6 +14,36 @@ namespace Legacy.Maliev.AccountingService.Tests;
 public sealed class FinancialLoggingBoundaryTests
 {
     [Theory]
+    [InlineData("invoices/{invoice}", "/invoices/customer-secret")]
+    [InlineData("payments/{paymentId:int}", "/payments/81927")]
+    [InlineData("receipts/{receiptId:int}", "/receipts/81927")]
+    public async Task FinancialCorrelationScope_ContainsRoutePatternButNoLiteralFinancialPath(
+        string pattern, string requestPath)
+    {
+        var logger = new CapturingScopeLogger();
+        var context = new DefaultHttpContext();
+        context.Request.Method = "GET";
+        context.Request.Path = requestPath;
+        context.Request.Headers["X-Correlation-ID"] = "finance-incident-123";
+        context.SetEndpoint(new RouteEndpointBuilder(
+            _ => Task.CompletedTask,
+            RoutePatternFactory.Parse(pattern),
+            0).Build());
+
+        var middleware = new CorrelationIdMiddleware(_ => Task.CompletedTask, logger);
+        await middleware.InvokeAsync(context);
+
+        Assert.Equal("finance-incident-123", context.Response.Headers["X-Correlation-ID"].ToString());
+        Assert.Equal("finance-incident-123", logger.Scope["CorrelationId"]);
+        Assert.Equal(pattern, logger.Scope["RouteTemplate"]);
+        Assert.Equal("GET", logger.Scope["RequestMethod"]);
+        Assert.DoesNotContain("RequestPath", logger.Scope.Keys);
+        Assert.DoesNotContain("UserAgent", logger.Scope.Keys);
+        Assert.DoesNotContain("RemoteIp", logger.Scope.Keys);
+        Assert.DoesNotContain(requestPath, string.Join(' ', logger.Scope.Values), StringComparison.Ordinal);
+    }
+
+    [Theory]
     [InlineData(typeof(InvoicesController), "invoices", "{invoice}", "/invoices/customer-secret")]
     [InlineData(typeof(Api.Controllers.Payment.PaymentsController), "payments", "{paymentId:int}", "/payments/81927")]
     [InlineData(typeof(Api.Controllers.Receipt.ReceiptsController), "receipts", "{receiptId:int}", "/receipts/81927")]
@@ -111,6 +141,27 @@ public sealed class FinancialLoggingBoundaryTests
                 ? structured.ToDictionary(item => item.Key, item => item.Value)
                 : new Dictionary<string, object?>();
             Entries.Add(new LogEntry(logLevel, formatter(state, exception), values, exception));
+        }
+    }
+
+    private sealed class CapturingScopeLogger : ILogger<CorrelationIdMiddleware>
+    {
+        public IReadOnlyDictionary<string, object?> Scope { get; private set; } =
+            new Dictionary<string, object?>();
+
+        public IDisposable BeginScope<TState>(TState state) where TState : notnull
+        {
+            Scope = state is IEnumerable<KeyValuePair<string, object?>> values
+                ? values.ToDictionary(item => item.Key, item => item.Value)
+                : throw new InvalidOperationException("The correlation scope is not structured.");
+            return NoopScope.Instance;
+        }
+
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state,
+            Exception? exception, Func<TState, Exception?, string> formatter)
+        {
         }
     }
 
