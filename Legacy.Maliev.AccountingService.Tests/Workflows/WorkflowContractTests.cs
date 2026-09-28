@@ -66,8 +66,8 @@ public sealed class WorkflowContractTests
     public void BuildAndTest_RejectsSharedActionMainWithPinnedShaComment()
     {
         AssertMutationRejected(
-            "MALIEV-Co-Ltd/Legacy.Maliev.Workflows/actions/dotnet-validate@f7bafd4ba7e8e6e92a0b7d853150f3ca60e1eae6",
-            "MALIEV-Co-Ltd/Legacy.Maliev.Workflows/actions/dotnet-validate@main # f7bafd4ba7e8e6e92a0b7d853150f3ca60e1eae6");
+            "MALIEV-Co-Ltd/Legacy.Maliev.Workflows/actions/dotnet-validate@73dd7304ffe85ec504389fd7664cc39070b9f148",
+            "MALIEV-Co-Ltd/Legacy.Maliev.Workflows/actions/dotnet-validate@main # 73dd7304ffe85ec504389fd7664cc39070b9f148");
     }
 
     [Fact]
@@ -184,7 +184,7 @@ public sealed class WorkflowContractTests
 internal static partial class WorkflowContractValidator
 {
     private const string CheckoutAction = "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1";
-    private const string SharedValidationAction = "MALIEV-Co-Ltd/Legacy.Maliev.Workflows/actions/dotnet-validate@f7bafd4ba7e8e6e92a0b7d853150f3ca60e1eae6";
+    private const string SharedValidationAction = "MALIEV-Co-Ltd/Legacy.Maliev.Workflows/actions/dotnet-validate@73dd7304ffe85ec504389fd7664cc39070b9f148";
 
     public static void Validate(string workflow)
     {
