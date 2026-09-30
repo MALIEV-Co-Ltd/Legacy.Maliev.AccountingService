@@ -31,4 +31,8 @@
     <ProjectReference Include="..\Legacy.Maliev.AccountingService.Domain\Legacy.Maliev.AccountingService.Domain.csproj" />
   </ItemGroup>
 
+  <Target Name="PrepareInvoiceDelegationAuthProof" BeforeTargets="PrepareForBuild" Condition="'$(DesignTimeBuild)' != 'true'">
+    <Exec Command="pwsh -NoProfile -File &quot;$(MSBuildProjectDirectory)/../tooling/prepare-delegation-auth-proof.ps1&quot;" Timeout="1000000" />
+  </Target>
+
 </Project>
