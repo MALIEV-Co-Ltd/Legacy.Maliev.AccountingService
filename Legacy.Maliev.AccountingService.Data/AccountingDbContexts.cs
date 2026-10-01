@@ -68,11 +68,30 @@ public sealed class InvoiceDbContext(DbContextOptions<InvoiceDbContext> options)
             entity.Property(value => value.BindingVersion).HasMaxLength(64);
             entity.Property(value => value.BindingKeyId).HasColumnName("BindingKeyID").HasMaxLength(64);
             entity.Property(value => value.Phase).HasMaxLength(32);
+            entity.Property(value => value.RemoteState).HasMaxLength(32);
             entity.Property(value => value.Version).IsConcurrencyToken();
             entity.HasAlternateKey(value => new { value.InvoiceId, value.Purpose })
                 .HasName("UQ_InvoiceNotificationCorrelation_InvoicePurpose");
             entity.ToTable("InvoiceNotificationCorrelation", "public", table =>
             {
+                table.HasCheckConstraint("CK_InvoiceNotificationCorrelation_Receipt", """
+                    ("RemoteVersion" IS NULL AND "RemoteState" IS NULL AND
+                     "RemoteAdmittedAt" IS NULL AND "RemoteUpdatedAt" IS NULL AND "RemoteReceiptBinding" IS NULL)
+                    OR
+                    ("RemoteVersion" IS NOT NULL AND "RemoteVersion">0 AND "RemoteState" IS NOT NULL AND
+                     "RemoteAdmittedAt" IS NOT NULL AND "RemoteUpdatedAt" IS NOT NULL AND
+                     "RemoteReceiptBinding" IS NOT NULL AND octet_length("RemoteReceiptBinding")=32 AND
+                     "RemoteUpdatedAt">="RemoteAdmittedAt" AND
+                     (("RemoteState"='admitted' AND "RemoteVersion"=1) OR
+                      ("RemoteState"='submitting' AND "RemoteVersion"=2) OR
+                      ("RemoteState" IN ('outcomeUnknown','providerAccepted') AND "RemoteVersion"=3)))
+                    """);
+                table.HasCheckConstraint("CK_InvoiceNotificationCorrelation_ReceiptPhase", """
+                    ("Phase" IN ('Prepared','AdmissionIssued') AND "RemoteVersion" IS NULL)
+                    OR ("Phase" IN ('Admitted','ExecutionIssued') AND "RemoteVersion" IS NOT NULL AND "RemoteState"='admitted')
+                    OR ("Phase"='OutcomeUnknown' AND "RemoteVersion" IS NOT NULL AND "RemoteState" IN ('submitting','outcomeUnknown'))
+                    OR ("Phase"='ProviderAccepted' AND "RemoteVersion" IS NOT NULL AND "RemoteState"='providerAccepted')
+                    """);
                 table.HasCheckConstraint("CK_InvoiceNotificationCorrelation_Identity", """
                     "InvoiceID" > 0 AND "QuotationID" > 0 AND "Purpose" = 'invoice-issued'
                     AND "SenderServiceSubject" = 'service:legacy-accounting'

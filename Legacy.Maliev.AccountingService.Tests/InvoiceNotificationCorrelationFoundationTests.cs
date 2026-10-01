@@ -139,6 +139,8 @@ public sealed class InvoiceNotificationCorrelationFoundationTests(ITestOutputHel
         await database.SaveChangesAsync();
         await database.Database.ExecuteSqlRawAsync("""
             ALTER TABLE public."InvoiceNotificationCorrelation" DROP CONSTRAINT "CK_InvoiceNotificationCorrelation_State";
+            ALTER TABLE public."InvoiceNotificationCorrelation" DROP CONSTRAINT "CK_InvoiceNotificationCorrelation_Receipt";
+            ALTER TABLE public."InvoiceNotificationCorrelation" DROP CONSTRAINT "CK_InvoiceNotificationCorrelation_ReceiptPhase";
             UPDATE public."InvoiceNotificationCorrelation" SET "Phase"='ProviderAccepted', "Version"=0,
               "RemoteVersion"=0,"UpdatedAt"='1960-01-01T00:00:00Z';
             ALTER TABLE public."InvoiceNotificationCorrelation" ADD CONSTRAINT "CK_InvoiceNotificationCorrelation_State" CHECK ("Version">0) NOT VALID
@@ -375,7 +377,10 @@ public sealed class InvoiceNotificationCorrelationFoundationTests(ITestOutputHel
             "OriginEmployeeSubject:character varying(256):required:plain", "OriginIssuer:character varying(512):required:plain",
             "OriginServiceSubject:character varying(128):required:plain", "PayloadBinding:bytea:required:plain",
             "PayloadFrameVersion:character varying(64):required:plain", "Phase:character varying(32):required:plain",
-            "Purpose:character varying(32):required:plain", "QuotationID:integer:required:plain", "RemoteVersion:bigint:optional:plain",
+            "Purpose:character varying(32):required:plain", "QuotationID:integer:required:plain",
+            "RemoteAdmittedAt:timestamp with time zone:optional:plain", "RemoteReceiptBinding:bytea:optional:plain",
+            "RemoteState:character varying(32):optional:plain", "RemoteUpdatedAt:timestamp with time zone:optional:plain",
+            "RemoteVersion:bigint:optional:plain",
             "SenderIssuer:character varying(512):required:plain", "SenderServiceSubject:character varying(128):required:plain",
             "UpdatedAt:timestamp with time zone:required:plain", "Version:bigint:required:plain", "WorkflowOperationID:uuid:required:plain",
         }, shape);
@@ -386,7 +391,8 @@ public sealed class InvoiceNotificationCorrelationFoundationTests(ITestOutputHel
             """).ToListAsync();
         Assert.Equal(new[]
         {
-            "CK_InvoiceNotificationCorrelation_Identity:c:true", "CK_InvoiceNotificationCorrelation_State:c:true",
+            "CK_InvoiceNotificationCorrelation_Identity:c:true", "CK_InvoiceNotificationCorrelation_Receipt:c:true",
+            "CK_InvoiceNotificationCorrelation_ReceiptPhase:c:true", "CK_InvoiceNotificationCorrelation_State:c:true",
             "PK_InvoiceNotificationCorrelation:p:true", "UQ_InvoiceNotificationCorrelation_InvoicePurpose:u:true",
         }, constraints);
         foreach (var check in await database.Database.SqlQueryRaw<string>("""
@@ -472,9 +478,18 @@ public sealed class InvoiceNotificationCorrelationFoundationTests(ITestOutputHel
         {
             row.AdmissionIssuedAt = row.CreatedAt;
             row.ExecutionIssuedAt = row.CreatedAt;
-            row.RemoteVersion = 1;
         }
-        // Execution/unknown/accepted missing timestamps/remote version must refuse.
+        // Keep this original State-specific bad-local-timestamp proof independently reachable.
+        // New tests separately retain missing RemoteVersion / partial-quartet rejection.
+        if (phase is not ("Prepared" or "AdmissionIssued"))
+        {
+            row.RemoteState = phase == "ProviderAccepted" ? "providerAccepted" : phase == "OutcomeUnknown" ? "submitting" : "admitted";
+            row.RemoteVersion = phase == "ProviderAccepted" ? 3 : phase == "OutcomeUnknown" ? 2 : 1;
+            row.RemoteAdmittedAt = row.CreatedAt;
+            row.RemoteUpdatedAt = row.CreatedAt;
+            row.RemoteReceiptBinding = new byte[32];
+        }
+        // Execution/unknown/accepted still have the exact original missing local timestamps.
         database.InvoiceNotificationCorrelations.Add(row);
         var failure = await Assert.ThrowsAsync<DbUpdateException>(() => database.SaveChangesAsync());
         var postgresFailure = Assert.IsType<PostgresException>(failure.InnerException);

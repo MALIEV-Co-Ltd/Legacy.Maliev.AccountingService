@@ -20,6 +20,10 @@ public sealed class InvoiceNotificationCorrelationRow
     public required string Phase { get; set; }
     public long Version { get; set; }
     public long? RemoteVersion { get; set; }
+    public string? RemoteState { get; set; }
+    public DateTimeOffset? RemoteAdmittedAt { get; set; }
+    public DateTimeOffset? RemoteUpdatedAt { get; set; }
+    public byte[]? RemoteReceiptBinding { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
     public DateTimeOffset? AdmissionIssuedAt { get; set; }
