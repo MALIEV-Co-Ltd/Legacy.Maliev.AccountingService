@@ -150,7 +150,10 @@ includes workflow and is insufficient alone. No automatic TTL, DELETE, reset or
 Down: additive forward-only migration Down throws before any SQL. No startup DDL.
 Immutable columns are never in UPDATE SET; no caller timestamps/phase/version.
 Application validation is stricter than SQL about bounded valid UTF-8 subjects,
-issuer syntax and configured allowed identity. Physical checks are not trust proof.
+IDs and fixed purpose/sender/version text. It does not validate issuer URI syntax,
+configured issuer allowlists or authenticated provenance: OriginIssuer and
+SenderIssuer remain caller-supplied until a future validated consumer context.
+Physical checks and local HMAC continuity are not trust proof.
 
 Readiness runs uncached before admission/fences: exact public namespace, ordinary
 table/no partition/view/rule/RLS/user trigger, all live nondropped columns including

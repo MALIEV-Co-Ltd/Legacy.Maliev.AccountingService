@@ -34,7 +34,8 @@ internal static class InvoiceNotificationCorrelationReadiness
             """).ToListAsync(token);
         if (!constraints.SequenceEqual(new[]
         {
-            "CK_InvoiceNotificationCorrelation_Identity:c:true:false:false", "CK_InvoiceNotificationCorrelation_State:c:true:false:false",
+            "CK_InvoiceNotificationCorrelation_Identity:c:true:false:false", "CK_InvoiceNotificationCorrelation_Receipt:c:true:false:false",
+            "CK_InvoiceNotificationCorrelation_ReceiptPhase:c:true:false:false", "CK_InvoiceNotificationCorrelation_State:c:true:false:false",
             "PK_InvoiceNotificationCorrelation:p:true:false:false", "UQ_InvoiceNotificationCorrelation_InvoicePurpose:u:true:false:false",
         }, StringComparer.Ordinal)) throw Unavailable();
         var keys = await database.Database.SqlQueryRaw<string>("""
@@ -63,7 +64,13 @@ internal static class InvoiceNotificationCorrelationReadiness
             WHERE conrelid='public."InvoiceNotificationCorrelation"'::regclass AND contype='c' ORDER BY conname
             """).ToListAsync(token);
         var hashes = checks.Select(value => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(value[(value.IndexOf(':') + 1)..])))).ToArray();
-        if (!hashes.SequenceEqual(new[] { "DA46F967D09D3FA847E81EB64A5B2305AE13AD3116E81AB432F387F767699D81", "5DBD2F14FE4DE524928B01DB1AE28E08FCFA5E80820B2D3B749835600A4B5E0D" }, StringComparer.Ordinal)) throw Unavailable();
+        if (!hashes.SequenceEqual(new[]
+        {
+            "DA46F967D09D3FA847E81EB64A5B2305AE13AD3116E81AB432F387F767699D81",
+            "07B7F85EFDCBC4A00B801D8B0D0F5F7F5EEA7405460AF48D1AD1BB675AE9416D",
+            "C6CD3AA2D4B86EE44187E1918AE3852DFDD4456C3F265800368FAA703FF37D72",
+            "5DBD2F14FE4DE524928B01DB1AE28E08FCFA5E80820B2D3B749835600A4B5E0D",
+        }, StringComparer.Ordinal)) throw Unavailable();
         var unexpected = await database.Database.SqlQueryRaw<long>("""
             SELECT (SELECT count(*) FROM pg_rewrite WHERE ev_class='public."InvoiceNotificationCorrelation"'::regclass)
               + (SELECT count(*) FROM pg_trigger WHERE tgrelid='public."InvoiceNotificationCorrelation"'::regclass AND NOT tgisinternal)
@@ -75,9 +82,10 @@ internal static class InvoiceNotificationCorrelationReadiness
         if (unexpected != 0) throw Unavailable();
         var migration = await database.Database.SqlQueryRaw<int>("""
             SELECT count(*)::int AS "Value" FROM public."__EFMigrationsHistory"
-            WHERE "MigrationId"='20261001105037_AddInvoiceNotificationCorrelation' AND "ProductVersion"='10.0.12'
+            WHERE "MigrationId" IN ('20261001105037_AddInvoiceNotificationCorrelation',
+              '20261001133820_RetainInvoiceNotificationReceipt') AND "ProductVersion"='10.0.12'
             """).SingleAsync(token);
-        if (migration != 1 || database.Database.HasPendingModelChanges()) throw Unavailable();
+        if (migration != 2 || database.Database.HasPendingModelChanges()) throw Unavailable();
     }
 
     private static InvoiceNotificationCorrelationUnavailableException Unavailable() => new();
@@ -93,5 +101,7 @@ internal static class InvoiceNotificationCorrelationReadiness
         "Version:bigint:required:plain", "RemoteVersion:bigint:optional:plain", "CreatedAt:timestamp with time zone:required:plain",
         "UpdatedAt:timestamp with time zone:required:plain", "AdmissionIssuedAt:timestamp with time zone:optional:plain",
         "ExecutionIssuedAt:timestamp with time zone:optional:plain",
+        "RemoteAdmittedAt:timestamp with time zone:optional:plain", "RemoteReceiptBinding:bytea:optional:plain",
+        "RemoteState:character varying(32):optional:plain", "RemoteUpdatedAt:timestamp with time zone:optional:plain",
     ];
 }
