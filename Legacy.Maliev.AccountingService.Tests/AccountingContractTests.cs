@@ -53,7 +53,13 @@ public sealed class AccountingContractTests
         using var receipt = new ReceiptDbContext(ReceiptOptions());
 
         Assert.Equal(6, payment.Model.GetEntityTypes().Count());
-        Assert.Equal(4, invoice.Model.GetEntityTypes().Count());
+        Assert.Equal(5, invoice.Model.GetEntityTypes().Count());
+        var correlation = invoice.Model.FindEntityType(typeof(InvoiceNotificationCorrelationRow))!;
+        Assert.Equal("InvoiceNotificationCorrelation", correlation.GetTableName());
+        Assert.Equal("public", correlation.GetSchema());
+        Assert.Empty(correlation.GetForeignKeys());
+        Assert.Null(payment.Model.FindEntityType(typeof(InvoiceNotificationCorrelationRow)));
+        Assert.Null(receipt.Model.FindEntityType(typeof(InvoiceNotificationCorrelationRow)));
         Assert.Equal(3, receipt.Model.GetEntityTypes().Count());
         Assert.Null(payment.Model.FindEntityType(typeof(Invoice)));
         Assert.Null(invoice.Model.FindEntityType(typeof(Receipt)));
