@@ -32,6 +32,7 @@ public sealed class PaymentDbContext(DbContextOptions<PaymentDbContext> options)
 public sealed class InvoiceDbContext(DbContextOptions<InvoiceDbContext> options) : DbContext(options)
 {
     public DbSet<InvoiceCreationAdmission> InvoiceCreationAdmissions => Set<InvoiceCreationAdmission>();
+    public DbSet<InvoiceNotificationCorrelationRow> InvoiceNotificationCorrelations => Set<InvoiceNotificationCorrelationRow>();
     public DbSet<Invoice> Invoices => Set<Invoice>();
     public DbSet<InvoiceOrderItem> Items => Set<InvoiceOrderItem>();
     public DbSet<InvoiceFile> Files => Set<InvoiceFile>();
@@ -49,6 +50,64 @@ public sealed class InvoiceDbContext(DbContextOptions<InvoiceDbContext> options)
             entity.Property(value => value.IntentFingerprint).HasMaxLength(64);
             entity.Property(value => value.State).HasMaxLength(32);
             entity.ToTable(table => table.HasCheckConstraint("CK_InvoiceCreationAdmission_Quotation", "\"QuotationID\" > 0"));
+        });
+        modelBuilder.Entity<InvoiceNotificationCorrelationRow>(entity =>
+        {
+            entity.HasKey(value => value.IntentId).HasName("PK_InvoiceNotificationCorrelation");
+            entity.Property(value => value.IntentId).HasColumnName("IntentID").ValueGeneratedNever();
+            entity.Property(value => value.InvoiceId).HasColumnName("InvoiceID");
+            entity.Property(value => value.QuotationId).HasColumnName("QuotationID");
+            entity.Property(value => value.WorkflowOperationId).HasColumnName("WorkflowOperationID");
+            entity.Property(value => value.Purpose).HasMaxLength(32);
+            entity.Property(value => value.OriginIssuer).HasMaxLength(512);
+            entity.Property(value => value.OriginEmployeeSubject).HasMaxLength(256);
+            entity.Property(value => value.OriginServiceSubject).HasMaxLength(128);
+            entity.Property(value => value.SenderIssuer).HasMaxLength(512);
+            entity.Property(value => value.SenderServiceSubject).HasMaxLength(128);
+            entity.Property(value => value.PayloadFrameVersion).HasMaxLength(64);
+            entity.Property(value => value.BindingVersion).HasMaxLength(64);
+            entity.Property(value => value.BindingKeyId).HasColumnName("BindingKeyID").HasMaxLength(64);
+            entity.Property(value => value.Phase).HasMaxLength(32);
+            entity.Property(value => value.Version).IsConcurrencyToken();
+            entity.HasAlternateKey(value => new { value.InvoiceId, value.Purpose })
+                .HasName("UQ_InvoiceNotificationCorrelation_InvoicePurpose");
+            entity.ToTable("InvoiceNotificationCorrelation", "public", table =>
+            {
+                table.HasCheckConstraint("CK_InvoiceNotificationCorrelation_Identity", """
+                    "InvoiceID" > 0 AND "QuotationID" > 0 AND "Purpose" = 'invoice-issued'
+                    AND "SenderServiceSubject" = 'service:legacy-accounting'
+                    AND "IntentID" <> '00000000-0000-0000-0000-000000000000'::uuid
+                    AND "WorkflowOperationID" <> '00000000-0000-0000-0000-000000000000'::uuid
+                    AND "IntentID" <> "WorkflowOperationID"
+                    AND octet_length("PayloadBinding") = 32
+                    AND length("OriginIssuer") > 0 AND length("OriginEmployeeSubject") > 0
+                    AND length("OriginServiceSubject") > 0 AND length("SenderIssuer") > 0
+                    AND length("BindingKeyID") > 0
+                    AND "PayloadFrameVersion" = 'notification-payload-v1'
+                    AND "BindingVersion" = 'accounting-invoice-notification-hmac-v1'
+                    """);
+                table.HasCheckConstraint("CK_InvoiceNotificationCorrelation_State", """
+                    "Version" > 0 AND ("RemoteVersion" IS NULL OR "RemoteVersion" > 0)
+                    AND "UpdatedAt" >= "CreatedAt"
+                    AND "Phase" IN ('Prepared','AdmissionIssued','Admitted','ExecutionIssued',
+                                    'OutcomeUnknown','ProviderAccepted','RejectedBeforeSubmission')
+                    AND ("AdmissionIssuedAt" IS NULL OR "AdmissionIssuedAt" >= "CreatedAt")
+                    AND ("ExecutionIssuedAt" IS NULL OR
+                      ("AdmissionIssuedAt" IS NOT NULL AND "ExecutionIssuedAt" >= "AdmissionIssuedAt"))
+                    AND ("Phase" = 'Prepared' OR "AdmissionIssuedAt" IS NOT NULL)
+                    AND ("Phase" <> 'Prepared' OR
+                      ("AdmissionIssuedAt" IS NULL AND "ExecutionIssuedAt" IS NULL AND "RemoteVersion" IS NULL))
+                    AND ("Phase" <> 'AdmissionIssued' OR
+                      ("AdmissionIssuedAt" IS NOT NULL AND "ExecutionIssuedAt" IS NULL))
+                    AND ("Phase" <> 'Admitted' OR
+                      ("AdmissionIssuedAt" IS NOT NULL AND "ExecutionIssuedAt" IS NULL AND "RemoteVersion" IS NOT NULL))
+                    AND ("Phase" <> 'ExecutionIssued' OR
+                      ("ExecutionIssuedAt" IS NOT NULL AND "RemoteVersion" IS NOT NULL))
+                    AND ("Phase" NOT IN ('OutcomeUnknown','ProviderAccepted') OR
+                      ("ExecutionIssuedAt" IS NOT NULL AND "RemoteVersion" IS NOT NULL))
+                    AND ("Phase" NOT IN ('ProviderAccepted','RejectedBeforeSubmission') OR "RemoteVersion" IS NOT NULL)
+                    """);
+            });
         });
         modelBuilder.Entity<InvoiceOrderItem>().ToTable("OrderItem");
         modelBuilder.Entity<InvoiceOrderItem>().Property(value => value.UnitPrice).HasPrecision(18, 2);

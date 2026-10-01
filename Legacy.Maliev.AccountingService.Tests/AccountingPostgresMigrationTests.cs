@@ -96,7 +96,11 @@ public sealed class AccountingPostgresMigrationTests : IAsyncLifetime
         Assert.Equal(0.50m, detail.DeltaAmount);
         Assert.Equal(2, (await repository.GetYearlyDetailAsync(true, 2026, null, CancellationToken.None))!.Count);
         Assert.Equal(6, await TableCount(paymentContext));
-        Assert.Equal(4, await TableCount(invoiceContext));
+        Assert.Equal(5, await TableCount(invoiceContext));
+        Assert.Equal(1, await invoiceContext.Database.SqlQueryRaw<int>("""
+            SELECT count(*)::int AS "Value" FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace
+            WHERE n.nspname='public' AND c.relname='InvoiceNotificationCorrelation' AND c.relkind='r' AND NOT c.relispartition
+            """).SingleAsync());
         Assert.Equal(3, await TableCount(receiptContext));
     }
 
@@ -338,6 +342,8 @@ public sealed class AccountingPostgresMigrationTests : IAsyncLifetime
     {
         await using var context = InvoiceContext();
         await context.Database.MigrateAsync();
+        var tablesBeforeCreate = await TableCount(context);
+        Assert.Equal(5, tablesBeforeCreate);
         var store = new InvoiceCreationStore(context, TimeProvider.System);
         var marker = $"CREATE-{Guid.NewGuid():N}";
 
@@ -353,7 +359,12 @@ public sealed class AccountingPostgresMigrationTests : IAsyncLifetime
         Assert.Equal(invoice.Id, found?.Id);
         Assert.Single(await context.Items.Where(value => value.InvoiceId == invoice.Id).ToListAsync());
         Assert.Single(await context.Files.Where(value => value.InvoiceId == invoice.Id).ToListAsync());
-        Assert.Equal(4, await TableCount(context));
+        Assert.Equal(5, await TableCount(context));
+        Assert.Equal(tablesBeforeCreate, await TableCount(context));
+        Assert.Equal(1, await context.Database.SqlQueryRaw<int>("""
+            SELECT count(*)::int AS "Value" FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace
+            WHERE n.nspname='public' AND c.relname='InvoiceNotificationCorrelation' AND c.relkind='r' AND NOT c.relispartition
+            """).SingleAsync());
     }
 
     [Fact]
