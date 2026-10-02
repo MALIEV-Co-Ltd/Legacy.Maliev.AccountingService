@@ -19,11 +19,18 @@ builder.AddStandardMiddleware(options => options.EnableRequestLogging = true);
 builder.AddStandardOpenApi(
     title: "Legacy MALIEV Accounting Service API",
     description: "Temporary .NET 10 compatibility API for historical payment, invoice, and receipt records. It does not execute payments.");
+builder.Services.AddOpenApi("v1");
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     options.JsonSerializerOptions.PropertyNamingPolicy = null;
     options.JsonSerializerOptions.DictionaryKeyPolicy = null;
+});
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    options.SerializerOptions.PropertyNamingPolicy = null;
+    options.SerializerOptions.DictionaryKeyPolicy = null;
 });
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<DistributedAccountingCache>();

@@ -11,6 +11,25 @@ public enum InvoiceSortType
     InvoicePaymentDate_Ascending,
     InvoicePaymentDate_Descending,
 }
+public enum PaymentSortType
+{
+    PaymentId_Ascending,
+    PaymentId_Descending,
+    PaymentDate_Ascending,
+    PaymentDate_Descending,
+    PaymentCreatedDate_Ascending,
+    PaymentCreatedDate_Descending,
+    PaymentModifiedDate_Ascending,
+    PaymentModifiedDate_Descending,
+    PaymentDirection_Ascending,
+    PaymentDirection_Descending,
+    PaymentType_Ascending,
+    PaymentType_Descending,
+    PaymentMethod_Ascending,
+    PaymentMethod_Descending,
+    Recipient_Ascending,
+    Recipient_Descending,
+}
 public sealed class FinancialSummary { public List<SummaryDetail> Details { get; } = []; }
 public sealed class SummaryDetail { public string CurrencyId { get; set; } = "-"; public decimal CurrentAmount { get; set; } public decimal PreviousAmount { get; set; } public decimal DeltaAmount { get; set; } public decimal DeltaPercent { get; set; } }
 public enum UpdateResult { Updated, NotFound, Conflict }

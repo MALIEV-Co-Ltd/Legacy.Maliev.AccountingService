@@ -81,8 +81,8 @@ public sealed class AccountingRepository(
         }
 
         var created = ReadDate(existing, "CreatedDate");
+        SetIdentity(item, id);
         context.Entry(existing).CurrentValues.SetValues(item);
-        SetIdentity(existing, id);
         SetDate(existing, "CreatedDate", created);
         SetDate(existing, "ModifiedDate", Now());
         if (expected is not null && context.Entry(existing).Metadata.FindProperty("ModifiedDate") is not null)
@@ -227,6 +227,7 @@ public sealed class AccountingRepository(
         await receipts.Files.AsNoTracking().Where(file => file.ReceiptId == receiptId).OrderBy(file => file.Id).ToListAsync(cancellationToken);
 
     public async Task<PaginatedResponse<Payment>?> GetPaymentsAsync(
+        PaymentSortType? sort,
         string? search,
         int page,
         int size,
@@ -235,13 +236,56 @@ public sealed class AccountingRepository(
         IQueryable<Payment> query = payments.Payments.AsNoTracking();
         if (!string.IsNullOrWhiteSpace(search))
         {
-            var pattern = $"%{search.Trim()}%";
-            query = query.Where(payment => EF.Functions.ILike(payment.Description, pattern)
-                || EF.Functions.ILike(payment.Recipient, pattern)
-                || EF.Functions.ILike(payment.TransactionNumber, pattern));
+            var normalizedSearch = search.Trim();
+            if (int.TryParse(normalizedSearch, out var paymentId))
+            {
+                query = query.Where(payment => payment.Id == paymentId);
+            }
+            else
+            {
+                var pattern = $"%{EscapeLikePattern(normalizedSearch)}%";
+                query = query.Where(payment => EF.Functions.ILike(payment.Description, pattern, "\\")
+                    || EF.Functions.ILike(payment.Recipient, pattern, "\\")
+                    || EF.Functions.ILike(payment.TransactionNumber, pattern, "\\"));
+            }
         }
 
-        return await PageAsync(query.OrderByDescending(payment => payment.Id), page, size, cancellationToken);
+        query = sort switch
+        {
+            PaymentSortType.PaymentId_Ascending => query.OrderBy(payment => payment.Id),
+            PaymentSortType.PaymentId_Descending => query.OrderByDescending(payment => payment.Id),
+            // SQL Server orders NULL dates first ascending and last descending; PostgreSQL differs.
+            PaymentSortType.PaymentDate_Ascending => query.OrderBy(payment => payment.PaymentDate != null)
+                .ThenBy(payment => payment.PaymentDate).ThenBy(payment => payment.Id),
+            PaymentSortType.PaymentDate_Descending => query.OrderBy(payment => payment.PaymentDate == null)
+                .ThenByDescending(payment => payment.PaymentDate).ThenBy(payment => payment.Id),
+            PaymentSortType.PaymentCreatedDate_Ascending => query.OrderBy(payment => payment.CreatedDate != null)
+                .ThenBy(payment => payment.CreatedDate).ThenBy(payment => payment.Id),
+            PaymentSortType.PaymentCreatedDate_Descending => query.OrderBy(payment => payment.CreatedDate == null)
+                .ThenByDescending(payment => payment.CreatedDate).ThenBy(payment => payment.Id),
+            PaymentSortType.PaymentModifiedDate_Ascending => query.OrderBy(payment => payment.ModifiedDate != null)
+                .ThenBy(payment => payment.ModifiedDate).ThenBy(payment => payment.Id),
+            PaymentSortType.PaymentModifiedDate_Descending => query.OrderBy(payment => payment.ModifiedDate == null)
+                .ThenByDescending(payment => payment.ModifiedDate).ThenBy(payment => payment.Id),
+            PaymentSortType.PaymentDirection_Ascending => query.OrderBy(payment => payment.PaymentDirection.Name != null)
+                .ThenBy(payment => payment.PaymentDirection.Name).ThenBy(payment => payment.Id),
+            PaymentSortType.PaymentDirection_Descending => query.OrderBy(payment => payment.PaymentDirection.Name == null)
+                .ThenByDescending(payment => payment.PaymentDirection.Name).ThenBy(payment => payment.Id),
+            PaymentSortType.PaymentType_Ascending => query.OrderBy(payment => payment.PaymentType.Name != null)
+                .ThenBy(payment => payment.PaymentType.Name).ThenBy(payment => payment.Id),
+            PaymentSortType.PaymentType_Descending => query.OrderBy(payment => payment.PaymentType.Name == null)
+                .ThenByDescending(payment => payment.PaymentType.Name).ThenBy(payment => payment.Id),
+            PaymentSortType.PaymentMethod_Ascending => query.OrderBy(payment => payment.PaymentMethod.Name != null)
+                .ThenBy(payment => payment.PaymentMethod.Name).ThenBy(payment => payment.Id),
+            PaymentSortType.PaymentMethod_Descending => query.OrderBy(payment => payment.PaymentMethod.Name == null)
+                .ThenByDescending(payment => payment.PaymentMethod.Name).ThenBy(payment => payment.Id),
+            PaymentSortType.Recipient_Ascending => query.OrderBy(payment => payment.Recipient != null)
+                .ThenBy(payment => payment.Recipient).ThenBy(payment => payment.Id),
+            PaymentSortType.Recipient_Descending => query.OrderBy(payment => payment.Recipient == null)
+                .ThenByDescending(payment => payment.Recipient).ThenBy(payment => payment.Id),
+            _ => query.OrderBy(payment => payment.Id),
+        };
+        return await PageAsync(query, page, size, cancellationToken);
     }
 
     public async Task<IReadOnlyList<PaymentFile>> GetPaymentFilesAsync(int paymentId, CancellationToken cancellationToken) =>

@@ -17,10 +17,14 @@ public sealed class PaymentsController(IAccountingService service, IIdempotencyS
     [HttpDelete("{paymentId:int}"), RequirePermission(AccountingPermissions.Delete, RequireLiveCheck = true)]
     public Task<IActionResult> DeletePaymentAsync(int paymentId, CancellationToken cancellationToken) => Delete(paymentId, cancellationToken);
     [HttpGet, RequirePermission(AccountingPermissions.Read, RequireLiveCheck = true)]
-    public async Task<ActionResult<PaginatedResponse<PaymentRecord>>> GetPaginatedPaymentAsync(string? sort, string? search, int? index, int? size, CancellationToken cancellationToken)
+    public async Task<ActionResult<PaginatedResponse<PaymentRecord>>> GetPaginatedPaymentAsync(PaymentSortType? sort, string? search, int? index, int? size, CancellationToken cancellationToken)
     {
-        _ = sort;
-        var value = await Service.GetPaymentsAsync(search, index ?? 1, size ?? 20, cancellationToken);
+        if (sort.HasValue && !Enum.IsDefined(sort.Value))
+        {
+            return BadRequest();
+        }
+
+        var value = await Service.GetPaymentsAsync(sort, search, index ?? 1, size ?? 20, cancellationToken);
         return value is null ? NotFound() : value;
     }
     [HttpGet("{paymentId:int}", Name = "GetPayment"), RequirePermission(AccountingPermissions.Read, RequireLiveCheck = true)]
