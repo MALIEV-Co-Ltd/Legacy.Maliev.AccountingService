@@ -88,6 +88,7 @@ namespace Legacy.Maliev.AccountingService.Data.Migrations.Payment
                         .HasColumnName("EmployeeID");
 
                     b.Property<DateTime?>("ModifiedDate")
+                        .IsConcurrencyToken()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");

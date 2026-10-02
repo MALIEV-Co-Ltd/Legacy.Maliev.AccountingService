@@ -18,6 +18,7 @@ public sealed class PaymentDbContext(DbContextOptions<PaymentDbContext> options)
     {
         ModelRules.Apply(modelBuilder);
         modelBuilder.Entity<Payment>().Property(value => value.Amount).HasPrecision(18, 2);
+        modelBuilder.Entity<Payment>().Property(value => value.ModifiedDate).IsConcurrencyToken();
         modelBuilder.Entity<Payment>().HasOne(value => value.PaymentDirection).WithMany(value => value.Payment)
             .HasForeignKey(value => value.PaymentDirectionId).OnDelete(DeleteBehavior.NoAction).HasConstraintName("FK_Payment_PaymentDirection");
         modelBuilder.Entity<Payment>().HasOne(value => value.PaymentMethod).WithMany(value => value.Payment)
