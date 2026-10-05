@@ -19,6 +19,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Http;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.IdentityModel.Tokens;
 using Moq;
 using Npgsql;
@@ -50,6 +51,14 @@ public sealed class AccountingBoundaryHttpFixture : IAsyncLifetime
 
     public ConcurrentQueue<(string Subject, string Permission)> LiveChecks { get; } = new();
     public ConcurrentQueue<string> FailureMetadata { get; } = new();
+    private SummaryCacheObserver? summaryCache;
+
+    public async Task<string> SummaryCacheSnapshotAsync()
+    {
+        _ = summary!.Services.GetRequiredService<IDistributedCache>();
+        var observer = summaryCache ?? throw new InvalidOperationException("Summary cache observer is not initialized.");
+        return await observer.SnapshotAsync();
+    }
 
     public async Task InitializeAsync()
     {
@@ -463,6 +472,15 @@ public sealed class AccountingBoundaryHttpFixture : IAsyncLifetime
                 {
                     services.RemoveAll<TimeProvider>();
                     services.AddSingleton(clock);
+                    var descriptor = services.Last(value => value.ServiceType == typeof(IDistributedCache));
+                    services.RemoveAll<IDistributedCache>();
+                    services.Add(new ServiceDescriptor(typeof(IDistributedCache), provider =>
+                    {
+                        var inner = (IDistributedCache)(descriptor.ImplementationInstance
+                            ?? descriptor.ImplementationFactory?.Invoke(provider)
+                            ?? ActivatorUtilities.CreateInstance(provider, descriptor.ImplementationType!));
+                        return fixture.summaryCache = new SummaryCacheObserver(inner, descriptor.ImplementationInstance is null);
+                    }, descriptor.Lifetime));
                 }
                 var iam = new Mock<IIamServiceClient>(MockBehavior.Strict);
                 iam.Setup(value => value.CheckPermissionLiveAsync(It.IsAny<string>(), It.IsAny<string>(),
@@ -477,6 +495,36 @@ public sealed class AccountingBoundaryHttpFixture : IAsyncLifetime
                 services.AddSingleton<ILoggerProvider>(new FailureMetadataProvider(fixture));
             });
         }
+    }
+
+    // Observe the actual configured cache; do not replace its provider or summary behavior.
+    private sealed class SummaryCacheObserver(IDistributedCache inner, bool ownsInner) : IDistributedCache, IDisposable
+    {
+        private readonly ConcurrentQueue<string> operations = new();
+        private const string Probe = "summary-unique-id-regression-probe";
+        private bool initialized;
+
+        public async Task<string> SnapshotAsync()
+        {
+            if (!initialized)
+            {
+                await inner.SetAsync(Probe, [11, 22, 33], new DistributedCacheEntryOptions());
+                initialized = true;
+            }
+
+            return Digest(new { Operations = operations.ToArray(), Probe = await inner.GetAsync(Probe) });
+        }
+
+        private void Record(string operation, string key) => operations.Enqueue(operation + ":" + Digest(key));
+        public byte[]? Get(string key) { Record("get", key); return inner.Get(key); }
+        public Task<byte[]?> GetAsync(string key, CancellationToken token = default) { Record("get", key); return inner.GetAsync(key, token); }
+        public void Set(string key, byte[] value, DistributedCacheEntryOptions options) { Record("set", key); inner.Set(key, value, options); }
+        public Task SetAsync(string key, byte[] value, DistributedCacheEntryOptions options, CancellationToken token = default) { Record("set", key); return inner.SetAsync(key, value, options, token); }
+        public void Refresh(string key) { Record("refresh", key); inner.Refresh(key); }
+        public Task RefreshAsync(string key, CancellationToken token = default) { Record("refresh", key); return inner.RefreshAsync(key, token); }
+        public void Remove(string key) { Record("remove", key); inner.Remove(key); }
+        public Task RemoveAsync(string key, CancellationToken token = default) { Record("remove", key); return inner.RemoveAsync(key, token); }
+        public void Dispose() { if (ownsInner && inner is IDisposable disposable) disposable.Dispose(); }
     }
 
     private sealed class FailureMetadataProvider(AccountingBoundaryHttpFixture fixture) : ILoggerProvider
