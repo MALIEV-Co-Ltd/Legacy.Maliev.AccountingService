@@ -83,10 +83,18 @@ public sealed class PaymentMasterQuerySourceHttpTests(PaymentListHttpFixture fix
 
     private static Payment Row(int id, string description) => new()
     {
-        Id = id, Amount = 1234.56m, CurrencyId = 1, EmployeeId = 42,
-        Description = description, TransactionNumber = "TX-synthetic", Recipient = "Thai fixture",
-        PaymentDirectionId = 1, PaymentMethodId = 1, PaymentTypeId = 1,
-        CreatedDate = new DateTime(2026, 10, 5), ModifiedDate = new DateTime(2026, 10, 5),
+        Id = id,
+        Amount = 1234.56m,
+        CurrencyId = 1,
+        EmployeeId = 42,
+        Description = description,
+        TransactionNumber = "TX-synthetic",
+        Recipient = "Thai fixture",
+        PaymentDirectionId = 1,
+        PaymentMethodId = 1,
+        PaymentTypeId = 1,
+        CreatedDate = new DateTime(2026, 10, 5),
+        ModifiedDate = new DateTime(2026, 10, 5),
         PaymentDate = new DateTime(2026, 10, 5, 0, 0, 0, DateTimeKind.Utc),
     };
 

@@ -243,9 +243,9 @@ public sealed class AccountingRepository(
         CancellationToken cancellationToken)
     {
         IQueryable<Payment> query = payments.Payments.AsNoTracking();
-        if (!string.IsNullOrWhiteSpace(search))
+        if (!string.IsNullOrEmpty(search))
         {
-            var normalizedSearch = search.Trim();
+            var normalizedSearch = search;
             if (int.TryParse(normalizedSearch, out var paymentId))
             {
                 query = query.Where(payment => payment.Id == paymentId);
@@ -294,7 +294,8 @@ public sealed class AccountingRepository(
                 .ThenByDescending(payment => payment.Recipient).ThenBy(payment => payment.Id),
             _ => query.OrderBy(payment => payment.Id),
         };
-        return await PageAsync(query, page, size, cancellationToken);
+        var result = await PageAsync(query, page, size, cancellationToken);
+        return result is not null && result.Items.Count == 0 ? null : result;
     }
 
     public async Task<IReadOnlyList<PaymentFile>> GetPaymentFilesAsync(int paymentId, CancellationToken cancellationToken) =>
