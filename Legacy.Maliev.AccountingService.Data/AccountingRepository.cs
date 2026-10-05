@@ -22,6 +22,7 @@ public sealed class AccountingRepository(
     public async Task<T> CreateAsync<T>(T item, CancellationToken cancellationToken) where T : class
     {
         var context = ContextFor<T>();
+        PreservePaymentClock(item);
         SetIdentity(item, 0);
         SetDate(item, "CreatedDate", Now());
         SetDate(item, "ModifiedDate", Now());
@@ -80,6 +81,14 @@ public sealed class AccountingRepository(
             return UpdateResult.NotFound;
         }
 
+        // Attribution is authoritative at invoice creation and cannot be replaced by a full PUT.
+        if (existing is Invoice storedInvoice && item is Invoice suppliedInvoice)
+        {
+            suppliedInvoice.SourceRequestId = storedInvoice.SourceRequestId;
+            suppliedInvoice.SourceJourneyId = storedInvoice.SourceJourneyId;
+        }
+
+        PreservePaymentClock(item);
         var created = ReadDate(existing, "CreatedDate");
         SetIdentity(item, id);
         context.Entry(existing).CurrentValues.SetValues(item);
@@ -323,7 +332,7 @@ public sealed class AccountingRepository(
         var now = clock.GetUtcNow().UtcDateTime;
         var (currentStart, currentEnd, previousStart, previousEnd) = SummaryWindows(now, period);
         var rows = await payments.Payments.AsNoTracking()
-            .Where(payment => payment.PaymentDate >= previousStart && payment.PaymentDate < currentEnd)
+            .Where(payment => payment.PaymentDate >= previousStart && payment.PaymentDate <= currentEnd)
             .Select(payment => new
             {
                 Date = payment.PaymentDate!.Value,
@@ -333,13 +342,13 @@ public sealed class AccountingRepository(
                 Type = payment.PaymentType.Name,
             })
             .ToListAsync(cancellationToken);
-        var current = rows.Where(row => row.Date >= currentStart && row.Date < currentEnd).ToList();
+        var current = rows.Where(row => row.Date >= currentStart && row.Date <= currentEnd).ToList();
         if (current.Count == 0)
         {
             return null;
         }
 
-        var previous = rows.Where(row => row.Date >= previousStart && row.Date < previousEnd).ToList();
+        var previous = rows.Where(row => row.Date >= previousStart && row.Date <= previousEnd).ToList();
         var result = new FinancialSummary();
         foreach (var currency in current.GroupBy(row => row.CurrencyId))
         {
@@ -350,6 +359,11 @@ public sealed class AccountingRepository(
                     - source.Where(row => string.Equals(row.Direction, "Expense", StringComparison.OrdinalIgnoreCase)).Sum(row => (decimal)row.Amount);
             var currentAmount = Value(currency);
             var previousAmount = Value(previous.Where(row => row.CurrencyId == currency.Key));
+            if (jobIncomeOnly && previousAmount == 0m)
+            {
+                continue;
+            }
+
             var delta = currentAmount - previousAmount;
             result.Details.Add(new SummaryDetail
             {
@@ -368,9 +382,9 @@ public sealed class AccountingRepository(
     {
         var selectedYear = year ?? clock.GetUtcNow().Year;
         var start = new DateTime(selectedYear, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-        var end = start.AddYears(1);
+        var end = start.AddYears(1).AddDays(-1);
         var rows = await payments.Payments.AsNoTracking()
-            .Where(payment => payment.PaymentDate >= start && payment.PaymentDate < end
+            .Where(payment => payment.PaymentDate >= start && payment.PaymentDate <= end
                 && (!currencyId.HasValue || payment.CurrencyId == currencyId))
             .Where(payment => income ? payment.PaymentDirection.Name == "Income" : payment.PaymentDirection.Name == "Expense")
             .Select(payment => new { Date = payment.PaymentDate!.Value.Date, payment.Amount })
@@ -455,13 +469,24 @@ public sealed class AccountingRepository(
         var previousStart = period.Equals("week", StringComparison.OrdinalIgnoreCase) ? currentStart.AddDays(-7)
             : period.Equals("year", StringComparison.OrdinalIgnoreCase) ? currentStart.AddYears(-1)
             : currentStart.AddMonths(-1);
-        return (currentStart, currentEnd, previousStart, currentStart);
+        return (currentStart, currentEnd.AddDays(-1), previousStart, currentStart.AddDays(-1));
     }
 
     // CreatedDate/ModifiedDate are "timestamp without time zone" wall-clock columns storing the
     // UTC instant with Kind stripped (matching the column's own CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
     // default); Npgsql rejects Kind=Utc values for that column type.
     private DateTime Now() => DateTime.SpecifyKind(clock.GetUtcNow().UtcDateTime, DateTimeKind.Unspecified);
+
+    // The legacy date input carries a clock value without an offset. Keep those ticks,
+    // using UTC storage representation only to satisfy the existing timestamptz column.
+    // Explicit UTC values retain their existing behavior; no local timezone conversion occurs.
+    private static void PreservePaymentClock<T>(T item) where T : class
+    {
+        if (item is Payment { PaymentDate: { Kind: DateTimeKind.Unspecified } date } payment)
+        {
+            payment.PaymentDate = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+        }
+    }
 
     private static string CacheKey<T>(int id) => $"{typeof(T).Name.ToLowerInvariant()}:{id}";
 

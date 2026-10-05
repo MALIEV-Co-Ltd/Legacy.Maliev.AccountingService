@@ -34,7 +34,7 @@ public sealed class InvoiceCreationSourceClient(IHttpClientFactory clients) : II
             : CountryAsync(catalog, customer.ShippingAddress?.CountryId, cancellationToken);
         await Task.WhenAll(billingCountryTask, shippingCountryTask);
         return new(
-            new(quotation.Id, quotation.CustomerId, quotation.EmployeeId, quotation.CurrencyId, quotation.Subtotal, quotation.Vat, quotation.Total, quotation.WithholdingTax, quotation.Comment, quotation.Fob, quotation.ShippedVia, quotation.Terms, quotation.InvoiceId),
+            new(quotation.Id, quotation.CustomerId, quotation.EmployeeId, quotation.CurrencyId, quotation.Subtotal, quotation.Vat, quotation.Total, quotation.WithholdingTax, quotation.Comment, quotation.Fob, quotation.ShippedVia, quotation.Terms, quotation.InvoiceId, quotation.SourceRequestId, quotation.SourceJourneyId),
             new(customer.Id, customer.FullName, customer.Email, customer.Mobile, customer.Telephone, customer.Fax,
                 customer.Company is null ? null : new(customer.Company.Name, customer.Company.TaxNumber, customer.Company.Registrar),
                 Address(customer.BillingAddress, await billingCountryTask), Address(customer.ShippingAddress, await shippingCountryTask)),
@@ -54,7 +54,7 @@ public sealed class InvoiceCreationSourceClient(IHttpClientFactory clients) : II
         return JsonSerializer.Deserialize<T>(bytes, Json) ?? throw new InvoiceCreationDependencyException($"{name} service returned invalid data.");
     }
 
-    private sealed record QuotationResponse(int Id, int? CustomerId, int? EmployeeId, int? InvoiceId, int Period, DateTime ExpirationDate, decimal Subtotal, decimal Vat, decimal Total, decimal? WithholdingTax, decimal? QuotedAmount, int CurrencyId, string? Comment, string? Fob, string? ShippedVia, string? Terms, bool? Accepted, DateTime? CreatedDate, DateTime? ModifiedDate);
+    private sealed record QuotationResponse(int Id, int? CustomerId, int? EmployeeId, int? InvoiceId, int Period, DateTime ExpirationDate, decimal Subtotal, decimal Vat, decimal Total, decimal? WithholdingTax, decimal? QuotedAmount, int CurrencyId, string? Comment, string? Fob, string? ShippedVia, string? Terms, bool? Accepted, DateTime? CreatedDate, DateTime? ModifiedDate, int? SourceRequestId, Guid? SourceJourneyId);
     private sealed record OrderItemResponse(int Id, int QuotationId, int? OrderId, string? Description, int? Quantity, decimal? UnitPrice, decimal? Subtotal);
     private sealed record CustomerResponse(int Id, string FullName, string? Telephone, string? Mobile, string? Fax, string Email, CompanyResponse? Company, AddressResponse? BillingAddress, AddressResponse? ShippingAddress);
     private sealed record CompanyResponse(string? Name, string? TaxNumber, string? Registrar);
