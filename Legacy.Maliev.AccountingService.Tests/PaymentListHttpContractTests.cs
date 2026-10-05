@@ -2,6 +2,7 @@ using System.Net;
 using System.Text.Json;
 using Legacy.Maliev.AccountingService.Domain.Payment;
 using Legacy.Maliev.AccountingService.Tests.Fixtures;
+using Microsoft.EntityFrameworkCore;
 
 namespace Legacy.Maliev.AccountingService.Tests;
 
@@ -268,16 +269,23 @@ public sealed class PaymentListHttpContractTests(PaymentListHttpFixture fixture)
     }
 
     [Fact]
-    public async Task BeyondLastPage_RetainsEmpty200PageWithTotalMetadata()
+    public async Task BeyondLastPage_SourceReturns404AndPreservesValidPageMetadata()
     {
         await fixture.SeedAsync(Row(11), Row(22));
+        await using var database = fixture.Database();
+        var before = JsonSerializer.Serialize(await database.Payments.AsNoTracking().OrderBy(row => row.Id).ToArrayAsync());
         using var client = fixture.Client();
-        var page = await Page(client, "/payments?index=3&size=1");
+        var page = await Page(client, "/payments?index=2&size=1");
 
-        Assert.Empty(Ids(page));
+        Assert.Equal(new[] { 22 }, Ids(page));
         Assert.Equal(2, page.GetProperty("TotalRecords").GetInt32());
-        Assert.Equal(3, page.GetProperty("PageIndex").GetInt32());
+        Assert.Equal(2, page.GetProperty("PageIndex").GetInt32());
         Assert.Equal(2, page.GetProperty("TotalPages").GetInt32());
+        using var beyond = await client.GetAsync("/payments?index=3&size=1");
+        Assert.Equal(HttpStatusCode.NotFound, beyond.StatusCode);
+        Assert.DoesNotContain("\"Items\"", await beyond.Content.ReadAsStringAsync(), StringComparison.Ordinal);
+        Assert.Equal(new[] { 11, 22 }, Ids(await Page(client, "/payments?size=2")));
+        Assert.Equal(before, JsonSerializer.Serialize(await database.Payments.AsNoTracking().OrderBy(row => row.Id).ToArrayAsync()));
     }
 
     private async Task SeedSortRows()
