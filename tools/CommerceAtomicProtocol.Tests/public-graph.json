@@ -105,7 +105,7 @@
     },
     {
       "path": "AtomicProtocolScenario.cs",
-      "sha256": "3883ad95e0ab984d359d0a0137460333aeec64fb09f862be138406bb81782035"
+      "sha256": "37be1be6bfccd4ba5bc8a22601b4c806fa815e287d6d8407bbf84a04d8203478"
     },
     {
       "path": "Commerce.AtomicProtocol.Tests.csproj",
@@ -113,7 +113,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "847e6b9be4fe2a9ec0448ac56cef20a48b5a14041c9d8ba02204a1665ec8dee1"
+      "sha256": "b0424427ba039b1436f244611edca08572072463fe260bfcdc90ff5634da6c72"
     }
   ],
   "hashRepresentation": "Committed LF bytes",

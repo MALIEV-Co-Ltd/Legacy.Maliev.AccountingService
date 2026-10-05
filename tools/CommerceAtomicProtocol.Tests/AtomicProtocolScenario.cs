@@ -209,8 +209,18 @@ public sealed class AtomicProtocolScenario : IAsyncDisposable
         Assert.DoesNotContain(Requests, value => value == $"PUT /quotations/{quotation}");
     }
 
-    // Per-case await using releases no shared hosts; collection lifetime owns them.
-    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+    // Per-case cleanup retains status receipts for xUnit diagnostics; collection owns hosts.
+    public ValueTask DisposeAsync()
+    {
+        BeforeCompletionLookup = null;
+        BeforeDecisionDispatch = null;
+        LoseDecisionResponse = false;
+        CorruptCompletionLookup = null;
+        AccountingIamFailure = null;
+        FailedOrder = 0;
+        lost = 0;
+        return ValueTask.CompletedTask;
+    }
 
     public async ValueTask DisposeHostsAsync()
     {

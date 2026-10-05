@@ -16,7 +16,9 @@ routes retain the historical refusal path.
 
 The serialized collection owns one actual Accounting/Quotation host pair, preserving
 normal DI token caches and the unchanged Auth service-login limiter. Each case resets
-transport controls and observations and seeds distinct persisted records. Strict
+transport controls and observations and seeds distinct persisted records. Per-case
+cleanup also clears hooks and failure controls after awaited operations, retaining
+status receipts for xUnit diagnostics until the next case reset. Strict
 financial comparisons use a database-read baseline. Safe per-case Auth path/status
 receipts support diagnosis without changing authentication responses.
 
