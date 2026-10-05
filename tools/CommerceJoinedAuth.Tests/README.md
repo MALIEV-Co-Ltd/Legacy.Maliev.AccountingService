@@ -1,8 +1,15 @@
 # Public joined authorization diagnostic
 
 This is a fresh public-only graph, distinct from the sealed 906-input graph.
-Auth51afbbd and Accountingff8fcf6 are retained; public Quotation36c4bab
-includes production differences and is not original baseline equivalence.
+Identity commerce-joined-normal-iam-public-20261005 pins reviewed normal-IAM
+Auth74e5c9e and Accountinge0438c1. Public Quotation36c4bab, Defaults8f4f5f2 and
+Contracts78e48ff remain unchanged. This is not original baseline equivalence.
+The byte-exact predecessor manifest is retained under public-graphs/. The new
+manifest records its actual six-failure run37254089055 as predecessor evidence. The four harness source files, six
+assertions and sealed906 inputs remain unchanged; only producer references and
+diagnostic provenance advance. Auth707 and Accounting478 service results do
+not establish joined completion acceptance. The full-PUT completion protocol
+is unchanged and actual diagnostic results must establish the next boundary.
 Exact references and adapted file hashes are in public-graph.json.
 Project references, three content roots and five equivalent Assert.Single
 predicate overloads change in this harness to satisfy xUnit2031.

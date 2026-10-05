@@ -1,13 +1,13 @@
 {
-  "identity": "commerce-joined-normal-iam-public-20261005",
+  "identity": "commerce-joined-public-20261005",
   "references": [
     {
       "repository": "Legacy.Maliev.AuthService",
-      "commit": "74e5c9eda8696ebe9cf5c2dcd30321148b32ff0b"
+      "commit": "51afbbd6e2829382a3431338abedccf339de33b1"
     },
     {
       "repository": "Legacy.Maliev.AccountingService",
-      "commit": "e0438c159583a946ad66836023005755e651dff0"
+      "commit": "ff8fcf61684566b150fe06d88f2ee0c41bc6a33f"
     },
     {
       "repository": "Legacy.Maliev.QuotationService",
@@ -64,34 +64,5 @@
     "single worker and BuildInParallel=false restored to match sealed runner scheduling"
   ],
   "projectSha256": "D7A1E9D1D4B291C10C15BE8E452749A418C66632B1B481B47116B89F17D294A2",
-  "hashRepresentation": "Committed LF blob bytes; original hashes refer to sealed source artifact bytes",
-  "predecessor": {
-    "identity": "commerce-joined-public-20261005",
-    "manifest": "public-graphs/commerce-joined-public-20261005.json",
-    "manifestSha256": "dc86d100930ccfe7133de1b7c05ec8318ac33e5a66d46dff23db427c5a207d26",
-    "harnessHead": "e0438c159583a946ad66836023005755e651dff0",
-    "actualRun": 37254089055,
-    "executed": 6,
-    "passed": 0,
-    "failed": 6,
-    "skipped": 0
-  },
-  "producerEvidence": {
-    "Auth": {
-      "run": 37260072207,
-      "passed": 707,
-      "candidateTree": "04fb685ef752421b8b4268e979da14c76bc23d43",
-      "checkout": "481c70bc7129969d5b090325c4b8075ff53ce9c5",
-      "strictBuild": "0 warnings / 0 errors",
-      "security": "success"
-    },
-    "Accounting": {
-      "run": 37254089190,
-      "passed": 478,
-      "candidateTree": "b2430fe3dc9d75cef85fb22cd66f22dda66ddebb",
-      "securityCheck": 111590388725,
-      "security": "success"
-    }
-  },
-  "stage": "Diagnostic with reviewed normal Program IAM producers; completion protocol unchanged; actual six outcomes pending."
+  "hashRepresentation": "Committed LF blob bytes; original hashes refer to sealed source artifact bytes"
 }

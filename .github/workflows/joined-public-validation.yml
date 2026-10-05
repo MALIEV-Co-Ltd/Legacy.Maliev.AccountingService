@@ -40,14 +40,14 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: MALIEV-Co-Ltd/Legacy.Maliev.AuthService
-          ref: 51afbbd6e2829382a3431338abedccf339de33b1
+          ref: 74e5c9eda8696ebe9cf5c2dcd30321148b32ff0b
           path: .joined-public/Legacy.Maliev.AuthService
           persist-credentials: false
       - name: Check out Legacy.Maliev.AccountingService
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: MALIEV-Co-Ltd/Legacy.Maliev.AccountingService
-          ref: ff8fcf61684566b150fe06d88f2ee0c41bc6a33f
+          ref: e0438c159583a946ad66836023005755e651dff0
           path: .joined-public/Legacy.Maliev.AccountingService
           persist-credentials: false
       - name: Check out Legacy.Maliev.QuotationService
