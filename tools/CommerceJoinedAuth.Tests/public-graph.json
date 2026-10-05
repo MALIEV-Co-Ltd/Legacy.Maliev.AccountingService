@@ -28,9 +28,10 @@
     {
       "path": "AccountingQuotationBaselineHttpTests.cs",
       "originalSha256": "075290F05306B60AB941BEFC5095A55CFFAA1734468E0B2E0C5D961FE832218B",
-      "newSha256": "983C445B2B354750D570D011F4DD9DE7020A14021483372B4A2E0E0648B029E9",
+      "newSha256": "BCE9459EDB535C1DBB2C1DF528A0208760F97F58F8EB501099340EC654D0A03C",
       "adaptation": "content root only",
-      "analyzerAdaptation": "Equivalent Assert.Single predicate overload; no predicate or cardinality change"
+      "analyzerAdaptation": "Equivalent Assert.Single predicate overload; no predicate or cardinality change",
+      "securityAdaptation": "Same context-to-disposable-database mapping expressed as named dictionary; actual password remains generated"
     },
     {
       "path": "FrozenAuthHost.cs",

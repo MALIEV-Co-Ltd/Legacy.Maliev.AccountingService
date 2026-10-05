@@ -193,8 +193,14 @@ public sealed class AccountingQuotationBaselineFixture : IAsyncLifetime
             }
             foreach (var (context, name) in new[] { ("InvoiceDbContext", "joined_invoice"), ("PaymentDbContext", "joined_payment"), ("ReceiptDbContext", "joined_receipt") })
                 connections[context] = new NpgsqlConnectionStringBuilder(authority.ConnectionString) { Database = name, Pooling = false }.ConnectionString;
-            foreach (var (context, name) in new[] { ("CustomerIdentity", "joined_auth_customer"), ("EmployeeIdentity", "joined_auth_employee"), ("RefreshSessions", "joined_auth_state") })
-                connections[context] = new NpgsqlConnectionStringBuilder(authority.ConnectionString) { Database = name, Pooling = false }.ConnectionString;
+            var authDatabases = new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["CustomerIdentity"] = "joined_auth_customer",
+                ["EmployeeIdentity"] = "joined_auth_employee",
+                ["RefreshSessions"] = "joined_auth_state",
+            };
+            foreach (var database in authDatabases)
+                connections[database.Key] = new NpgsqlConnectionStringBuilder(authority.ConnectionString) { Database = database.Value, Pooling = false }.ConnectionString;
             await using (var invoice = InvoiceDatabase()) await invoice.Database.MigrateAsync();
             await using (var payment = new PaymentDbContext(Options<PaymentDbContext>("PaymentDbContext"))) await payment.Database.MigrateAsync();
             await using (var receipt = new ReceiptDbContext(Options<ReceiptDbContext>("ReceiptDbContext"))) await receipt.Database.MigrateAsync();
