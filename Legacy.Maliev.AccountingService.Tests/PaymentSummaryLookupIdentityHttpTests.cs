@@ -108,10 +108,15 @@ public sealed class PaymentSummaryLookupIdentityHttpTests(AccountingBoundaryHttp
 
     private static Payment Row(int direction, int type, int month, int day, decimal amount, int year = 2026) => new()
     {
-        PaymentDirectionId = direction, PaymentTypeId = type, PaymentMethodId = 100000,
+        PaymentDirectionId = direction,
+        PaymentTypeId = type,
+        PaymentMethodId = 100000,
         PaymentDate = new DateTime(year, month, day, 12, 0, 0, DateTimeKind.Utc),
-        CurrencyId = 7, Amount = amount, Description = "Synthetic lookup identity regression",
-        Recipient = "Synthetic", TransactionNumber = "LOOKUP-IDENTITY-ONLY",
+        CurrencyId = 7,
+        Amount = amount,
+        Description = "Synthetic lookup identity regression",
+        Recipient = "Synthetic",
+        TransactionNumber = "LOOKUP-IDENTITY-ONLY",
     };
 
     private async Task<string> SnapshotAsync()
@@ -122,16 +127,35 @@ public sealed class PaymentSummaryLookupIdentityHttpTests(AccountingBoundaryHttp
         var types = await database.Types.AsNoTracking().OrderBy(row => row.Id)
             .Select(row => new { row.Id, row.Name, row.Description, row.CreatedDate, row.ModifiedDate }).ToArrayAsync();
         var payments = await database.Payments.AsNoTracking().OrderBy(row => row.Id)
-            .Select(row => new { row.Id, row.EmployeeId, row.PaymentDirectionId, row.PaymentTypeId, row.PaymentMethodId,
-                row.PaymentDate, row.Amount, row.CurrencyId, row.CreatedDate, row.ModifiedDate,
-                row.Description, row.Recipient, row.TransactionNumber }).ToArrayAsync();
+            .Select(row => new
+            {
+                row.Id,
+                row.EmployeeId,
+                row.PaymentDirectionId,
+                row.PaymentTypeId,
+                row.PaymentMethodId,
+                row.PaymentDate,
+                row.Amount,
+                row.CurrencyId,
+                row.CreatedDate,
+                row.ModifiedDate,
+                row.Description,
+                row.Recipient,
+                row.TransactionNumber
+            }).ToArrayAsync();
         return JsonSerializer.Serialize(new { directions, types, payments, Cache = await fixture.SummaryCacheSnapshotAsync() });
     }
 
     private async Task AssertOpaqueFailureAsync(HttpResponseMessage response)
     {
-        await fixture.AssertStatusAsync(response, HttpStatusCode.InternalServerError);
+        // Retain the normal Defaults mapping; this producer does not change error contracts.
+        await fixture.AssertStatusAsync(response, HttpStatusCode.BadRequest);
         var body = await response.Content.ReadAsStringAsync();
+        var wire = JsonNode.Parse(body)!.AsObject();
+        Assert.Equal("The request cannot be processed.", wire["error"]!.GetValue<string>());
+        Assert.Equal(400, wire["statusCode"]!.GetValue<int>());
+        Assert.Null(wire["details"]);
+        Assert.Contains("InvalidOperationException", fixture.FailureMetadata);
         Assert.DoesNotContain("InvalidOperationException", body, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Sequence contains", body, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("LOOKUP-IDENTITY-ONLY", body, StringComparison.Ordinal);
