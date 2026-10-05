@@ -1,5 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json;
+using Xunit.Abstractions;
 using Commerce.JoinedAuth.Tests;
 using Legacy.Maliev.AccountingService.Application.Interfaces;
 using Legacy.Maliev.AccountingService.Application.Models;
@@ -12,12 +14,25 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Commerce.AtomicProtocol.Tests;
 
 [Collection("atomic-protocol")]
-public sealed class AtomicProtocolHttpTests(AccountingQuotationBaselineFixture fixture)
+public sealed class AtomicProtocolHttpTests(AtomicProtocolSharedFixture owned, ITestOutputHelper output) : IDisposable
 {
+    private AccountingQuotationBaselineFixture fixture => owned.Base;
+    private int authResponseStart;
+
+    public void Dispose()
+    {
+        output.WriteLine(JsonSerializer.Serialize(new
+        {
+            authResponses = fixture.Auth.Responses.Skip(authResponseStart).Select(value => new { value.Path, value.Status }),
+            workloadLogins = owned.Scenario.AuthLogins.ToArray()
+        }));
+    }
+
     private AtomicProtocolScenario Scenario()
     {
-        fixture.ResetObservations();
-        return new(fixture);
+        authResponseStart = fixture.Auth.Responses.Count;
+        owned.Scenario.Reset();
+        return owned.Scenario;
     }
 
     [Fact]

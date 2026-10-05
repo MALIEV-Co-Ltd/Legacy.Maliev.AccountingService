@@ -101,11 +101,11 @@
   "files": [
     {
       "path": "AtomicProtocolHttpTests.cs",
-      "sha256": "bbdc8800c2cb158b44d88e5a78e19f3ac72f16a4447b3b27dec222cc2991fc98"
+      "sha256": "2b995ee57ee1af79fa382b97bb338f252de86e43a4ee1d06eeb7277394b22fc1"
     },
     {
       "path": "AtomicProtocolScenario.cs",
-      "sha256": "9b036dc24894d2db56529ebac727f4519e0071b430204ca6455c1b0797be9b45"
+      "sha256": "3883ad95e0ab984d359d0a0137460333aeec64fb09f862be138406bb81782035"
     },
     {
       "path": "Commerce.AtomicProtocol.Tests.csproj",
@@ -113,7 +113,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "2f29080ec584b26f10268b06ea7f0be641ca1aca00d0b44e50dc854b57858c83"
+      "sha256": "847e6b9be4fe2a9ec0448ac56cef20a48b5a14041c9d8ba02204a1665ec8dee1"
     }
   ],
   "hashRepresentation": "Committed LF bytes",
@@ -208,5 +208,18 @@
     "rawAvailable": false,
     "cause": "Ambiguous UpdateResult in child repository characterization",
     "correction": "Explicit Quotation UpdateResult enum; producer pins and assertions unchanged"
+  },
+  "priorProspectiveExecution": {
+    "harnessHead": "5e093178d5456357c2e92c43b91163308301c3fb",
+    "actualRun": 37282774536,
+    "warnings": 0,
+    "errors": 0,
+    "executed": 17,
+    "passed": 8,
+    "failed": 9,
+    "skipped": 0,
+    "rawSha256": "1e8fe8c652fe30e96a2e5227652efa5c1f76ec6f103538a00f1b95e8611aa93b",
+    "accepted": false,
+    "correction": "Persisted seed baseline and shared actual host lifecycle; original assertions and producer pins unchanged. Authorization failures require fresh execution evidence."
   }
 }

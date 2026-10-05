@@ -14,6 +14,12 @@ synthetic prerequisites for successful Accounting HTTP creation. They establish
 neither live Order/provider acceptance nor deployed IAM grants. Unknown external
 routes retain the historical refusal path.
 
+The serialized collection owns one actual Accounting/Quotation host pair, preserving
+normal DI token caches and the unchanged Auth service-login limiter. Each case resets
+transport controls and observations and seeds distinct persisted records. Strict
+financial comparisons use a database-read baseline. Safe per-case Auth path/status
+receipts support diagnosis without changing authentication responses.
+
 Exactly 17 Fact executions are declared:
 
 1. PersistedInvoice_ActualDiCompletionUsesExactAtomicCustomerWire

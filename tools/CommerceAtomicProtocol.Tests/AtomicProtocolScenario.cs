@@ -20,8 +20,34 @@ using Microsoft.Extensions.Http;
 namespace Commerce.AtomicProtocol.Tests;
 
 [CollectionDefinition("atomic-protocol", DisableParallelization = true)]
-public sealed class AtomicProtocolCollection : ICollectionFixture<AccountingQuotationBaselineFixture>
+public sealed class AtomicProtocolCollection : ICollectionFixture<AtomicProtocolSharedFixture>
 {
+}
+
+/// <summary>Owns one real host pair for the serialized prospective collection.</summary>
+public sealed class AtomicProtocolSharedFixture : IAsyncLifetime
+{
+    public AccountingQuotationBaselineFixture Base { get; } = new();
+    public AtomicProtocolScenario Scenario { get; private set; } = null!;
+    private int disposed;
+
+    public async Task InitializeAsync()
+    {
+        try
+        {
+            await Base.InitializeAsync();
+            Scenario = new(Base);
+            using var bootstrap = Scenario.Accounting.CreateClient();
+        }
+        catch { await DisposeAsync(); throw; }
+    }
+
+    public async Task DisposeAsync()
+    {
+        if (Interlocked.Exchange(ref disposed, 1) != 0) return;
+        try { if (Scenario is not null) await Scenario.DisposeHostsAsync(); }
+        finally { await Base.DisposeAsync(); }
+    }
 }
 
 /// <summary>Transport-only prospective wrapper; historical fixtures and production registration remain unchanged.</summary>
@@ -29,12 +55,14 @@ public sealed class AtomicProtocolScenario : IAsyncDisposable
 {
     public sealed record Decision(string Path, JsonElement Body, string Key, string Version, int Status);
     public sealed record OrderCall(int Id, string Key, int Status);
+    public sealed record AuthLogin(string Host, int Status);
     public AccountingQuotationBaselineFixture Base { get; }
     public WebApplicationFactory<AccountingProgram> Accounting { get; }
     public WebApplicationFactory<QuotationProgram> Quotation { get; }
     public ConcurrentQueue<Decision> Decisions { get; } = new();
     public ConcurrentQueue<string> Requests { get; } = new();
     public ConcurrentQueue<OrderCall> Orders { get; } = new();
+    public ConcurrentQueue<AuthLogin> AuthLogins { get; } = new();
     public Func<Task>? BeforeCompletionLookup;
     public Func<CancellationToken, Task>? BeforeDecisionDispatch;
     public bool LoseDecisionResponse;
@@ -47,6 +75,7 @@ public sealed class AtomicProtocolScenario : IAsyncDisposable
     private readonly QuotationNormalIamBoundary boundary = new();
     private readonly Dictionary<int, string> sourceFinancialScalars = new();
     private int lost;
+    private int hostsDisposed;
 
     public AtomicProtocolScenario(AccountingQuotationBaselineFixture fixture)
     {
@@ -54,11 +83,42 @@ public sealed class AtomicProtocolScenario : IAsyncDisposable
         Quotation = fixture.Quotation.App(boundary, environment: "Testing").WithWebHostBuilder(builder =>
             builder.ConfigureTestServices(services => services.PostConfigureAll<HttpClientFactoryOptions>(options =>
                 options.HttpMessageHandlerBuilderActions.Add(http => http.PrimaryHandler = new OrderTransport(this, http.PrimaryHandler)))));
-        using var bootstrap = Quotation.CreateClient();
-        Accounting = fixture.Accounting.WithWebHostBuilder(builder =>
-            builder.ConfigureTestServices(services => services.PostConfigureAll<HttpClientFactoryOptions>(options =>
-                options.HttpMessageHandlerBuilderActions.Add(http => http.PrimaryHandler = new AccountingTransport(this,
-                    http.Name ?? throw new InvalidOperationException("Missing named HTTP client."), http.PrimaryHandler)))));
+        try
+        {
+            using var bootstrap = Quotation.CreateClient();
+            Accounting = fixture.Accounting.WithWebHostBuilder(builder =>
+                builder.ConfigureTestServices(services => services.PostConfigureAll<HttpClientFactoryOptions>(options =>
+                    options.HttpMessageHandlerBuilderActions.Add(http => http.PrimaryHandler = new AccountingTransport(this,
+                        http.Name ?? throw new InvalidOperationException("Missing named HTTP client."), http.PrimaryHandler)))));
+        }
+        catch { Quotation.Dispose(); throw; }
+    }
+
+    public void Reset()
+    {
+        Base.ResetObservations();
+        while (Decisions.TryDequeue(out _)) { }
+        while (Requests.TryDequeue(out _)) { }
+        while (Orders.TryDequeue(out _)) { }
+        while (AuthLogins.TryDequeue(out _)) { }
+        while (boundary.IamResponses.TryDequeue(out _)) { }
+        BeforeCompletionLookup = null;
+        BeforeDecisionDispatch = null;
+        LoseDecisionResponse = false;
+        CorruptCompletionLookup = null;
+        AccountingIamFailure = null;
+        FailedOrder = 0;
+        LaterEffects = 0;
+        IamControls = 0;
+        Unmatched = 0;
+        lost = 0;
+        boundary.SuccessfulStandardResponses = 0;
+        boundary.SuccessfulLiveResponses = 0;
+        boundary.IamTransportFailures = 0;
+        boundary.UnmatchedTransportCalls = 0;
+        boundary.IamCalls = 0;
+        boundary.LoginCalls = 0;
+        sourceFinancialScalars.Clear();
     }
 
     public async Task<Quotation> SeedAsync(bool? accepted = null)
@@ -67,8 +127,9 @@ public sealed class AtomicProtocolScenario : IAsyncDisposable
         await using var db = Base.Quotation.Context();
         db.OrderItems.Add(new QuotationOrderItem { QuotationId = row.Id, Description = "Synthetic Thai part", Quantity = 1, UnitPrice = 100m });
         await db.SaveChangesAsync();
-        sourceFinancialScalars.Add(row.Id, FinancialScalars(row));
-        return row;
+        var persisted = await db.Quotations.AsNoTracking().SingleAsync(value => value.Id == row.Id);
+        sourceFinancialScalars.Add(persisted.Id, FinancialScalars(persisted));
+        return persisted;
     }
 
     public async Task<int> InvoiceAsync()
@@ -148,8 +209,12 @@ public sealed class AtomicProtocolScenario : IAsyncDisposable
         Assert.DoesNotContain(Requests, value => value == $"PUT /quotations/{quotation}");
     }
 
-    public async ValueTask DisposeAsync()
+    // Per-case await using releases no shared hosts; collection lifetime owns them.
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+
+    public async ValueTask DisposeHostsAsync()
     {
+        if (Interlocked.Exchange(ref hostsDisposed, 1) != 0) return;
         try { await Accounting.DisposeAsync(); }
         finally { await Quotation.DisposeAsync(); }
     }
@@ -203,6 +268,12 @@ public sealed class AtomicProtocolScenario : IAsyncDisposable
                 Interlocked.Increment(ref owner.IamControls);
                 return Json(new { allowed = false }, mode == "denied" ? HttpStatusCode.OK : HttpStatusCode.ServiceUnavailable);
             }
+            if (uri.Host == "joined-auth.invalid" && uri.AbsolutePath == "/auth/v1/service/login" && request.Method == HttpMethod.Post)
+            {
+                var response = await base.SendAsync(request, token);
+                owner.AuthLogins.Enqueue(new(uri.Host, (int)response.StatusCode));
+                return response;
+            }
             if (uri.Host == "joined-document.invalid" && request.Method == HttpMethod.Post && uri.AbsolutePath == "/pdfs/invoice")
             {
                 AssertWorkload(request, "service:legacy-accounting");
@@ -226,10 +297,16 @@ public sealed class AtomicProtocolScenario : IAsyncDisposable
 
     private sealed class OrderTransport(AtomicProtocolScenario owner, HttpMessageHandler inner) : DelegatingHandler(inner)
     {
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken token)
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken token)
         {
             var uri = request.RequestUri;
-            if (uri is null || uri.Host != "quotation95-order.invalid") return base.SendAsync(request, token);
+            if (uri is null || uri.Host != "quotation95-order.invalid")
+            {
+                var response = await base.SendAsync(request, token);
+                if (uri?.Host == "quotation95-auth.invalid" && uri.AbsolutePath == "/auth/v1/service/login" && request.Method == HttpMethod.Post)
+                    owner.AuthLogins.Enqueue(new(uri.Host, (int)response.StatusCode));
+                return response;
+            }
             var parts = uri.AbsolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
             if (request.Method != HttpMethod.Post || parts.Length != 4 || parts[0] != "orderstatuses"
                 || parts[1] != "histories" || parts[3] != "accepted" || !int.TryParse(parts[2], out var order))
@@ -240,7 +317,7 @@ public sealed class AtomicProtocolScenario : IAsyncDisposable
             Assert.Equal("service:legacy-quotation", new JwtSecurityTokenHandler().ReadJwtToken(request.Headers.Authorization!.Parameter).Subject);
             var status = order == owner.FailedOrder ? HttpStatusCode.ServiceUnavailable : HttpStatusCode.Created;
             owner.Orders.Enqueue(new(order, Assert.Single(request.Headers.GetValues("Idempotency-Key")), (int)status));
-            return Task.FromResult(Json(new { }, status));
+            return Json(new { }, status);
         }
     }
 
