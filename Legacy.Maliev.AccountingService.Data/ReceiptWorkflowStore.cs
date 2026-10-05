@@ -10,7 +10,8 @@ namespace Legacy.Maliev.AccountingService.Data;
 public sealed class ReceiptWorkflowStore(
     InvoiceDbContext invoices,
     ReceiptDbContext receipts,
-    TimeProvider timeProvider) : IReceiptWorkflowStore
+    TimeProvider timeProvider,
+    IAccountingCache cache) : IReceiptWorkflowStore
 {
     /// <inheritdoc />
     public async Task<ReceiptWorkflowSnapshot> GetAsync(int invoiceId, CancellationToken cancellationToken)
@@ -153,6 +154,8 @@ public sealed class ReceiptWorkflowStore(
                     $"Invoice {invoiceId} is already linked to a different receipt.");
             }
         }
+
+        await InvalidateInvoiceAsync(invoiceId);
     }
 
     /// <inheritdoc />
@@ -184,24 +187,35 @@ public sealed class ReceiptWorkflowStore(
     /// <inheritdoc />
     public async Task DeleteReceiptAsync(int receiptId, CancellationToken cancellationToken)
     {
-        await using var transaction = await receipts.Database.BeginTransactionAsync(cancellationToken);
-        await receipts.Files.Where(value => value.ReceiptId == receiptId).ExecuteDeleteAsync(cancellationToken);
-        await receipts.Items.Where(value => value.ReceiptId == receiptId).ExecuteDeleteAsync(cancellationToken);
-        await receipts.Receipts.Where(value => value.Id == receiptId).ExecuteDeleteAsync(cancellationToken);
-        await transaction.CommitAsync(cancellationToken);
+        await receipts.Database.CreateExecutionStrategy().ExecuteAsync(async token =>
+        {
+            await using var transaction = await receipts.Database.BeginTransactionAsync(token);
+            await receipts.Files.Where(value => value.ReceiptId == receiptId).ExecuteDeleteAsync(token);
+            await receipts.Items.Where(value => value.ReceiptId == receiptId).ExecuteDeleteAsync(token);
+            await receipts.Receipts.Where(value => value.Id == receiptId).ExecuteDeleteAsync(token);
+            await transaction.CommitAsync(token);
+        }, cancellationToken);
     }
 
     /// <inheritdoc />
     public async Task UnlinkInvoiceAsync(int invoiceId, int receiptId, CancellationToken cancellationToken)
     {
         var modified = Now();
-        await invoices.Invoices
+        var updated = await invoices.Invoices
             .Where(value => value.Id == invoiceId && value.ReceiptId == receiptId)
             .ExecuteUpdateAsync(
                 setters => setters
                     .SetProperty(value => value.ReceiptId, (int?)null)
                     .SetProperty(value => value.ModifiedDate, modified),
                 cancellationToken);
+        if (updated != 0) await InvalidateInvoiceAsync(invoiceId);
+    }
+
+    private async Task InvalidateInvoiceAsync(int invoiceId)
+    {
+        // The normal workflow's UPDATE has committed. Caller abort must not retain the old read.
+        using var budget = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        await cache.RemoveAsync($"invoice:{invoiceId}", budget.Token);
     }
 
     // CreatedDate/ModifiedDate are "timestamp without time zone" wall-clock columns storing the

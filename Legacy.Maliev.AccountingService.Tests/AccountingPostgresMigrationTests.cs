@@ -299,7 +299,7 @@ public sealed class AccountingPostgresMigrationTests : IAsyncLifetime
         await invoiceContext.SaveChangesAsync();
         invoiceContext.Add(new InvoiceOrderItem { InvoiceId = invoice.Id, Description = "Print", Quantity = 1, UnitPrice = 100m });
         await invoiceContext.SaveChangesAsync();
-        var store = new ReceiptWorkflowStore(invoiceContext, receiptContext, TimeProvider.System);
+        var store = new ReceiptWorkflowStore(invoiceContext, receiptContext, TimeProvider.System, Mock.Of<IAccountingCache>());
 
         var before = await store.GetAsync(invoice.Id, CancellationToken.None);
         var receipt = await store.CreateReceiptAsync(before.Invoice, before.InvoiceItems, "paid", CancellationToken.None);
