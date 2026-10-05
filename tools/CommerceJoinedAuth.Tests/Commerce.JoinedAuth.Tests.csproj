@@ -6,7 +6,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <MalievWorkspaceRoot>$(MSBuildThisFileDirectory)../../.joined-public</MalievWorkspaceRoot>
+    <MalievWorkspaceRoot Condition="'$(MalievWorkspaceRoot)' == ''">$(MSBuildThisFileDirectory)../../.joined-public</MalievWorkspaceRoot>
     <UseLocalMalievDependencies>true</UseLocalMalievDependencies>
   </PropertyGroup>
   <ItemGroup>
@@ -19,11 +19,11 @@
   </ItemGroup>
   <ItemGroup>
     <Using Include="Xunit" />
-    <ProjectReference Include="../../.joined-public/Legacy.Maliev.AuthService/Legacy.Maliev.AuthService.Api/Legacy.Maliev.AuthService.Api.csproj" Aliases="auth_api" AdditionalProperties="MalievWorkspaceRoot=$(MalievWorkspaceRoot);UseLocalMalievDependencies=true" />
-    <ProjectReference Include="../../.joined-public/Legacy.Maliev.AuthService/Legacy.Maliev.AuthService.Infrastructure/Legacy.Maliev.AuthService.Infrastructure.csproj" AdditionalProperties="MalievWorkspaceRoot=$(MalievWorkspaceRoot);UseLocalMalievDependencies=true" />
-    <ProjectReference Include="../../.joined-public/Legacy.Maliev.AccountingService/Legacy.Maliev.AccountingService.Api/Legacy.Maliev.AccountingService.Api.csproj" Aliases="accounting_api" AdditionalProperties="MalievWorkspaceRoot=$(MalievWorkspaceRoot);UseLocalMalievDependencies=true" />
-    <ProjectReference Include="../../.joined-public/Legacy.Maliev.AccountingService/Legacy.Maliev.AccountingService.Data/Legacy.Maliev.AccountingService.Data.csproj" AdditionalProperties="MalievWorkspaceRoot=$(MalievWorkspaceRoot);UseLocalMalievDependencies=true" />
-    <ProjectReference Include="../../.joined-public/Legacy.Maliev.QuotationService/Legacy.Maliev.QuotationService.Api/Legacy.Maliev.QuotationService.Api.csproj" Aliases="quotation_api" AdditionalProperties="MalievWorkspaceRoot=$(MalievWorkspaceRoot);UseLocalMalievDependencies=true" />
-    <ProjectReference Include="../../.joined-public/Legacy.Maliev.QuotationService/Legacy.Maliev.QuotationService.Data/Legacy.Maliev.QuotationService.Data.csproj" AdditionalProperties="MalievWorkspaceRoot=$(MalievWorkspaceRoot);UseLocalMalievDependencies=true" />
+    <ProjectReference Include="../../.joined-public/Legacy.Maliev.AuthService/Legacy.Maliev.AuthService.Api/Legacy.Maliev.AuthService.Api.csproj" Aliases="auth_api" />
+    <ProjectReference Include="../../.joined-public/Legacy.Maliev.AuthService/Legacy.Maliev.AuthService.Infrastructure/Legacy.Maliev.AuthService.Infrastructure.csproj" />
+    <ProjectReference Include="../../.joined-public/Legacy.Maliev.AccountingService/Legacy.Maliev.AccountingService.Api/Legacy.Maliev.AccountingService.Api.csproj" Aliases="accounting_api" />
+    <ProjectReference Include="../../.joined-public/Legacy.Maliev.AccountingService/Legacy.Maliev.AccountingService.Data/Legacy.Maliev.AccountingService.Data.csproj" />
+    <ProjectReference Include="../../.joined-public/Legacy.Maliev.QuotationService/Legacy.Maliev.QuotationService.Api/Legacy.Maliev.QuotationService.Api.csproj" Aliases="quotation_api" />
+    <ProjectReference Include="../../.joined-public/Legacy.Maliev.QuotationService/Legacy.Maliev.QuotationService.Data/Legacy.Maliev.QuotationService.Data.csproj" />
   </ItemGroup>
 </Project>

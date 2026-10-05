@@ -19,3 +19,14 @@ into an expected-failure success. A failing desired contract remains a failing j
 Standard hosted validation retains TRX and generated-inclusive raw coverage even
 on failure. Service PR validation and its unchanged per-assembly80% gates remain
 separate. No acceptance, merge, deployment, or source-history closure is inferred.
+
+The hosted graph uses one worker, disables parallel project-reference builds,
+and inherits one canonical workspace property rather than creating duplicate
+project instances with per-reference property overrides. This addresses the
+actual GenerateDepsFile output collision, not a retry or assertion fallback.
+
+The hosted workflow must supply the explicit absolute MalievWorkspaceRoot for
+.joined-public. Any separately authorized future local invocation also requires
+that value explicitly; the parent repository default targets ordinary service
+dependencies and is not the joined graph. No local SDK invocation is authorized
+by this document.

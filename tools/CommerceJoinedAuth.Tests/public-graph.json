@@ -58,8 +58,10 @@
   "projectAdaptations": [
     "six reference paths and aliases retained",
     "workspace root",
-    "coverlet.collector 6.0.4 added for raw diagnostic evidence"
+    "coverlet.collector 6.0.4 added for raw diagnostic evidence",
+    "workspace environment is canonical; redundant per-reference property overrides removed to prevent duplicate output graphs",
+    "single worker and BuildInParallel=false restored to match sealed runner scheduling"
   ],
-  "projectSha256": "5936B46660EA251F8C27BFBF4C0E3AD2AB85F179CB934296078A48FF953D7916",
+  "projectSha256": "D7A1E9D1D4B291C10C15BE8E452749A418C66632B1B481B47116B89F17D294A2",
   "hashRepresentation": "Committed LF blob bytes; original hashes refer to sealed source artifact bytes"
 }

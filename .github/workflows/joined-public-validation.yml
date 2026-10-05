@@ -22,6 +22,11 @@ jobs:
     timeout-minutes: 30
     env:
       TreatWarningsAsErrors: 'true'
+      BuildInParallel: 'false'
+      DOTNET_PROCESSOR_COUNT: '1'
+      DOTNET_CLI_DO_NOT_USE_MSBUILD_SERVER: '1'
+      MSBUILDDISABLENODEREUSE: '1'
+      UseSharedCompilation: 'false'
       MalievWorkspaceRoot: ${{ github.workspace }}/.joined-public
       VSTestCollect: XPlat Code Coverage
       VSTestLogger: trx
