@@ -187,11 +187,14 @@ public sealed class ReceiptWorkflowStore(
     /// <inheritdoc />
     public async Task DeleteReceiptAsync(int receiptId, CancellationToken cancellationToken)
     {
-        await using var transaction = await receipts.Database.BeginTransactionAsync(cancellationToken);
-        await receipts.Files.Where(value => value.ReceiptId == receiptId).ExecuteDeleteAsync(cancellationToken);
-        await receipts.Items.Where(value => value.ReceiptId == receiptId).ExecuteDeleteAsync(cancellationToken);
-        await receipts.Receipts.Where(value => value.Id == receiptId).ExecuteDeleteAsync(cancellationToken);
-        await transaction.CommitAsync(cancellationToken);
+        await receipts.Database.CreateExecutionStrategy().ExecuteAsync(async token =>
+        {
+            await using var transaction = await receipts.Database.BeginTransactionAsync(token);
+            await receipts.Files.Where(value => value.ReceiptId == receiptId).ExecuteDeleteAsync(token);
+            await receipts.Items.Where(value => value.ReceiptId == receiptId).ExecuteDeleteAsync(token);
+            await receipts.Receipts.Where(value => value.Id == receiptId).ExecuteDeleteAsync(token);
+            await transaction.CommitAsync(token);
+        }, cancellationToken);
     }
 
     /// <inheritdoc />

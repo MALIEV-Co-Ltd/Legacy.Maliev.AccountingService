@@ -9,6 +9,7 @@ import xml.etree.ElementTree as ET
 expected = {
     "ReconcileReceipt_CommittedLinkReplacesPrimedInvoiceReadAndExposesOwnedFiles": 1,
     "RemoveReceipt_CommittedUnlinkReplacesPrimedInvoiceRead": 1,
+    "DeleteReceiptFailure_RollsBackOwnedRowsAndPreservesPrimedInvoiceCache": 1,
     "CompletedCreateReplay_KeepsCommittedLinkWithoutDuplicateFinancialOrJournalEffects": 1,
     "ConflictingLink_LeavesPrimedInvoiceCacheAndEveryOwnedTableUnchanged": 1,
     "CancellationBeforeLink_LeavesPrimedInvoiceCacheAndEveryOwnedTableUnchanged": 1,
@@ -31,8 +32,8 @@ for result in trx.findall("./t:Results/t:UnitTestResult", ns):
 if dict(actual) != expected:
     raise SystemExit(f"Receipt cache cardinality mismatch: {dict(actual)}")
 counters = trx.find("./t:ResultSummary/t:Counters", ns)
-if counters is None or any(int(counters.get(key, "-1")) != 8 for key in ("total", "executed", "passed")):
-    raise SystemExit("Require exactly 8 executed/passed cases")
+if counters is None or any(int(counters.get(key, "-1")) != 9 for key in ("total", "executed", "passed")):
+    raise SystemExit("Require exactly 9 executed/passed cases")
 if any(int(counters.get(key, "0")) != 0 for key in
        ("failed", "error", "timeout", "aborted", "inconclusive", "notExecuted")):
     raise SystemExit("Failed or skipped receipt cache case")
@@ -46,11 +47,11 @@ for assembly in ("Api", "Application", "Data", "Domain"):
     if not selected or not any(p.findall(".//line") for p in selected):
         raise SystemExit(f"Missing owned executable inventory: {assembly}")
 proof = {
-    "passed": 8, "failed": 0, "skipped": 0, "methods": dict(actual),
+    "passed": 9, "failed": 0, "skipped": 0, "methods": dict(actual),
     "trxSha256": hashlib.sha256(reports[0].read_bytes()).hexdigest(),
     "rawSha256": next(iter(digests)), "rawCopies": len(raw),
     "fullServiceCoverageAcceptance": False, "actualAuthProducerAcceptance": False,
-    "note": "Normal HTTP reconciliation/removal/replay plus direct real-PG store conflict/cancellation controls; owned actual Redis, no fake cache. No provider, arbitrary ambient transaction, distributed race or outage guarantee.",
+    "note": "Normal HTTP reconciliation/removal/replay plus direct real-PG store conflict/cancellation and configured-retry transaction rollback controls; owned actual Redis, no fake cache. No provider, arbitrary ambient transaction, distributed race or outage guarantee.",
 }
 (root / "receipt-cache-proof.json").write_text(json.dumps(proof, indent=2) + "\n", encoding="utf-8")
 print(json.dumps(proof, indent=2))

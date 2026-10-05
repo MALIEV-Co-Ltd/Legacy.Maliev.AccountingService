@@ -42,6 +42,8 @@ public sealed class ReceiptInvoiceCacheHttpTests(AccountingBoundaryHttpFixture f
     public async Task RemoveReceipt_CommittedUnlinkReplacesPrimedInvoiceRead()
     {
         await SeedAsync(91, false);
+        await using var scope = await fixture.ReceiptScopeAsync();
+        AssertConfiguredRetryStrategy(scope.ServiceProvider.GetRequiredService<ReceiptDbContext>());
         using var client = await ClientAsync();
         Assert.Equal(91, (await ReadInvoiceAsync(client)).ReceiptId);
         await AssertCachedAsync(91);
@@ -55,6 +57,42 @@ public sealed class ReceiptInvoiceCacheHttpTests(AccountingBoundaryHttpFixture f
         await AssertCachedAsync(null);
         await using var receipts = fixture.ReceiptDatabase();
         Assert.Empty(await receipts.Receipts.ToArrayAsync());
+        Assert.Equal(0, fixture.ReceiptOutboundCalls);
+    }
+
+    [Fact]
+    public async Task DeleteReceiptFailure_RollsBackOwnedRowsAndPreservesPrimedInvoiceCache()
+    {
+        await SeedAsync(91, true);
+        await using (var seeded = fixture.ReceiptDatabase())
+        {
+            seeded.Items.Add(new ReceiptOrderItem { Id = 912, ReceiptId = 91, Description = "Synthetic rollback item", Quantity = 1, UnitPrice = 100m });
+            await seeded.SaveChangesAsync();
+        }
+        using var client = await ClientAsync();
+        Assert.Equal(91, (await ReadInvoiceAsync(client)).ReceiptId);
+        var before = await fixture.ReceiptSnapshotAsync();
+        await using var scope = await fixture.ReceiptScopeAsync();
+        var configured = scope.ServiceProvider.GetRequiredService<ReceiptDbContext>();
+        AssertConfiguredRetryStrategy(configured);
+        var options = (DbContextOptions<ReceiptDbContext>)configured.GetService<IDbContextOptions>();
+        var failure = new FailAfterReceiptFilesDelete();
+        await using var receipts = new ReceiptDbContext(new DbContextOptionsBuilder<ReceiptDbContext>(options)
+            .AddInterceptors(failure).Options);
+        AssertConfiguredRetryStrategy(receipts);
+        await using var invoices = fixture.InvoiceDatabase();
+        var store = new ReceiptWorkflowStore(invoices, receipts, TimeProvider.System,
+            scope.ServiceProvider.GetRequiredService<IAccountingCache>());
+        using var cancelled = new CancellationTokenSource();
+        cancelled.Cancel();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => store.DeleteReceiptAsync(91, cancelled.Token));
+        Assert.Equal(0, failure.FileRowsDeleted);
+        Assert.Equal(before, await fixture.ReceiptSnapshotAsync());
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => store.DeleteReceiptAsync(91, CancellationToken.None));
+        Assert.Equal("Synthetic failure after owned file deletion", exception.Message);
+        Assert.Equal(1, failure.FileRowsDeleted);
+        Assert.Equal(before, await fixture.ReceiptSnapshotAsync());
+        await AssertCachedAsync(91);
         Assert.Equal(0, fixture.ReceiptOutboundCalls);
     }
 
@@ -150,6 +188,13 @@ public sealed class ReceiptInvoiceCacheHttpTests(AccountingBoundaryHttpFixture f
     private Task<HttpClient> ClientAsync() => fixture.ReceiptClientAsync([
         AccountingPermissions.Read, AccountingPermissions.Create, AccountingPermissions.Delete, AccountingPermissions.FilesRead]);
 
+    private static void AssertConfiguredRetryStrategy(ReceiptDbContext context)
+    {
+        var strategy = context.Database.CreateExecutionStrategy();
+        Assert.True(strategy.RetriesOnFailure);
+        Assert.IsType<Npgsql.EntityFrameworkCore.PostgreSQL.NpgsqlRetryingExecutionStrategy>(strategy);
+    }
+
     private static async Task<Invoice> ReadInvoiceAsync(HttpClient client)
     {
         using var response = await client.GetAsync("/invoices/42");
@@ -207,6 +252,28 @@ public sealed class ReceiptInvoiceCacheHttpTests(AccountingBoundaryHttpFixture f
             int result, CancellationToken cancellationToken = default)
         {
             if (command.CommandText.Contains("UPDATE \"Invoice\"", StringComparison.Ordinal)) caller.Cancel();
+            return ValueTask.FromResult(result);
+        }
+    }
+
+    private sealed class FailAfterReceiptFilesDelete : DbCommandInterceptor
+    {
+        public int FileRowsDeleted { get; private set; }
+
+        public override ValueTask<InterceptionResult<int>> NonQueryExecutingAsync(DbCommand command,
+            CommandEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
+        {
+            if (command.CommandText.StartsWith("DELETE", StringComparison.Ordinal)
+                && command.CommandText.Contains("\"OrderItem\"", StringComparison.Ordinal))
+                throw new InvalidOperationException("Synthetic failure after owned file deletion");
+            return ValueTask.FromResult(result);
+        }
+
+        public override ValueTask<int> NonQueryExecutedAsync(DbCommand command, CommandExecutedEventData eventData,
+            int result, CancellationToken cancellationToken = default)
+        {
+            if (command.CommandText.StartsWith("DELETE", StringComparison.Ordinal)
+                && command.CommandText.Contains("\"ReceiptFile\"", StringComparison.Ordinal)) FileRowsDeleted += result;
             return ValueTask.FromResult(result);
         }
     }
