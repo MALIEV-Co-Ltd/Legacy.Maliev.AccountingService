@@ -56,7 +56,10 @@ acknowledgments can leave accepted quotation/invoice state committed, with deleg
 Accounting admission fenced as NeedsReconciliation.
 Cases 10 and 16 also exercise explicit same-intent completion reconciliation after
 the controlled failure, preserving the producer scalar snapshot, single outcome
-and linked Order keys. They leave the HTTP admission in NeedsReconciliation;
+and linked Order keys. Case 16 retains actual producer standard resilience retries:
+every physical attempt for each of exactly two linked Orders must keep its original
+key, followed by exactly two successful requests during explicit reconciliation.
+They leave the HTTP admission in NeedsReconciliation;
 this is not an automatic admission retry or a global repair transaction.
 Idempotency-Key is observed on the wire; Quotation does not deduplicate this header. No global transaction, saga
 atomicity, provider success or runtime pass is claimed by these source drafts.

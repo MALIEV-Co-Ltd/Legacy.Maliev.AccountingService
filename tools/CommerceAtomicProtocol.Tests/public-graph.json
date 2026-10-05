@@ -101,7 +101,7 @@
   "files": [
     {
       "path": "AtomicProtocolHttpTests.cs",
-      "sha256": "2b995ee57ee1af79fa382b97bb338f252de86e43a4ee1d06eeb7277394b22fc1"
+      "sha256": "fd5393ebf32b761eed80ed0ea22e80d525350455df6e4214a5c4ad5799f0a94f"
     },
     {
       "path": "AtomicProtocolScenario.cs",
@@ -113,7 +113,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "b0424427ba039b1436f244611edca08572072463fe260bfcdc90ff5634da6c72"
+      "sha256": "cb418ee5b592763484226b66b849ada61d46441f2032cda20fee4646c6a66f41"
     }
   ],
   "hashRepresentation": "Committed LF bytes",
@@ -221,5 +221,19 @@
     "rawSha256": "1e8fe8c652fe30e96a2e5227652efa5c1f76ec6f103538a00f1b95e8611aa93b",
     "accepted": false,
     "correction": "Persisted seed baseline and shared actual host lifecycle; original assertions and producer pins unchanged. Authorization failures require fresh execution evidence."
+  },
+  "retryCardinalityReceipt": {
+    "harnessHead": "cd7f6f49f445863376de6cfbbe8cbc8c69f01dbb",
+    "actualRun": 37284482467,
+    "warnings": 0,
+    "errors": 0,
+    "executed": 17,
+    "passed": 16,
+    "failed": 1,
+    "skipped": 0,
+    "rawSha256": "a146b447e430e6fd21a0ea8c62034676164d6875b87d1ac0776345f75e080504",
+    "accepted": false,
+    "cause": "Duplicate Order 7202 key while constructing physical-attempt dictionary. Pinned Quotation Program.cs standard resilience retries POST503. Later reconciliation assertions not reached.",
+    "correction": "NEW prospective case groups exactly two Order IDs and requires original stable keys across every attempt, then exactly two additional successful reconciliation sends. Production retry/security policy and all historical assertions unchanged."
   }
 }

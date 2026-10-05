@@ -24,7 +24,8 @@ public sealed class AtomicProtocolHttpTests(AtomicProtocolSharedFixture owned, I
         output.WriteLine(JsonSerializer.Serialize(new
         {
             authResponses = fixture.Auth.Responses.Skip(authResponseStart).Select(value => new { value.Path, value.Status }),
-            workloadLogins = owned.Scenario.AuthLogins.ToArray()
+            workloadLogins = owned.Scenario.AuthLogins.ToArray(),
+            orderAttempts = owned.Scenario.Orders.ToArray()
         }));
     }
 
@@ -300,12 +301,22 @@ public sealed class AtomicProtocolHttpTests(AtomicProtocolSharedFixture owned, I
         Assert.Contains(scenario.Orders, value => value.Id == 7202 && value.Status == 503);
         await AssertUncertainAsync(scenario, row.Id, operation, number);
         var before = await fixture.QuotationScalarSnapshotAsync(row.Id);
-        var firstOrderKeys = scenario.Orders.ToDictionary(value => value.Id, value => value.Key);
+        var failedAttempts = scenario.Orders.ToArray();
+        var orderGroups = failedAttempts.GroupBy(value => value.Id).ToArray();
+        Assert.Equal(new[] { 7201, 7202 }, orderGroups.Select(group => group.Key).OrderBy(id => id));
+        var firstOrderKeys = orderGroups.ToDictionary(group => group.Key,
+            group => Assert.Single(group.Select(value => value.Key).Distinct()));
+        Assert.Equal(201, Assert.Single(failedAttempts.Where(value => value.Id == 7201)).Status);
+        Assert.True(failedAttempts.Count(value => value.Id == 7202) > 1); // Actual standard resilience retries 503.
+        Assert.All(failedAttempts.Where(value => value.Id == 7202), value => Assert.Equal(503, value.Status));
         scenario.FailedOrder = 0;
         // Direct same-intent reconciliation does not reopen the admission or repair a saga.
         await scenario.CompleteAsync(row.Id, invoice.Id, operation, row.ModifiedDate);
         Assert.Equal(before, await fixture.QuotationScalarSnapshotAsync(row.Id));
-        Assert.Equal(4, scenario.Orders.Count);
+        Assert.Equal(failedAttempts.Length + 2, scenario.Orders.Count);
+        var reconciliationAttempts = scenario.Orders.Skip(failedAttempts.Length).ToArray();
+        Assert.Equal(new[] { 7201, 7202 }, reconciliationAttempts.Select(value => value.Id).OrderBy(id => id));
+        Assert.All(reconciliationAttempts, value => Assert.Equal(201, value.Status));
         foreach (var order in scenario.Orders)
             Assert.Equal(firstOrderKeys[order.Id], order.Key);
         await scenario.AssertAcceptedAsync(row.Id, invoice.Id);
