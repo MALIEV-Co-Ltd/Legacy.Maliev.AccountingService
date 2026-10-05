@@ -1,13 +1,7 @@
-name: Public joined authorization diagnostic
+name: Archived public joined authorization diagnostic
 
 on:
   workflow_dispatch:
-  pull_request:
-    branches: [main, develop, staging]
-    paths:
-      - 'tools/CommerceJoinedAuth.Tests/**'
-      - '.github/workflows/joined-public-validation.yml'
-      - 'scripts/verify-joined-public-results.py'
 
 permissions:
   contents: read

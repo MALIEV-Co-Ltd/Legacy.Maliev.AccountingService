@@ -1,6 +1,13 @@
-# Public joined authorization diagnostic
+# Archived public joined authorization diagnostic
 
-This is a fresh public-only graph, distinct from the sealed 906-input graph.
+This historical public-only graph is retained for explicit manual reproduction,
+distinct from the sealed 906-input graph and the current 17-case atomic protocol
+graph. Actual run37262778842 executed six cases: five passed, one failed, zero
+skipped, with zero build warnings/errors. The failed desired positive full-PUT
+completion assertion remains a failure. The workflow is manual-only and preserves
+its strict failing exit, full job, verifier, six assertions and all producer pins.
+Current acceptance is evaluated by the distinct atomic protocol workflow; this
+historical result is never relabeled GREEN.
 Identity commerce-joined-normal-iam-dependencies-public-20261005 pins reviewed
 Auth74e5c9e, Accountinge0438c1 and compatible Defaultsc40a7f8. Public
 Quotation36c4bab and Contracts78e48ff remain unchanged. This is not original

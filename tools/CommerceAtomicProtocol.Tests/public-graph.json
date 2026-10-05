@@ -113,7 +113,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "cb418ee5b592763484226b66b849ada61d46441f2032cda20fee4646c6a66f41"
+      "sha256": "2c7824557936ccd53ca638d949f6d32986c3dc7018b8c9560bc831e25bb56841"
     }
   ],
   "hashRepresentation": "Committed LF bytes",
@@ -191,11 +191,19 @@
   "validationFiles": [
     {
       "path": ".github/workflows/atomic-protocol-validation.yml",
-      "sha256": "7b6b38f9a896c905c85d3f4aafaf165e08541baa5ef0dc1b98d65e7db9a70aec"
+      "sha256": "1227984f1c2b08b0d61f5abf92da11ba7fbe1ebf6da0829623413aecd7ff859a"
     },
     {
       "path": "scripts/verify-atomic-protocol-results.py",
       "sha256": "828e77b7198cf3b397f120131f26e18a24d908426f51108584c4031ac85e0f3b"
+    },
+    {
+      "path": "scripts/verify_atomic_producer_inputs.py",
+      "sha256": "975e54b2d6e538733ee839bba08abb7640ba052ec9ab3ca11889859eed7c28b4"
+    },
+    {
+      "path": "scripts/test_atomic_producer_inputs.py",
+      "sha256": "972e2ad0b0ac04031034adc90ad4cbd722f549545586051a7448016e14841c8d"
     }
   ],
   "preTestBuildReceipt": {

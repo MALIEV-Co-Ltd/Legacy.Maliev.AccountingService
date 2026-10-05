@@ -5,6 +5,16 @@ their four source files or executing their historical tests. Validate this proje
 as the test target. Set MalievWorkspaceRoot to the absolute .joined-public directory
 and preserve the local-dependency mode used for restore/build/test. Producer pins
 and workflow admission belong to the separately owned public-graph.json.
+The current workflow runs for affected Accounting source/test/workflow changes
+and every push to main. Before executing the pinned graph, it requires all four
+current Accounting production project trees and deterministic tracked root build
+inputs (including file additions/removals) to equal the reviewed producer. Ordinary
+full/focused validation must use the graph's exact Defaults and Contracts pins.
+Mutation controls exercise matching input, root drift/addition/removal, dependency
+pin drift and duplicate/missing checkouts.
+Future production changes therefore fail closed until a separately reviewed graph
+explicitly advances its producer; triggering the old pin cannot silently validate
+new production. Historical six-case reproduction remains manual and strict.
 
 All Accounting, Quotation and Auth Programs, JWT/IAM registrations, repositories,
 issuer/session behavior and admission state machines remain real. Additional
