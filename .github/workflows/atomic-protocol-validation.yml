@@ -10,6 +10,7 @@ on:
       - 'tools/CommerceAtomicProtocol.Tests/**'
       - '.github/workflows/atomic-protocol-validation.yml'
       - 'scripts/verify-atomic-protocol-results.py'
+      - 'scripts/verify-defaults-cache-compat-results.py'
       - 'Legacy.Maliev.AccountingService.Api/**'
       - 'Legacy.Maliev.AccountingService.Application/**'
       - 'Legacy.Maliev.AccountingService.Data/**'
@@ -78,7 +79,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: MALIEV-Co-Ltd/Legacy.Maliev.ServiceDefaults
-          ref: c40a7f82cea347b949444dcd7fb730f2b8dc3c0e
+          ref: 7edcd961024868513fd5f373cab3dcb261197f77
           path: .joined-public/Legacy.Maliev.ServiceDefaults
           persist-credentials: false
       - name: Check out Legacy.Maliev.CompatibilityContracts
@@ -100,6 +101,37 @@ jobs:
       - name: Verify every declared prospective execution and raw evidence
         if: always()
         run: python3 scripts/verify-atomic-protocol-results.py atomic-results
+      - name: Build pinned Defaults cache compatibility tests with zero warnings
+        shell: bash
+        working-directory: .joined-public/Legacy.Maliev.ServiceDefaults
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/defaults-cache-results"
+          dotnet build tests/Legacy.Maliev.ServiceDefaults.Tests/Legacy.Maliev.ServiceDefaults.Tests.csproj \
+            --configuration Release --nologo --disable-build-servers -warnaserror \
+            -p:TreatWarningsAsErrors=true -p:UseLocalMalievDependencies=true -p:GITHUB_ACTIONS=false \
+            | tee "$GITHUB_WORKSPACE/defaults-cache-results/build.log"
+      - name: Execute all nine pinned IAM cache compatibility cases
+        shell: bash
+        working-directory: .joined-public/Legacy.Maliev.ServiceDefaults
+        env:
+          VSTestResultsDirectory: ${{ github.workspace }}/defaults-cache-results
+        run: |
+          dotnet test tests/Legacy.Maliev.ServiceDefaults.Tests/Legacy.Maliev.ServiceDefaults.Tests.csproj \
+            --configuration Release --no-build --no-restore -p:UseLocalMalievDependencies=true -p:GITHUB_ACTIONS=false \
+            --filter "FullyQualifiedName~IamPermissionCacheIsolationTests" \
+            --logger "trx;LogFileName=defaults-cache.trx" \
+            --results-directory "$GITHUB_WORKSPACE/defaults-cache-results"
+      - name: Require exact Defaults cache compatibility evidence
+        if: always()
+        run: python3 -B scripts/verify-defaults-cache-compat-results.py defaults-cache-results
+      - name: Preserve Defaults cache compatibility evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: defaults-cache-compatibility-${{ github.sha }}
+          path: defaults-cache-results
+          if-no-files-found: warn
+          retention-days: 7
       - name: Preserve joined evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
