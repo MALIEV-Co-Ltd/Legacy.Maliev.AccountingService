@@ -306,7 +306,7 @@ public sealed class AtomicProtocolHttpTests(AtomicProtocolSharedFixture owned, I
         Assert.Equal(new[] { 7201, 7202 }, orderGroups.Select(group => group.Key).OrderBy(id => id));
         var firstOrderKeys = orderGroups.ToDictionary(group => group.Key,
             group => Assert.Single(group.Select(value => value.Key).Distinct()));
-        Assert.Equal(201, Assert.Single(failedAttempts.Where(value => value.Id == 7201)).Status);
+        Assert.Equal(201, Assert.Single(failedAttempts, value => value.Id == 7201).Status);
         Assert.True(failedAttempts.Count(value => value.Id == 7202) > 1); // Actual standard resilience retries 503.
         Assert.All(failedAttempts.Where(value => value.Id == 7202), value => Assert.Equal(503, value.Status));
         scenario.FailedOrder = 0;

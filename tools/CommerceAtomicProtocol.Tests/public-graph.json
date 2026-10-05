@@ -101,7 +101,7 @@
   "files": [
     {
       "path": "AtomicProtocolHttpTests.cs",
-      "sha256": "fd5393ebf32b761eed80ed0ea22e80d525350455df6e4214a5c4ad5799f0a94f"
+      "sha256": "56d16c1f6d6b76c0faa083f5862c139259e76b29a82efcf899c5886c1db957a2"
     },
     {
       "path": "AtomicProtocolScenario.cs",
@@ -235,5 +235,16 @@
     "accepted": false,
     "cause": "Duplicate Order 7202 key while constructing physical-attempt dictionary. Pinned Quotation Program.cs standard resilience retries POST503. Later reconciliation assertions not reached.",
     "correction": "NEW prospective case groups exactly two Order IDs and requires original stable keys across every attempt, then exactly two additional successful reconciliation sends. Production retry/security policy and all historical assertions unchanged."
+  },
+  "retryAnalyzerReceipt": {
+    "harnessHead": "39783a742dca78ae6c96e0ce18b39190efde206c",
+    "actualRun": 37285281439,
+    "warnings": 0,
+    "errors": 1,
+    "testsExecuted": false,
+    "trxAvailable": false,
+    "rawAvailable": false,
+    "cause": "xUnit2031: use Assert.Single predicate overload instead of Where",
+    "correction": "Equivalent predicate overload preserves exact one7201/201 requirement"
   }
 }
