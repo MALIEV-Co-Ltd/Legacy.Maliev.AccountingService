@@ -219,14 +219,19 @@ public sealed class AccountingRepository(
         CancellationToken cancellationToken)
     {
         IQueryable<Receipt> query = receipts.Receipts.AsNoTracking();
-        if (!string.IsNullOrWhiteSpace(search))
+        if (!string.IsNullOrEmpty(search))
         {
-            var pattern = $"%{search.Trim()}%";
-            query = query.Where(receipt => EF.Functions.ILike(receipt.InvoiceNumber, pattern)
-                || EF.Functions.ILike(receipt.TaxIdentification, pattern));
+            var pattern = $"%{EscapeLikePattern(search)}%";
+            query = query.Where(receipt => EF.Functions.ILike(receipt.Comment, pattern, "\\")
+                || EF.Functions.ILike(receipt.CommercialRegistration, pattern, "\\")
+                || EF.Functions.ILike(receipt.TaxIdentification, pattern, "\\")
+                || EF.Functions.ILike(receipt.InvoiceNumber, pattern, "\\")
+                || (receipt.CustomerId.HasValue && EF.Functions.ILike(receipt.CustomerId.Value.ToString(), pattern, "\\"))
+                || EF.Functions.ILike(receipt.Id.ToString(), pattern, "\\"));
         }
 
-        return await PageAsync(query.OrderByDescending(receipt => receipt.Id), page, size, cancellationToken);
+        var result = await PageAsync(query.OrderByDescending(receipt => receipt.Id), page, size, cancellationToken);
+        return result is not null && result.Items.Count == 0 ? null : result;
     }
 
     public async Task<IReadOnlyList<ReceiptOrderItem>> GetReceiptItemsAsync(int receiptId, CancellationToken cancellationToken) =>
