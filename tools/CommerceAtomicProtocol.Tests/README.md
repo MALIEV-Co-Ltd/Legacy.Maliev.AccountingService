@@ -73,3 +73,20 @@ They leave the HTTP admission in NeedsReconciliation;
 this is not an automatic admission retry or a global repair transaction.
 Idempotency-Key is observed on the wire; Quotation does not deduplicate this header. No global transaction, saga
 atomicity, provider success or runtime pass is claimed by these source drafts.
+
+The security dependency successor is commerce-atomic-security-cache-public-20261005.
+Only Defaults advances to 7edcd961024868513fd5f373cab3dcb261197f77 in the current
+full, focused and 17-case graph workflows. Auth74, Accountingc1, Quotation36 and
+Contracts78 remain pinned. The predecessor manifest from accepted Accounting f12
+is archived byte-for-byte as public-graph-accepted-f12.json; this successor makes
+no baseline-equivalence or fresh execution claim.
+
+The hosted workflow additionally builds the pinned Defaults test project with
+warnings treated as errors, then executes four cross-host cached-result theory
+combinations and five independent cache/coalescing/cancellation/live-refresh
+Facts (nine executions). The exact-name/outcome/counter verifier requires all nine
+and a zero-warning/error build log. Results and an always-preserved artifact use
+defaults-cache-results, separate from atomic-results and its one-TRX 17-case gate.
+This compatibility proof does not replace Accounting full-suite/raw coverage or
+the 17-case producer graph; no coverage threshold, exclusion or settings change
+is introduced. All successor hosted execution remains pending.
