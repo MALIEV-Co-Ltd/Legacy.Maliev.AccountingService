@@ -63,7 +63,12 @@ public sealed class OrderItemsController(IAccountingService service, IIdempotenc
     [HttpGet("{orderItemId:int}", Name = "GetInvoiceOrderItem"), RequirePermission(AccountingPermissions.Read, RequireLiveCheck = true)]
     public Task<ActionResult<InvoiceOrderItem>> GetOrderItemAsync(int orderItemId, CancellationToken cancellationToken) => Get(orderItemId, cancellationToken);
     [HttpGet("/invoices/{invoiceId:int}/orderitems"), RequirePermission(AccountingPermissions.Read, RequireLiveCheck = true)]
-    public async Task<ActionResult<IReadOnlyList<InvoiceOrderItem>>> GetOrderItemsAsync(int invoiceId, CancellationToken cancellationToken) => Ok(await Service.GetInvoiceItemsAsync(invoiceId, cancellationToken));
+    public async Task<ActionResult<IReadOnlyList<InvoiceOrderItem>>> GetOrderItemsAsync(int invoiceId, CancellationToken cancellationToken)
+    {
+        if (invoiceId == 0) return BadRequest("Invoice id is required");
+        var items = await Service.GetInvoiceItemsAsync(invoiceId, cancellationToken);
+        return items.Count == 0 ? NotFound() : Ok(items);
+    }
     [HttpPut("{orderItemId:int}"), RequirePermission(AccountingPermissions.Update, RequireLiveCheck = true)]
     public Task<IActionResult> UpdateOrderItemAsync(int orderItemId, InvoiceOrderItem item, [FromHeader(Name = "If-Unmodified-Since")] DateTimeOffset? expected, CancellationToken cancellationToken) => Update(orderItemId, item, expected, cancellationToken);
 }
@@ -78,7 +83,11 @@ public sealed class FilesController(IAccountingService service, IIdempotencyStor
     [HttpGet("{invoiceFileId:int}", Name = "GetInvoiceFile"), RequirePermission(AccountingPermissions.FilesRead, RequireLiveCheck = true)]
     public Task<ActionResult<InvoiceFile>> GetInvoiceFileAsync(int invoiceFileId, CancellationToken cancellationToken) => Get(invoiceFileId, cancellationToken);
     [HttpGet("/invoices/{invoiceId:int}/files"), RequirePermission(AccountingPermissions.FilesRead, RequireLiveCheck = true)]
-    public async Task<ActionResult<IReadOnlyList<InvoiceFile>>> GetInvoiceFilesAsync(int invoiceId, CancellationToken cancellationToken) => Ok(await Service.GetInvoiceFilesAsync(invoiceId, cancellationToken));
+    public async Task<ActionResult<IReadOnlyList<InvoiceFile>>> GetInvoiceFilesAsync(int invoiceId, CancellationToken cancellationToken)
+    {
+        var files = await Service.GetInvoiceFilesAsync(invoiceId, cancellationToken);
+        return files.Count == 0 ? NotFound() : Ok(files);
+    }
     [HttpPut("{invoiceFileId:int}"), RequirePermission(AccountingPermissions.FilesWrite, RequireLiveCheck = true)]
     public Task<IActionResult> UpdateInvoiceFileAsync(int invoiceFileId, InvoiceFile item, [FromHeader(Name = "If-Unmodified-Since")] DateTimeOffset? expected, CancellationToken cancellationToken) => Update(invoiceFileId, item, expected, cancellationToken);
 }
