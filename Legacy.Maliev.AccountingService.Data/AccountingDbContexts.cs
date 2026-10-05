@@ -47,6 +47,7 @@ public sealed class InvoiceDbContext(DbContextOptions<InvoiceDbContext> options)
             entity.Property(value => value.OperationId).HasColumnName("OperationID");
             entity.Property(value => value.QuotationId).HasColumnName("QuotationID");
             entity.Property(value => value.EmployeeSubject).HasMaxLength(256);
+            entity.Property(value => value.OriginIssuer).HasMaxLength(512);
             entity.Property(value => value.ServiceSubject).HasMaxLength(128);
             entity.Property(value => value.IntentFingerprint).HasMaxLength(64);
             entity.Property(value => value.State).HasMaxLength(32);

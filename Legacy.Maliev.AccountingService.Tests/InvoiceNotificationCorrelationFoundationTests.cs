@@ -272,7 +272,7 @@ public sealed class InvoiceNotificationCorrelationFoundationTests(ITestOutputHel
             new Invoice { Number = "INV-new-authority", CustomerId = 42 }, [], CancellationToken.None);
         var identity = Identity(Row(invoice.Id));
         await new InvoiceCreationAdmissionStore(database).AdmitAsync(identity.WorkflowOperationId, 84,
-            "employee:42", "service:legacy-intranet", new string('A', 64), CancellationToken.None);
+            identity.Origin, new string('A', 64), CancellationToken.None);
         return identity;
     }
 
@@ -325,7 +325,8 @@ public sealed class InvoiceNotificationCorrelationFoundationTests(ITestOutputHel
                 new Invoice { Number = "INV-two-context", CustomerId = 42 }, [], CancellationToken.None)).Id;
             var admissions = new InvoiceCreationAdmissionStore(database);
             foreach (var workflow in new[] { Guid.Parse("22222222-2222-4222-8222-222222222222"), Guid.Parse("44444444-4444-4444-8444-444444444444") })
-                await admissions.AdmitAsync(workflow, 84, "employee:42", "service:legacy-intranet", new string('A', 64), CancellationToken.None);
+                await admissions.AdmitAsync(workflow, 84, new InvoiceNotificationOrigin("https://auth.example.invalid", "employee:42", "service:legacy-intranet"),
+                    new string('A', 64), CancellationToken.None);
         }
         async Task<Exception?> Attempt(Guid intent, Guid workflow)
         {
@@ -537,13 +538,13 @@ public sealed class InvoiceNotificationCorrelationFoundationTests(ITestOutputHel
         var invoice = await new InvoiceCreationStore(database, TimeProvider.System).CreateAsync(
             new Invoice { Number = "INV-typed-correlation", CustomerId = 42, Total = 107m }, [], CancellationToken.None);
         var workflow = Guid.Parse("22222222-2222-4222-8222-222222222222");
-        await new InvoiceCreationAdmissionStore(database).AdmitAsync(workflow, 84, "employee:42",
-            "service:legacy-intranet", new string('A', 64), CancellationToken.None);
         var identity = new InvoiceNotificationCorrelationIdentity(
             Guid.Parse("11111111-1111-4111-8111-111111111111"), invoice.Id, "invoice-issued", 84, workflow,
             new("https://auth.example.invalid", "employee:42", "service:legacy-intranet"),
             "https://auth.example.invalid", "service:legacy-accounting", "notification-payload-v1",
             "accounting-invoice-notification-hmac-v1");
+        await new InvoiceCreationAdmissionStore(database).AdmitAsync(workflow, 84, identity.Origin,
+            new string('A', 64), CancellationToken.None);
         IInvoiceNotificationCorrelationStore store = new InvoiceNotificationCorrelationStore(database, TimeProvider.System, new SyntheticKeys());
         InvoiceNotificationCorrelation? result = null;
         var failure = await Record.ExceptionAsync(async () => result = await store.AdmitAsync(identity, new string('a', 64), CancellationToken.None));

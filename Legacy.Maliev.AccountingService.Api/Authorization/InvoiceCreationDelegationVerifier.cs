@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using Microsoft.IdentityModel.Tokens;
+using Legacy.Maliev.AccountingService.Application.Models;
 
 namespace Legacy.Maliev.AccountingService.Api.Authorization;
 
@@ -13,7 +14,10 @@ public sealed class InvoiceCreationDelegationVerifier(IConfiguration configurati
     public const string Scope = "legacy.accounting.create";
     public const string IntranetSubject = "service:legacy-intranet";
 
-    public string? Verify(string? header, ClaimsPrincipal service, int quotationId, Guid operationId)
+    public string? Verify(string? header, ClaimsPrincipal service, int quotationId, Guid operationId) =>
+        VerifyOrigin(header, service, quotationId, operationId)?.EmployeeSubject;
+
+    public InvoiceNotificationOrigin? VerifyOrigin(string? header, ClaimsPrincipal service, int quotationId, Guid operationId)
     {
         if (header is null) return null;
         if (header.Length is < 8 or > 16391 || !header.StartsWith("Bearer ", StringComparison.Ordinal) ||
@@ -69,7 +73,7 @@ public sealed class InvoiceCreationDelegationVerifier(IConfiguration configurati
             var now = clock.GetUtcNow().ToUnixTimeSeconds();
             if (issuedAt > now + 30 || notBefore > now + 30 || expires <= now - 30 ||
                 notBefore < issuedAt - 1 || expires - issuedAt is < 1 or > 120) return null;
-            return employee;
+            return new(token.Issuer, employee, IntranetSubject);
         }
         catch (Exception exception) when (exception is SecurityTokenException or CryptographicException or FormatException or ArgumentException or System.Text.Json.JsonException)
         {

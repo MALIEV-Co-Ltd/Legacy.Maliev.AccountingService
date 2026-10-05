@@ -1,5 +1,5 @@
 {
-  "identity": "commerce-atomic-invoice-intent-consumer-public-20261005",
+  "identity": "commerce-atomic-security-cache-public-20261005",
   "references": [
     {
       "repository": "Legacy.Maliev.AuthService",
@@ -7,7 +7,7 @@
     },
     {
       "repository": "Legacy.Maliev.AccountingService",
-      "commit": "8f467cd66c5ad3210d685d616179ca772d533ff5"
+      "commit": "c1abf131d1b50b2329b21db2daf32eb1b8b4d8e6"
     },
     {
       "repository": "Legacy.Maliev.QuotationService",
@@ -23,47 +23,6 @@
     }
   ],
   "baselineEquivalent": false,
-  "previousPaymentProducerAdvance": {
-    "previousAccounting": "c1abf131d1b50b2329b21db2daf32eb1b8b4d8e6",
-    "reviewedAccounting": "fa190f391ba91f0c67ae20032153a1bd30d59f1b",
-    "acceptedMainBaseline": "da972b07cc6851a17565833b7eaca2d1a389e33d",
-    "changedInput": "Legacy.Maliev.AccountingService.Data/AccountingRepository.cs",
-    "previousBlob": "c604385ec51733f689f6ea3fc6b37845d69a045d",
-    "reviewedBlob": "11046139435205555d396acb80a61d52e47c69f6",
-    "unchangedInputCount": 89,
-    "unchangedInputSha256": "a975cc97d98b5e611fcb042cb4f72c641610a175083082d4e0a5fc17ed2d6282",
-    "scope": "Payment literal spaces and empty selected pages only; direct selected-input equality preserves every other production/build blob",
-    "nativeAcceptance": "Pending fresh prospective execution; prior accepted graph and historical source proof remain separate"
-  },
-  "previousReceiptProducerAdvance": {
-    "previousAccounting": "fa190f391ba91f0c67ae20032153a1bd30d59f1b",
-    "reviewedAccounting": "d362a856519667b171059b827dd1f5fc74c59dcc",
-    "acceptedMainBaseline": "a48ffed579633068afecb646fce40efbddcb17cb",
-    "changedInput": "Legacy.Maliev.AccountingService.Data/AccountingRepository.cs",
-    "previousBlob": "11046139435205555d396acb80a61d52e47c69f6",
-    "reviewedBlob": "32da0810710fa9051699d105903bfb8d4676f048",
-    "unchangedInputCount": 89,
-    "unchangedInputSha256": "a975cc97d98b5e611fcb042cb4f72c641610a175083082d4e0a5fc17ed2d6282",
-    "scope": "Receipt six-field literal substring search, significant spaces and selected-empty-page 404 only; sorting and global collation remain unclaimed",
-    "independentReview": "Coordinator direct all-four-production-tree diff approved exactly this Receipt input change on 2026-10-05; guard and seven mutation controls unchanged",
-    "nativeAcceptance": "Pending fresh prospective execution; prior accepted Payment main and frozen historical graph remain separate"
-  },
-  "producerAdvance": {
-    "previousAccounting": "68c54823853861587db866aa194adf6844af1efb",
-    "reviewedAccounting": "8f467cd66c5ad3210d685d616179ca772d533ff5",
-    "acceptedMainBaseline": "7a4f02394ed1eaed7108e83269934d309a9ec588",
-    "acceptedPaymentMain": "a48ffed579633068afecb646fce40efbddcb17cb",
-    "normalMergeParents": ["4e755bef631009e3339215c79b36e53f7c0420a6", "7a4f02394ed1eaed7108e83269934d309a9ec588"],
-    "changedInput": "Legacy.Maliev.AccountingService.Data/AccountingRepository.cs",
-    "previousBlob": "c604385ec51733f689f6ea3fc6b37845d69a045d",
-    "reviewedBlob": "32da0810710fa9051699d105903bfb8d4676f048",
-    "inputCount": 99,
-    "unchangedInputCount": 98,
-    "unchangedInputSha256": "5df2e94fb44ab501fad7da906e70d34210f1162532939b63e3966a2d48758956",
-    "scope": "Normal reconciliation of accepted Payment57 and Receipt58 queries; all invoice notification runtime inputs remain identical to reviewed 68c producer",
-    "independentReview": "Coordinator direct staged all-four-production-tree diff approved exactly these accepted query hunks on 2026-10-05; strict guard and seven mutation controls unchanged",
-    "nativeAcceptance": "Pending fresh combined full635, invoice316, Payment10, Receipt17, atomic21 and prospective17 plus Defaults9; old 4e consumer evidence remains historical"
-  },
   "historicalAssertionsChanged": false,
   "sealed906Changed": false,
   "nativeExecuted": false,
@@ -154,7 +113,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "ae6b7367f539401250d6e911743f895606a39d7545aa990a9d6afc0d25a88e58"
+      "sha256": "93df3402f8b637c64285aba738c4efdf06ce3e6039295535a4a51b21f83c6eb6"
     }
   ],
   "hashRepresentation": "Committed LF bytes",
@@ -193,7 +152,7 @@
     "failed": 12,
     "skipped": 0
   },
-  "historicalSourceValidation": {
+  "sourceValidation": {
     "head": "c1abf131d1b50b2329b21db2daf32eb1b8b4d8e6",
     "fullRun": 37281312439,
     "focusedRun": 37281312013,
@@ -232,7 +191,7 @@
   "validationFiles": [
     {
       "path": ".github/workflows/atomic-protocol-validation.yml",
-      "sha256": "931bb92b84de239556c5d61dd59c25970f125fe26b92555bee413d44ffd49e7b"
+      "sha256": "ed205a15353b8bbde894d6a5d64c947526f7ea47263ad7c75d4758bbfd5662eb"
     },
     {
       "path": "scripts/verify-atomic-protocol-results.py",
@@ -301,13 +260,11 @@
     "correction": "Equivalent predicate overload preserves exact one7201/201 requirement"
   },
   "predecessor": {
-    "harnessHead": "da972b07cc6851a17565833b7eaca2d1a389e33d",
-    "archive": "public-graph-accepted-da972.json",
-    "archiveSha256": "0063a45fa40ff6e6cb0db2a5e7a8cdcb09087dae59c87fc641f9479ee8004d4a",
+    "harnessHead": "f12f1443eb33ad28d5d66430164a6b5cc4aab167",
+    "archive": "public-graph-accepted-f12.json",
+    "archiveSha256": "6ed46a10f7b21ece87aa8a397bede5f553138b3764b087ae0fa31f7a14ab4a31",
     "byteExactCommittedManifest": true,
-    "seventeenAssertionsUnchanged": true,
-    "fullRun": 37298962894,
-    "graphRun": 37298962446
+    "seventeenAssertionsUnchanged": true
   },
   "cacheCompatibility": {
     "defaultsCommit": "7edcd961024868513fd5f373cab3dcb261197f77",
@@ -328,39 +285,5 @@
     "nativeExecuted": false,
     "accepted": false,
     "coverageAcceptance": false
-  },
-  "invoiceConsumerSourceValidation": {
-    "head": "68c54823853861587db866aa194adf6844af1efb",
-    "fullRun": 37303169718,
-    "fullExecuted": 608,
-    "fullPassed": 607,
-    "fullFailed": 1,
-    "invoiceFocusedRun": 37303169357,
-    "invoiceFocusedPassed": 316,
-    "atomicFocusedRun": 37303169412,
-    "atomicFocusedPassed": 21,
-    "skipped": 0,
-    "buildWarnings": 0,
-    "buildErrors": 0,
-    "accepted": false,
-    "cause": "Matching workflow contract still asserted historical c1 producer after separately versioned graph advance.",
-    "correction": "Matching explicit contract and graph advance to compiled UTF8-corrected producer; fresh full-suite and graph acceptance remain required."
-  },
-  "invoiceConsumerSourceValidationHistory": [
-    {
-      "head": "94376b1367173ce60eb083ebafa09d66b500a987",
-      "fullRun": 37301659686,
-      "fullPassed": 604,
-      "invoiceFocusedRun": 37301659428,
-      "invoiceFocusedPassed": 312,
-      "atomicFocusedRun": 37301659362,
-      "atomicFocusedPassed": 21,
-      "skipped": 0,
-      "buildWarnings": 0,
-      "buildErrors": 0,
-      "rawSha256": "b5b5db395f6a1ea1fb30e3699d693e5771262cf2e0d3f0a534c0d6d12cd42b3f",
-      "exclusions": [],
-      "status": "Actual hosted source and focused GREEN; this successor graph and real Notification producer join require separate fresh execution."
-    }
-  ]
+  }
 }

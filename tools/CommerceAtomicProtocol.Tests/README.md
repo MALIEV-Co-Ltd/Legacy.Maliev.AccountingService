@@ -90,3 +90,28 @@ defaults-cache-results, separate from atomic-results and its one-TRX 17-case gat
 This compatibility proof does not replace Accounting full-suite/raw coverage or
 the 17-case producer graph; no coverage threshold, exclusion or settings change
 is introduced. All successor hosted execution remains pending.
+
+
+The invoice consumer source successor is
+commerce-atomic-invoice-intent-consumer-public-20261005. Accounting advances to
+94376b1367173ce60eb083ebafa09d66b500a987 after actual hosted source validation:
+604 full-suite, 312 invoice-focused and 21 atomic-focused executions passed with
+zero skipped cases and zero build warnings/errors. Auth74, Quotation36,
+Defaults7ed and Contracts78 remain pinned. The accepted da972 manifest is archived
+byte-for-byte as public-graph-accepted-da972.json. Earlier source receipts above
+remain historical evidence for their respective graph versions.
+
+The original 17 scenarios/assertions, seven producer-input mutation controls and
+nine Defaults cache compatibility cases remain unchanged. This version requires
+fresh hosted graph execution; source validation does not prove the Notification
+producer join, Intranet counterpart, production IAM, provider acceptance or
+deployment. Delivery intents remain disabled by default.
+
+
+The current Accounting producer pin is the compiled UTF8 origin-bound correction
+68c54823853861587db866aa194adf6844af1efb. Its actual invoice-focused316 and
+atomic-focused21 cases passed; the full run37303169718 executed608 with607 passed
+and one failed matching workflow-pin assertion. That failure is retained rather
+than called source acceptance. This successor updates the explicit workflow
+contract with the producer pin and requires fresh full-suite and graph execution.
+The 17 graph assertions and seven mutation controls remain unchanged.

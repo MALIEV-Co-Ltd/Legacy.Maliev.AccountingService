@@ -10,6 +10,116 @@ namespace Legacy.Maliev.AccountingService.Tests;
 public sealed class InvoiceCreationWorkflowTests
 {
     private static readonly Guid OperationId = Guid.Parse("4f7870e2-d349-41bb-b4cf-567450f261e9");
+    private static readonly InvoiceNotificationOrigin Origin = new("https://auth.example.invalid", "employee:42", "service:legacy-intranet");
+
+    [Fact]
+    public async Task EnabledEmail_MissingOriginRefusesBeforeJournalOrFinancialEffects()
+    {
+        var coordinator = new Mock<IInvoiceNotificationWorkflow>();
+        coordinator.SetupGet(value => value.Enabled).Returns(true);
+        var source = new Mock<IInvoiceCreationSource>(MockBehavior.Strict);
+        var journal = new Mock<IInvoiceCreationJournal>(MockBehavior.Strict);
+        var workflow = Create(source: source, journal: journal.Object, invoiceNotifications: coordinator.Object);
+        await Assert.ThrowsAsync<InvoiceCreationConflictException>(() => workflow.CreateAsync(84, Request(false), OperationId, CancellationToken.None));
+        source.VerifyNoOtherCalls();
+        journal.VerifyNoOtherCalls();
+    }
+
+    [Fact]
+    public async Task EnabledReplay_ValidatesDurableOriginBeforeJournalAndReceiptReplay()
+    {
+        var sequence = new MockSequence();
+        var coordinator = new Mock<IInvoiceNotificationWorkflow>(MockBehavior.Strict);
+        coordinator.SetupGet(value => value.Enabled).Returns(true);
+        coordinator.InSequence(sequence).Setup(value => value.ValidateOriginAsync(84, OperationId, Origin, false, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        var completed = new InvoiceCreationResult(901, InvoiceCreationState.Completed, InvoiceCreationEmailState.ProviderAccepted,
+            "accepted", new("maliev.com", "invoice.pdf"));
+        var journal = new Mock<IInvoiceCreationJournal>(MockBehavior.Strict);
+        journal.InSequence(sequence).Setup(value => value.GetAsync("create:84", OperationId, It.IsAny<CancellationToken>())).ReturnsAsync(completed);
+        coordinator.InSequence(sequence).Setup(value => value.HasFenceAsync(901, It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        coordinator.InSequence(sequence).Setup(value => value.ValidateReplayAsync(84, OperationId, Origin, completed, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        var source = new Mock<IInvoiceCreationSource>(MockBehavior.Strict);
+        var result = await Create(source: source, journal: journal.Object, invoiceNotifications: coordinator.Object)
+            .CreateAsync(84, Request(false), OperationId, Origin, CancellationToken.None);
+        Assert.Equal(completed, result);
+        source.VerifyNoOtherCalls();
+        coordinator.VerifyAll();
+        journal.VerifyAll();
+    }
+
+    [Fact]
+    public async Task InvalidRetainedOrigin_RejectsBeforeEvenCompletedJournalLookup()
+    {
+        var coordinator = new Mock<IInvoiceNotificationWorkflow>();
+        coordinator.SetupGet(value => value.Enabled).Returns(true);
+        coordinator.Setup(value => value.ValidateOriginAsync(84, OperationId, Origin, false, It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvoiceCreationConflictException("different origin"));
+        var journal = new Mock<IInvoiceCreationJournal>(MockBehavior.Strict);
+        await Assert.ThrowsAsync<InvoiceCreationConflictException>(() => Create(journal: journal.Object, invoiceNotifications: coordinator.Object)
+            .CreateAsync(84, Request(false), OperationId, Origin, CancellationToken.None));
+        journal.VerifyNoOtherCalls();
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task EnabledEmail_RecordsOwnFinancialEvidenceAndNeverCallsLegacyClient(bool accepted)
+    {
+        var source = new Mock<IInvoiceCreationSource>();
+        source.Setup(value => value.GetAsync(84, It.IsAny<CancellationToken>())).ReturnsAsync(Snapshot());
+        var store = new Mock<IInvoiceCreationStore>();
+        store.Setup(value => value.CreateAsync(It.IsAny<Invoice>(), It.IsAny<IReadOnlyList<InvoiceOrderItem>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Invoice invoice, IReadOnlyList<InvoiceOrderItem> _, CancellationToken _) => { invoice.Id = 901; return invoice; });
+        var files = new Mock<IInvoiceCreationFileClient>();
+        files.Setup(value => value.ExistsAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        var coordinator = new Mock<IInvoiceNotificationWorkflow>();
+        coordinator.SetupGet(value => value.Enabled).Returns(true);
+        coordinator.Setup(value => value.SendAsync(84, OperationId, Origin, "customer@example.com", "Customer One",
+            It.IsAny<Invoice>(), It.IsAny<byte[]>(), It.IsAny<CancellationToken>())).ReturnsAsync(new InvoiceNotificationDeliveryResult(accepted, accepted ? "accepted" : null));
+        var legacy = new Mock<IInvoiceCreationNotificationClient>(MockBehavior.Strict);
+        var journal = Journal();
+        var result = await Create(source: source, store: store, files: files, notifications: legacy,
+            journal: journal.Object, invoiceNotifications: coordinator.Object).CreateAsync(84, Request(false), OperationId, Origin, CancellationToken.None);
+        Assert.Equal(accepted ? InvoiceCreationEmailState.ProviderAccepted : InvoiceCreationEmailState.ExplicitRetryRequired, result.EmailState);
+        coordinator.Verify(value => value.PrepareFinancialAsync(84, OperationId, Origin,
+            It.Is<InvoiceCreationResult>(financial => financial.InvoiceId == 901 && financial.State == InvoiceCreationState.Completed &&
+                financial.EmailState == InvoiceCreationEmailState.NotRequested && financial.ProviderMessageId == null), It.IsAny<CancellationToken>()), Times.Once);
+        coordinator.Verify(value => value.ValidateOriginAsync(84, OperationId, Origin, false, It.IsAny<CancellationToken>()), Times.Once);
+        coordinator.Verify(value => value.ValidateOriginAsync(84, OperationId, Origin, true, It.IsAny<CancellationToken>()), Times.Once);
+        legacy.VerifyNoOtherCalls();
+        journal.Verify(value => value.SetAsync("create:84", OperationId, It.IsAny<InvoiceCreationResult>(), It.IsAny<CancellationToken>()), accepted ? Times.Once() : Times.Never());
+    }
+
+    [Fact]
+    public async Task DisabledWithRetainedFence_CannotReplayOrFallbackToLegacy()
+    {
+        var journal = Journal();
+        journal.Setup(value => value.GetAsync("create:84", OperationId, It.IsAny<CancellationToken>())).ReturnsAsync(
+            new InvoiceCreationResult(901, InvoiceCreationState.Completed, InvoiceCreationEmailState.ProviderAccepted, "accepted", new("maliev.com", "invoice.pdf")));
+        var coordinator = new Mock<IInvoiceNotificationWorkflow>();
+        coordinator.SetupGet(value => value.Enabled).Returns(false);
+        coordinator.Setup(value => value.HasFenceAsync(901, It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        var source = new Mock<IInvoiceCreationSource>(MockBehavior.Strict);
+        var legacy = new Mock<IInvoiceCreationNotificationClient>(MockBehavior.Strict);
+        await Assert.ThrowsAsync<InvoiceCreationConflictException>(() => Create(source: source, notifications: legacy,
+            journal: journal.Object, invoiceNotifications: coordinator.Object).CreateAsync(84, Request(false), OperationId, CancellationToken.None));
+        source.VerifyNoOtherCalls();
+        legacy.VerifyNoOtherCalls();
+    }
+
+    [Fact]
+    public async Task ReconciliationAndCompletedReplay_DelegateWithoutFinancialEffects()
+    {
+        var coordinator = new Mock<IInvoiceNotificationWorkflow>();
+        var completed = new InvoiceCreationResult(901, InvoiceCreationState.Completed, InvoiceCreationEmailState.ProviderAccepted, "accepted", new("maliev.com", "invoice.pdf"));
+        coordinator.Setup(value => value.ReconcileAsync(84, OperationId, Origin, It.IsAny<CancellationToken>())).ReturnsAsync(completed);
+        var source = new Mock<IInvoiceCreationSource>(MockBehavior.Strict);
+        var workflow = Create(source: source, invoiceNotifications: coordinator.Object);
+        Assert.Equal(completed, await workflow.ReconcileAsync(84, OperationId, Origin, CancellationToken.None));
+        Assert.Equal(completed, await workflow.ReplayCompletedAsync(84, OperationId, Origin, completed, CancellationToken.None));
+        coordinator.Verify(value => value.ValidateReplayAsync(84, OperationId, Origin, completed, It.IsAny<CancellationToken>()), Times.Once);
+        source.VerifyNoOtherCalls();
+    }
 
     [Fact]
     public async Task PreviewAsync_DerivesIdentityFinancialsAndItemsFromQuotationSnapshot()
@@ -114,7 +224,8 @@ public sealed class InvoiceCreationWorkflowTests
         Mock<IInvoiceCreationDocumentClient>? documents = null,
         Mock<IInvoiceCreationFileClient>? files = null,
         Mock<IInvoiceCreationNotificationClient>? notifications = null,
-        IInvoiceCreationJournal? journal = null) => new(
+        IInvoiceCreationJournal? journal = null,
+        IInvoiceNotificationWorkflow? invoiceNotifications = null) => new(
             (source ?? new()).Object,
             (store ?? new()).Object,
             (quotation ?? new()).Object,
@@ -123,7 +234,7 @@ public sealed class InvoiceCreationWorkflowTests
             (notifications ?? new()).Object,
             journal ?? Journal().Object,
             new NoopLock(),
-            new FakeTimeProvider(new DateTimeOffset(2030, 7, 18, 12, 0, 0, TimeSpan.Zero)));
+            new FakeTimeProvider(new DateTimeOffset(2030, 7, 18, 12, 0, 0, TimeSpan.Zero)), invoiceNotifications);
 
     private static Mock<IInvoiceCreationDocumentClient> Document()
     {

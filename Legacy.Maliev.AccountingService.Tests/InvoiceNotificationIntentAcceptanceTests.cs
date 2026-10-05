@@ -336,7 +336,7 @@ public sealed class InvoiceNotificationIntentAcceptanceTests
         Assert.Empty(await database.Invoices.ToListAsync());
     }
 
-    private sealed class IntentFixture : IAsyncDisposable
+    public sealed class IntentFixture : IAsyncDisposable
     {
         private const string Issuer = "https://accounting-intent.invalid";
         private const string Audience = "maliev-services";
@@ -351,6 +351,10 @@ public sealed class InvoiceNotificationIntentAcceptanceTests
         public bool MissingLiveCredential;
         public string IamOrigin = "https://iam-intent.invalid/";
         public bool LoseNotificationResponse { get; set; }
+        public bool EnableNotificationV2 { get; set; }
+        public string WorkloadToken { get; set; } = "synthetic-workload-token";
+        public Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>>? NotificationV2Transport { get; set; }
+        private readonly string notificationBindingKey = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
         public string? ExternalIssuer;
         public string? ExternalPublicKey;
         public int LiveChecks;
@@ -382,6 +386,24 @@ public sealed class InvoiceNotificationIntentAcceptanceTests
         }
 
         public InvoiceDbContext Database() => new(new DbContextOptionsBuilder<InvoiceDbContext>().UseNpgsql(postgres.GetConnectionString()).Options);
+
+        public async Task RestartHostAsync()
+        {
+            await Host.DisposeAsync();
+            Host = new Factory(this);
+        }
+
+        public string Delegation()
+        {
+            var now = DateTimeOffset.UtcNow;
+            var token = new JwtSecurityToken(ExternalIssuer ?? Issuer, InvoiceCreationDelegationVerifier.Audience,
+                [new(JwtRegisteredClaimNames.Sub, "employee:42"), new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("D")),
+                 new(JwtRegisteredClaimNames.Iat, now.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
+                 new("azp", InvoiceCreationDelegationVerifier.IntranetSubject), new("scope", InvoiceCreationDelegationVerifier.Scope),
+                 new("quotation_id", "84"), new("operation_id", Operation.ToString("D"))],
+                now.UtcDateTime, now.AddSeconds(120).UtcDateTime, new SigningCredentials(new RsaSecurityKey(rsa), SecurityAlgorithms.RsaSha256));
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
 
         public async Task<HttpResponseMessage> CreateAsync(bool anonymous = false, string? bearer = null, string? delegation = null)
         {
@@ -422,7 +444,7 @@ public sealed class InvoiceNotificationIntentAcceptanceTests
             {
                 Interlocked.Increment(ref TokenExchangeCalls);
                 Assert.Equal(HttpMethod.Post, request.Method);
-                return Json("""{"accessToken":"synthetic-workload-token","expiresIn":300}""");
+                return Json(JsonSerializer.Serialize(new { accessToken = WorkloadToken, expiresIn = 300 }));
             }
             if (path == "/iam/v1/auth/check-permission")
             {
@@ -435,19 +457,21 @@ public sealed class InvoiceNotificationIntentAcceptanceTests
                 Assert.Equal("legacy.accounting.create", body.RootElement.GetProperty("permissionId").GetString());
                 Assert.True(body.RootElement.GetProperty("bypassCache").GetBoolean());
                 Assert.Equal("global", body.RootElement.GetProperty("resourcePath").GetString());
-                Assert.Equal("synthetic-workload-token", request.Headers.Authorization?.Parameter);
+                Assert.Equal(WorkloadToken, request.Headers.Authorization?.Parameter);
                 Interlocked.Increment(ref LiveChecks);
                 if (IamFailure == "unavailable") return Json("{}", HttpStatusCode.ServiceUnavailable);
                 if (IamFailure == "unauthorized") return Json("{}", HttpStatusCode.Unauthorized);
                 if (IamFailure == "malformed") return Json("not-json");
                 return Json(AllowLive ? "{\"allowed\":true}" : "{\"allowed\":false}");
             }
-            Assert.Equal("synthetic-workload-token", request.Headers.Authorization?.Parameter);
+            Assert.Equal(WorkloadToken, request.Headers.Authorization?.Parameter);
             Interlocked.Increment(ref DownstreamCalls);
             if (path.StartsWith("/notifications/", StringComparison.Ordinal))
             {
                 NotificationRequests.Add(request.Method + " " + path);
                 Interlocked.Increment(ref NotificationCalls);
+                if (path.StartsWith("/notifications/v2/", StringComparison.Ordinal) && NotificationV2Transport is not null)
+                    return await NotificationV2Transport(request, token);
                 if (LoseNotificationResponse) throw new HttpRequestException("Synthetic acknowledgment loss.");
                 return Json("""{"providerMessageId":"synthetic-accepted"}""");
             }
@@ -476,6 +500,9 @@ public sealed class InvoiceNotificationIntentAcceptanceTests
                 builder.UseSetting("Services:Auth", "https://auth-intent.invalid/");
                 builder.UseSetting("ServiceAuthentication:ClientId", "synthetic-accounting-client");
                 builder.UseSetting("ServiceAuthentication:ClientSecret", "synthetic-fixture-only");
+                builder.UseSetting("InvoiceNotifications:DeliveryIntentsEnabled", fixture.EnableNotificationV2.ToString());
+                builder.UseSetting("InvoiceNotifications:BindingActiveKeyId", "accounting-intent-fixture");
+                builder.UseSetting("InvoiceNotifications:BindingKeys:accounting-intent-fixture", fixture.notificationBindingKey);
                 builder.UseSetting("IAM:LivePermissionChecks:Credential", fixture.MissingLiveCredential ? "" : "synthetic-live-credential");
                 builder.UseSetting("Services:IAMService:BaseUrl", fixture.IamOrigin);
                 foreach (var name in new[] { "Notification", "Quotation", "Document", "File", "Customer", "Employee", "Catalog" }) builder.UseSetting("Services:" + name, "https://dependency-intent.invalid/");
@@ -496,6 +523,8 @@ public sealed class InvoiceNotificationIntentAcceptanceTests
                     });
                     // Only replace the remote transport: IAM registration/authentication must come from Program.
                     services.AddHttpClient("IAMService")
+                        .ConfigurePrimaryHttpMessageHandler(() => new RemoteHandler(fixture));
+                    services.AddHttpClient<InvoiceNotificationIntentClient>()
                         .ConfigurePrimaryHttpMessageHandler(() => new RemoteHandler(fixture));
                     services.AddHttpClient(LegacyServiceAccessTokenProvider.HttpClientName)
                         .ConfigurePrimaryHttpMessageHandler(() => new RemoteHandler(fixture));

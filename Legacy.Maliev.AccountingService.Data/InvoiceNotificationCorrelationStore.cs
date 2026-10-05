@@ -12,8 +12,206 @@ namespace Legacy.Maliev.AccountingService.Data;
 
 /// <summary>Non-expiring invoice-purpose authority; neither replay nor read grants execution.</summary>
 public sealed class InvoiceNotificationCorrelationStore(
-    InvoiceDbContext context, TimeProvider timeProvider, IInvoiceNotificationBindingKeyring keyring) : IInvoiceNotificationCorrelationStore
+    InvoiceDbContext context, TimeProvider timeProvider, IInvoiceNotificationBindingKeyring keyring)
+    : IInvoiceNotificationCorrelationStore, IInvoiceNotificationPhaseStore
 {
+    /// <summary>Finds only the matching first writer; restart lookup grants no send authority.</summary>
+    public Task<InvoiceNotificationCorrelation?> FindAsync(int invoiceId, string purpose, int quotationId,
+        Guid workflowOperationId, InvoiceNotificationOrigin origin, string senderIssuer,
+        string senderServiceSubject, CancellationToken cancellationToken) => AttemptAsync(async (owned, token) =>
+    {
+        if (invoiceId <= 0 || quotationId <= 0 || purpose != "invoice-issued" || workflowOperationId == Guid.Empty || origin is null)
+            throw new InvoiceNotificationCorrelationConflictException();
+        var row = await owned.InvoiceNotificationCorrelations.AsNoTracking()
+            .SingleOrDefaultAsync(value => value.InvoiceId == invoiceId && value.Purpose == purpose, token);
+        if (row is null) return null;
+        var identity = Identity(row);
+        if (identity.QuotationId != quotationId || identity.WorkflowOperationId != workflowOperationId ||
+            identity.Origin != origin || identity.SenderIssuer != senderIssuer || identity.SenderServiceSubject != senderServiceSubject)
+            throw new InvoiceNotificationCorrelationConflictException();
+        var key = Key(row.BindingKeyId);
+        try { ValidateRetainedReceipt(row, key); }
+        finally { CryptographicOperations.ZeroMemory(key); }
+        return Snapshot(row);
+    }, cancellationToken);
+
+    /// <summary>Issues admission only after the CAS transaction and both disposals acknowledge success.</summary>
+    public async Task<InvoiceNotificationAdmissionPermit> IssueAdmissionAsync(InvoiceNotificationCorrelationIdentity identity,
+        string payloadDigest, long expectedVersion, CancellationToken cancellationToken)
+    {
+        ValidatePayload(identity, payloadDigest);
+        var result = await IssueAsync(identity, payloadDigest, expectedVersion, false, cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        return new InvoiceNotificationAdmissionPermit(result, payloadDigest);
+    }
+
+    /// <summary>Issues execution only once from a retained, validated remote admission.</summary>
+    public async Task<InvoiceNotificationExecutionPermit> IssueExecutionAsync(InvoiceNotificationCorrelationIdentity identity,
+        string payloadDigest, long expectedVersion, CancellationToken cancellationToken)
+    {
+        ValidatePayload(identity, payloadDigest);
+        var result = await IssueAsync(identity, payloadDigest, expectedVersion, true, cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        return new InvoiceNotificationExecutionPermit(result, payloadDigest);
+    }
+
+    private Task<InvoiceNotificationCorrelation> IssueAsync(InvoiceNotificationCorrelationIdentity identity,
+        string payloadDigest, long expectedVersion, bool execution, CancellationToken cancellationToken) => AttemptAsync(async (owned, token) =>
+    {
+        var row = await LockedAsync(owned, identity, payloadDigest, token);
+        if (row.Version != expectedVersion || row.Phase != (execution ? "Admitted" : "Prepared"))
+            throw new InvoiceNotificationCorrelationConflictException();
+        row.Phase = execution ? "ExecutionIssued" : "AdmissionIssued";
+        row.Version = checked(row.Version + 1);
+        row.UpdatedAt = Now(row);
+        if (execution) row.ExecutionIssuedAt = row.UpdatedAt;
+        else row.AdmissionIssuedAt = row.UpdatedAt;
+        await owned.SaveChangesAsync(token);
+        return Snapshot(row);
+    }, cancellationToken);
+
+    /// <summary>Retains authenticated transport observations with original payload continuity, without permits.</summary>
+    public Task<InvoiceNotificationCorrelation> RetainReceiptAsync(InvoiceNotificationCorrelationIdentity identity,
+        string payloadDigest, long expectedVersion, InvoiceNotificationReceiptObservation receipt,
+        CancellationToken cancellationToken)
+    {
+        ValidatePayload(identity, payloadDigest);
+        return ReceiptAsync(identity, payloadDigest, expectedVersion, receipt, cancellationToken);
+    }
+
+    private static void ValidatePayload(InvoiceNotificationCorrelationIdentity identity, string payloadDigest)
+    {
+        var frame = InvoiceNotificationCorrelationBinding.Frame(identity, "validation", payloadDigest);
+        CryptographicOperations.ZeroMemory(frame);
+    }
+
+    /// <summary>Reconciles a retained first writer without rebuilding its original payload; never issues permits.</summary>
+    public Task<InvoiceNotificationCorrelation> ObserveAsync(InvoiceNotificationCorrelationIdentity identity,
+        long expectedVersion, InvoiceNotificationReceiptObservation receipt, CancellationToken cancellationToken) =>
+        ReceiptAsync(identity, null, expectedVersion, receipt, cancellationToken);
+
+    /// <summary>Validates a completed public result against retained receipt commitment without HTTP or new authority.</summary>
+    public async Task ValidateAcceptedResultAsync(InvoiceNotificationCorrelationIdentity identity,
+        string providerMessageId, CancellationToken cancellationToken)
+    {
+        _ = await AttemptAsync(async (owned, token) =>
+        {
+            var row = await LockedAsync(owned, identity, null, token);
+            if (row.Phase != "ProviderAccepted" || row.RemoteState != "providerAccepted" ||
+                row.RemoteVersion is not { } version || row.RemoteAdmittedAt is not { } admitted ||
+                row.RemoteUpdatedAt is not { } updated || row.RemoteReceiptBinding is not { Length: 32 } retained)
+                throw new InvoiceNotificationCorrelationConflictException();
+            var receipt = new InvoiceNotificationReceiptObservation(identity.IntentId.ToString("D"), identity.Purpose,
+                "invoice", identity.InvoiceId.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                identity.WorkflowOperationId.ToString("D"), row.RemoteState, version, admitted, updated, providerMessageId);
+            var key = Key(row.BindingKeyId);
+            byte[] binding;
+            try { binding = InvoiceNotificationReceiptBinding.Compute(identity, row.PayloadBinding, row.BindingKeyId, key, receipt); }
+            finally { CryptographicOperations.ZeroMemory(key); }
+            try
+            {
+                if (!CryptographicOperations.FixedTimeEquals(binding, retained)) throw new InvoiceNotificationCorrelationConflictException();
+            }
+            finally { CryptographicOperations.ZeroMemory(binding); }
+            return true;
+        }, cancellationToken);
+    }
+
+    private Task<InvoiceNotificationCorrelation> ReceiptAsync(InvoiceNotificationCorrelationIdentity identity,
+        string? payloadDigest, long expectedVersion, InvoiceNotificationReceiptObservation receipt,
+        CancellationToken cancellationToken) => AttemptAsync(async (owned, token) =>
+    {
+        var row = await LockedAsync(owned, identity, payloadDigest, token);
+        if (row.Version != expectedVersion) throw new InvoiceNotificationCorrelationConflictException();
+        var key = Key(row.BindingKeyId);
+        byte[] binding;
+        try { binding = InvoiceNotificationReceiptBinding.Compute(identity, row.PayloadBinding, row.BindingKeyId, key, receipt); }
+        finally { CryptographicOperations.ZeroMemory(key); }
+        try
+        {
+            InvoiceNotificationRetainedReceipt? previous = row.RemoteState is null ? null : new(
+                row.RemoteState, row.RemoteVersion!.Value, row.RemoteAdmittedAt!.Value, row.RemoteUpdatedAt!.Value, row.RemoteReceiptBinding!);
+            var progression = InvoiceNotificationReceiptBinding.ClassifyProgression(previous, receipt, binding);
+            if (progression == InvoiceNotificationReceiptProgression.Conflict) throw new InvoiceNotificationCorrelationConflictException();
+            if (progression == InvoiceNotificationReceiptProgression.Duplicate) return Snapshot(row);
+            if (previous is null && row.Phase != "AdmissionIssued" ||
+                previous is not null && row.Phase is not ("ExecutionIssued" or "OutcomeUnknown"))
+                throw new InvoiceNotificationCorrelationConflictException();
+            row.Phase = receipt.State switch
+            {
+                "admitted" => "Admitted",
+                "providerAccepted" => "ProviderAccepted",
+                "submitting" or "outcomeUnknown" => "OutcomeUnknown",
+                _ => throw new InvoiceNotificationCorrelationConflictException(),
+            };
+            row.RemoteState = receipt.State;
+            row.RemoteVersion = receipt.Version;
+            row.RemoteAdmittedAt = receipt.AdmittedAt;
+            row.RemoteUpdatedAt = receipt.UpdatedAt;
+            row.RemoteReceiptBinding = binding.ToArray();
+            row.Version = checked(row.Version + 1);
+            row.UpdatedAt = Now(row);
+            await owned.SaveChangesAsync(token);
+            return Snapshot(row);
+        }
+        finally { CryptographicOperations.ZeroMemory(binding); }
+    }, cancellationToken);
+
+    private DateTimeOffset Now(InvoiceNotificationCorrelationRow row)
+    {
+        var value = timeProvider.GetUtcNow();
+        var rounded = new DateTimeOffset(value.UtcTicks - value.UtcTicks % 10, TimeSpan.Zero);
+        return rounded < row.UpdatedAt ? row.UpdatedAt : rounded;
+    }
+
+    private async Task<InvoiceNotificationCorrelationRow> LockedAsync(InvoiceDbContext owned,
+        InvoiceNotificationCorrelationIdentity identity, string? payloadDigest, CancellationToken token)
+    {
+        var row = await owned.InvoiceNotificationCorrelations.FromSqlInterpolated($"""
+            SELECT * FROM public."InvoiceNotificationCorrelation" WHERE "IntentID"={identity.IntentId} FOR UPDATE
+            """).SingleOrDefaultAsync(token) ?? throw new InvoiceNotificationCorrelationConflictException();
+        if (Identity(row) != identity) throw new InvoiceNotificationCorrelationConflictException();
+        _ = Snapshot(row);
+        var key = Key(row.BindingKeyId);
+        try
+        {
+            ValidateRetainedReceipt(row, key);
+            if (payloadDigest is not null)
+            {
+                var binding = InvoiceNotificationCorrelationBinding.Compute(identity, row.BindingKeyId, key, payloadDigest);
+                try
+                {
+                    if (!CryptographicOperations.FixedTimeEquals(binding, row.PayloadBinding))
+                        throw new InvoiceNotificationCorrelationConflictException();
+                }
+                finally { CryptographicOperations.ZeroMemory(binding); }
+            }
+        }
+        finally { CryptographicOperations.ZeroMemory(key); }
+        return row;
+    }
+
+    private static void ValidateRetainedReceipt(InvoiceNotificationCorrelationRow row, byte[] key)
+    {
+        // Terminal accepted receipts contain only a keyed commitment to the provider identifier.
+        // Their equality is verified when the producer supplies the complete receipt again.
+        if (row.RemoteState is null or "providerAccepted") return;
+        if (row.RemoteVersion is not { } version || row.RemoteAdmittedAt is not { } admitted ||
+            row.RemoteUpdatedAt is not { } updated || row.RemoteReceiptBinding is not { Length: 32 } retained)
+            throw new InvoiceNotificationCorrelationUnavailableException();
+        var identity = Identity(row);
+        var receipt = new InvoiceNotificationReceiptObservation(identity.IntentId.ToString("D"), identity.Purpose,
+            "invoice", identity.InvoiceId.ToString(System.Globalization.CultureInfo.InvariantCulture),
+            identity.WorkflowOperationId.ToString("D"), row.RemoteState, version, admitted, updated, null);
+        var binding = InvoiceNotificationReceiptBinding.Compute(identity, row.PayloadBinding, row.BindingKeyId, key, receipt);
+        try
+        {
+            if (!CryptographicOperations.FixedTimeEquals(binding, retained))
+                throw new InvoiceNotificationCorrelationUnavailableException();
+        }
+        finally { CryptographicOperations.ZeroMemory(binding); }
+    }
+
     /// <summary>Admits only a known fresh caller with matching Pending origin; retained replay is read-only.</summary>
     public Task<InvoiceNotificationCorrelation> AdmitAsync(InvoiceNotificationCorrelationIdentity identity,
         string payloadDigest, CancellationToken cancellationToken)
@@ -53,6 +251,7 @@ public sealed class InvoiceNotificationCorrelationStore(
                 SELECT * FROM public."InvoiceCreationAdmission" WHERE "OperationID"={identity.WorkflowOperationId} FOR SHARE
                 """).AsNoTracking().SingleOrDefaultAsync(token);
             if (!invoiceExists || origin is null || origin.QuotationId != identity.QuotationId ||
+                origin.OriginIssuer != identity.Origin.Issuer ||
                 origin.EmployeeSubject != identity.Origin.EmployeeSubject || origin.ServiceSubject != identity.Origin.ServiceSubject ||
                 origin.State != "Pending" || origin.ResultJson is not null) throw new InvoiceNotificationCorrelationConflictException();
 

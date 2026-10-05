@@ -15,7 +15,8 @@ public sealed class InvoiceCreationWorkflowService(
     IInvoiceCreationNotificationClient notifications,
     IInvoiceCreationJournal journal,
     IInvoiceCreationLock operationLock,
-    TimeProvider timeProvider) : IInvoiceCreationWorkflow
+    TimeProvider timeProvider,
+    IInvoiceNotificationWorkflow? invoiceNotifications = null) : IInvoiceCreationWorkflow
 {
     private const string Bucket = "maliev.com";
 
@@ -25,20 +26,48 @@ public sealed class InvoiceCreationWorkflowService(
         return Preview(await source.GetAsync(quotationId, cancellationToken), timeProvider.GetUtcNow());
     }
 
-    public async Task<InvoiceCreationResult> CreateAsync(int quotationId, CreateInvoiceFromQuotationRequest request, Guid operationId, CancellationToken cancellationToken)
+    public Task<InvoiceCreationResult> CreateAsync(int quotationId, CreateInvoiceFromQuotationRequest request, Guid operationId, CancellationToken cancellationToken) =>
+        CreateCoreAsync(quotationId, request, operationId, null, cancellationToken);
+
+    public Task<InvoiceCreationResult> CreateAsync(int quotationId, CreateInvoiceFromQuotationRequest request, Guid operationId,
+        InvoiceNotificationOrigin origin, CancellationToken cancellationToken) => CreateCoreAsync(quotationId, request, operationId, origin, cancellationToken);
+
+    public Task<InvoiceCreationResult> ReconcileAsync(int quotationId, Guid operationId, InvoiceNotificationOrigin origin,
+        CancellationToken cancellationToken) => invoiceNotifications?.ReconcileAsync(quotationId, operationId, origin, cancellationToken)
+        ?? throw new InvoiceCreationUnavailableException("Invoice notification reconciliation is unavailable.");
+
+    public async Task<InvoiceCreationResult> ReplayCompletedAsync(int quotationId, Guid operationId, InvoiceNotificationOrigin origin,
+        InvoiceCreationResult result, CancellationToken cancellationToken)
+    {
+        if (invoiceNotifications is null) throw new InvoiceCreationUnavailableException("Invoice notification reconciliation is unavailable.");
+        await invoiceNotifications.ValidateReplayAsync(quotationId, operationId, origin, result, cancellationToken);
+        return result;
+    }
+
+    private async Task<InvoiceCreationResult> CreateCoreAsync(int quotationId, CreateInvoiceFromQuotationRequest request, Guid operationId,
+        InvoiceNotificationOrigin? origin, CancellationToken cancellationToken)
     {
         ValidateQuotation(quotationId);
         ArgumentNullException.ThrowIfNull(request);
         if (operationId == Guid.Empty) throw new ArgumentException("A stable operation UUID is required.", nameof(operationId));
         if (string.IsNullOrWhiteSpace(request.InvoiceNumber)) throw new ArgumentException("Invoice number is required.", nameof(request));
 
+        var useV2 = request.SendEmail && invoiceNotifications is { Enabled: true };
+        if (useV2)
+        {
+            if (origin is null) throw new InvoiceCreationConflictException("Verified originating admission is required for invoice notification.");
+            await invoiceNotifications!.ValidateOriginAsync(quotationId, operationId, origin, false, cancellationToken);
+        }
+
         var scope = $"create:{quotationId}";
         var replay = await journal.GetAsync(scope, operationId, cancellationToken);
-        if (replay is not null) return replay;
+        if (replay is not null) return await ReplayAsync(replay);
 
         await using var lease = await operationLock.AcquireAsync(quotationId, cancellationToken);
         replay = await journal.GetAsync(scope, operationId, cancellationToken);
-        if (replay is not null) return replay;
+        if (replay is not null) return await ReplayAsync(replay);
+
+        if (useV2) await invoiceNotifications!.ValidateOriginAsync(quotationId, operationId, origin!, true, cancellationToken);
 
         var snapshot = await source.GetAsync(quotationId, cancellationToken);
         if (snapshot.Quotation.ModifiedDate is null || snapshot.Quotation.ModifiedDate.Value.Kind == DateTimeKind.Local)
@@ -46,6 +75,11 @@ public sealed class InvoiceCreationWorkflowService(
         var preview = Preview(snapshot, timeProvider.GetUtcNow());
         var invoiceNumber = request.InvoiceNumber.Trim();
         var existing = await store.FindByNumberAsync(invoiceNumber, cancellationToken);
+        if (existing is not null && invoiceNotifications is not null && await invoiceNotifications.HasFenceAsync(existing.Id, cancellationToken))
+        {
+            if (!useV2 || origin is null) throw new InvoiceCreationConflictException("Retained invoice notification requires authenticated reconciliation.");
+            return await invoiceNotifications.ReconcileAsync(quotationId, operationId, origin, cancellationToken);
+        }
         var reconciled = existing is not null;
         Invoice invoice;
         IReadOnlyList<InvoiceOrderItem> items;
@@ -92,14 +126,37 @@ public sealed class InvoiceCreationWorkflowService(
             if (reconciled) emailState = InvoiceCreationEmailState.ExplicitRetryRequired;
             else
             {
-                messageId = await notifications.SendAsync(snapshot.Customer.Email, snapshot.Customer.FullName, invoice, pdf, operationId, cancellationToken);
-                emailState = InvoiceCreationEmailState.Delivered;
+                if (useV2)
+                {
+                    var financial = new InvoiceCreationResult(invoice.Id, InvoiceCreationState.Completed, InvoiceCreationEmailState.NotRequested, null, stored);
+                    await invoiceNotifications!.PrepareFinancialAsync(quotationId, operationId, origin!, financial, cancellationToken);
+                    var notification = await invoiceNotifications.SendAsync(quotationId, operationId, origin!, snapshot.Customer.Email,
+                        snapshot.Customer.FullName, invoice, pdf, cancellationToken);
+                    messageId = notification.ProviderMessageId;
+                    emailState = notification.ProviderAccepted ? InvoiceCreationEmailState.ProviderAccepted : InvoiceCreationEmailState.ExplicitRetryRequired;
+                }
+                else
+                {
+                    messageId = await notifications.SendAsync(snapshot.Customer.Email, snapshot.Customer.FullName, invoice, pdf, operationId, cancellationToken);
+                    emailState = InvoiceCreationEmailState.Delivered;
+                }
             }
         }
 
         var result = new InvoiceCreationResult(invoice.Id, reconciled ? InvoiceCreationState.Reconciled : InvoiceCreationState.Completed, emailState, messageId, stored);
-        await journal.SetAsync(scope, operationId, result, cancellationToken);
+        if (!useV2 || emailState != InvoiceCreationEmailState.ExplicitRetryRequired)
+            await journal.SetAsync(scope, operationId, result, cancellationToken);
         return result;
+
+        async Task<InvoiceCreationResult> ReplayAsync(InvoiceCreationResult completed)
+        {
+            if (invoiceNotifications is not null && await invoiceNotifications.HasFenceAsync(completed.InvoiceId, cancellationToken))
+            {
+                if (!useV2 || origin is null) throw new InvoiceCreationConflictException("Retained invoice notification requires verified originating authority.");
+                await invoiceNotifications.ValidateReplayAsync(quotationId, operationId, origin, completed, cancellationToken);
+            }
+            return completed;
+        }
     }
 
     private static InvoiceCreationPreview Preview(InvoiceCreationSourceSnapshot value, DateTimeOffset now)

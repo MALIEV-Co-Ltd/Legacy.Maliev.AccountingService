@@ -7,6 +7,12 @@ public interface IInvoiceCreationWorkflow
 {
     Task<InvoiceCreationPreview> PreviewAsync(int quotationId, CancellationToken cancellationToken);
     Task<InvoiceCreationResult> CreateAsync(int quotationId, CreateInvoiceFromQuotationRequest request, Guid operationId, CancellationToken cancellationToken);
+    Task<InvoiceCreationResult> CreateAsync(int quotationId, CreateInvoiceFromQuotationRequest request, Guid operationId,
+        InvoiceNotificationOrigin origin, CancellationToken cancellationToken) => CreateAsync(quotationId, request, operationId, cancellationToken);
+    Task<InvoiceCreationResult> ReconcileAsync(int quotationId, Guid operationId, InvoiceNotificationOrigin origin,
+        CancellationToken cancellationToken) => throw new InvoiceCreationUnavailableException("Invoice notification reconciliation is unavailable.");
+    Task<InvoiceCreationResult> ReplayCompletedAsync(int quotationId, Guid operationId, InvoiceNotificationOrigin origin,
+        InvoiceCreationResult result, CancellationToken cancellationToken) => Task.FromResult(result);
 }
 
 public interface IInvoiceCreationSource { Task<InvoiceCreationSourceSnapshot> GetAsync(int quotationId, CancellationToken cancellationToken); }
