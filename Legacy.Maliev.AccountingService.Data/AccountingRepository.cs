@@ -213,6 +213,7 @@ public sealed class AccountingRepository(
     }
 
     public async Task<PaginatedResponse<Receipt>?> GetReceiptsAsync(
+        ReceiptSortType? sort,
         string? search,
         int page,
         int size,
@@ -230,7 +231,19 @@ public sealed class AccountingRepository(
                 || EF.Functions.ILike(receipt.Id.ToString(), pattern, "\\"));
         }
 
-        var result = await PageAsync(query.OrderByDescending(receipt => receipt.Id), page, size, cancellationToken);
+        query = sort switch
+        {
+            ReceiptSortType.ReceiptId_Descending => query.OrderByDescending(receipt => receipt.Id),
+            // SQL Server places NULL first ascending and last descending; keep this explicit on PostgreSQL.
+            ReceiptSortType.ReceiptCreatedDate_Ascending => query.OrderBy(receipt => receipt.CreatedDate != null)
+                .ThenBy(receipt => receipt.CreatedDate).ThenBy(receipt => receipt.Id),
+            ReceiptSortType.ReceiptCreatedDate_Descending => query.OrderBy(receipt => receipt.CreatedDate == null)
+                .ThenByDescending(receipt => receipt.CreatedDate).ThenBy(receipt => receipt.Id),
+            ReceiptSortType.ReceiptPaymentDate_Ascending => query.OrderBy(receipt => receipt.PaymentDate).ThenBy(receipt => receipt.Id),
+            ReceiptSortType.ReceiptPaymentDate_Descending => query.OrderByDescending(receipt => receipt.PaymentDate).ThenBy(receipt => receipt.Id),
+            _ => query.OrderBy(receipt => receipt.Id),
+        };
+        var result = await PageAsync(query, page, size, cancellationToken);
         return result is not null && result.Items.Count == 0 ? null : result;
     }
 

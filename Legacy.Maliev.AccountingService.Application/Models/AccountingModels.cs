@@ -11,6 +11,15 @@ public enum InvoiceSortType
     InvoicePaymentDate_Ascending,
     InvoicePaymentDate_Descending,
 }
+public enum ReceiptSortType
+{
+    ReceiptId_Ascending,
+    ReceiptId_Descending,
+    ReceiptCreatedDate_Ascending,
+    ReceiptCreatedDate_Descending,
+    ReceiptPaymentDate_Ascending,
+    ReceiptPaymentDate_Descending,
+}
 public enum PaymentSortType
 {
     PaymentId_Ascending,

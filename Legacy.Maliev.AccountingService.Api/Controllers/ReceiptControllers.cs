@@ -16,10 +16,9 @@ public sealed class ReceiptsController(IAccountingService service, IIdempotencyS
     [HttpDelete("{id:int}"), RequirePermission(AccountingPermissions.Delete, RequireLiveCheck = true)]
     public Task<IActionResult> DeleteReceiptAsync(int id, CancellationToken cancellationToken) => Delete(id, cancellationToken);
     [HttpGet, RequirePermission(AccountingPermissions.Read, RequireLiveCheck = true)]
-    public async Task<ActionResult<PaginatedResponse<Domain.Receipt.Receipt>>> GetPaginatedAsync(string? sort, string? search, int? index, int? size, CancellationToken cancellationToken)
+    public async Task<ActionResult<PaginatedResponse<Domain.Receipt.Receipt>>> GetPaginatedAsync(ReceiptSortType? sort, string? search, int? index, int? size, CancellationToken cancellationToken)
     {
-        _ = sort;
-        var value = await Service.GetReceiptsAsync(search, index ?? 1, size ?? 20, cancellationToken);
+        var value = await Service.GetReceiptsAsync(sort, search, index ?? 1, size ?? 20, cancellationToken);
         return value is null ? NotFound() : value;
     }
     [HttpGet("{receiptId:int}", Name = "GetReceipt"), RequirePermission(AccountingPermissions.Read, RequireLiveCheck = true)]
