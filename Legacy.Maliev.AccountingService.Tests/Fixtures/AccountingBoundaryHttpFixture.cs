@@ -108,6 +108,13 @@ public sealed class AccountingBoundaryHttpFixture : IAsyncLifetime
     public int ReceiptOutboundCalls => receiptHost is { IsCompletedSuccessfully: true }
         ? receiptHost.Result.OutboundCalls : 0;
 
+    // Test observations resolve the normal receipt Program registrations and owned Redis.
+    public async Task<AsyncServiceScope> ReceiptScopeAsync()
+    {
+        var host = await (receiptHost ??= ReceiptHost.StartAsync(this));
+        return host.Factory.Services.CreateAsyncScope();
+    }
+
     public async Task<HttpClient> ReceiptClientAsync(string[]? permissions, bool allowLive = true)
     {
         var host = await (receiptHost ??= ReceiptHost.StartAsync(this));
