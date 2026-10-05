@@ -1,5 +1,5 @@
 {
-  "identity": "commerce-joined-normal-iam-public-20261005",
+  "identity": "commerce-joined-normal-iam-dependencies-public-20261005",
   "references": [
     {
       "repository": "Legacy.Maliev.AuthService",
@@ -15,7 +15,7 @@
     },
     {
       "repository": "Legacy.Maliev.ServiceDefaults",
-      "commit": "8f4f5f27b226ffe406c4c79b1903742e8c2e7dd3"
+      "commit": "c40a7f82cea347b949444dcd7fb730f2b8dc3c0e"
     },
     {
       "repository": "Legacy.Maliev.CompatibilityContracts",
@@ -66,15 +66,18 @@
   "projectSha256": "D7A1E9D1D4B291C10C15BE8E452749A418C66632B1B481B47116B89F17D294A2",
   "hashRepresentation": "Committed LF blob bytes; original hashes refer to sealed source artifact bytes",
   "predecessor": {
-    "identity": "commerce-joined-public-20261005",
-    "manifest": "public-graphs/commerce-joined-public-20261005.json",
-    "manifestSha256": "dc86d100930ccfe7133de1b7c05ec8318ac33e5a66d46dff23db427c5a207d26",
-    "harnessHead": "e0438c159583a946ad66836023005755e651dff0",
-    "actualRun": 37254089055,
-    "executed": 6,
-    "passed": 0,
-    "failed": 6,
-    "skipped": 0
+    "identity": "commerce-joined-normal-iam-public-20261005",
+    "manifest": "public-graphs/commerce-joined-normal-iam-public-20261005.json",
+    "manifestSha256": "53f25030b7646f19e69d4aa64e0e1da1f98c58494e5c89a8727c22167ab246f8",
+    "harnessHead": "03e21657d87e4d6c6209e131efd35a7d21dbeacb",
+    "actualRun": 37262229944,
+    "stage": "build before tests",
+    "warnings": 0,
+    "errors": 2,
+    "primaryError": "Auth Program.cs:5 CS0234 Diagnostics absent from retained Defaults8f",
+    "trxAvailable": false,
+    "rawCoverageAvailable": false,
+    "contractRed": false
   },
   "producerEvidence": {
     "Auth": {
@@ -93,5 +96,43 @@
       "security": "success"
     }
   },
-  "stage": "Diagnostic with reviewed normal Program IAM producers; completion protocol unchanged; actual six outcomes pending."
+  "stage": "Diagnostic with compatible reviewed normal Program IAM producers and Defaults dependency; completion protocol unchanged; actual six outcomes pending.",
+  "dependencyAdvance": {
+    "repository": "Legacy.Maliev.ServiceDefaults",
+    "from": "8f4f5f27b226ffe406c4c79b1903742e8c2e7dd3",
+    "to": "c40a7f82cea347b949444dcd7fb730f2b8dc3c0e",
+    "requiredBy": "Auth74e accepted baseline Diagnostics import; actual Auth37260072207 validates this dependency",
+    "changedPathCount": 27,
+    "changedPaths": [
+      ".github/workflows/_build-and-test.yml",
+      "README.md",
+      "docs/private-failure-producer-design-20261002.md",
+      "docs/private-http-transport-acceptance-design-20261002.md",
+      "docs/private-request-observation-design-20261003.md",
+      "docs/private-startup-boundary-design-20261002.md",
+      "docs/private-terminal-http-observer-design-20261002.md",
+      "src/Legacy.Maliev.ServiceDefaults/Diagnostics/PrivateDependencyFailureHandler.cs",
+      "src/Legacy.Maliev.ServiceDefaults/Diagnostics/PrivateRequestObservationPipeline.cs",
+      "src/Legacy.Maliev.ServiceDefaults/Diagnostics/PrivateRequestObservationState.cs",
+      "src/Legacy.Maliev.ServiceDefaults/Diagnostics/PrivateStartupBoundary.cs",
+      "src/Legacy.Maliev.ServiceDefaults/Diagnostics/ProductionObservabilityDiagnosticException.cs",
+      "src/Legacy.Maliev.ServiceDefaults/Extensions.Middleware.cs",
+      "src/Legacy.Maliev.ServiceDefaults/Extensions.PrivateFailureObservation.cs",
+      "src/Legacy.Maliev.ServiceDefaults/Extensions.PrivateRequestObservation.cs",
+      "src/Legacy.Maliev.ServiceDefaults/Extensions.cs",
+      "src/Legacy.Maliev.ServiceDefaults/Logging/PrivateFailureConsoleFormatter.cs",
+      "tests/Legacy.Maliev.ServiceDefaults.Tests/CachePrivateDiagnosticBoundaryTests.cs",
+      "tests/Legacy.Maliev.ServiceDefaults.Tests/IamPrivateDiagnosticBoundaryTests.cs",
+      "tests/Legacy.Maliev.ServiceDefaults.Tests/PrivateFailureProducerContractTests.cs",
+      "tests/Legacy.Maliev.ServiceDefaults.Tests/PrivateHttpTransportAcceptanceTests.cs",
+      "tests/Legacy.Maliev.ServiceDefaults.Tests/PrivateRequestObservationContractTests.cs",
+      "tests/Legacy.Maliev.ServiceDefaults.Tests/PrivateRequestObservationHttpFixture.cs",
+      "tests/Legacy.Maliev.ServiceDefaults.Tests/PrivateRequestObservationLateRoutingTests.cs",
+      "tests/Legacy.Maliev.ServiceDefaults.Tests/PrivateStartupBoundaryContractTests.cs",
+      "tests/Legacy.Maliev.ServiceDefaults.Tests/PrivateTerminalHttpObserverContractTests.cs",
+      "tests/Legacy.Maliev.ServiceDefaults.Tests/Source5acLoggingRemovalContractTests.cs"
+    ],
+    "reviewedScope": "Private diagnostics/logging/middleware observation and health metadata; no original baseline equivalence claimed",
+    "authorization": "Coordinator explicitly reviewed dependency-successor graph under Workflows98"
+  }
 }

@@ -1,15 +1,20 @@
 # Public joined authorization diagnostic
 
 This is a fresh public-only graph, distinct from the sealed 906-input graph.
-Identity commerce-joined-normal-iam-public-20261005 pins reviewed normal-IAM
-Auth74e5c9e and Accountinge0438c1. Public Quotation36c4bab, Defaults8f4f5f2 and
-Contracts78e48ff remain unchanged. This is not original baseline equivalence.
-The byte-exact predecessor manifest is retained under public-graphs/. The new
-manifest records its actual six-failure run37254089055 as predecessor evidence. The four harness source files, six
-assertions and sealed906 inputs remain unchanged; only producer references and
-diagnostic provenance advance. Auth707 and Accounting478 service results do
-not establish joined completion acceptance. The full-PUT completion protocol
-is unchanged and actual diagnostic results must establish the next boundary.
+Identity commerce-joined-normal-iam-dependencies-public-20261005 pins reviewed
+Auth74e5c9e, Accountinge0438c1 and compatible Defaultsc40a7f8. Public
+Quotation36c4bab and Contracts78e48ff remain unchanged. This is not original
+baseline equivalence. Defaults8f to c40 changes 27 files, including private
+diagnostics and conditional middleware observation, and is the actual dependency
+used in Auth's validated707-case run. Exact dependency scope is in the manifest.
+Both predecessor manifests are retained byte-exact under public-graphs/. The
+latest predecessor03e run37262229944 failed before tests with0 warnings and2
+errors because Defaults8f lacks Auth's Diagnostics import; it has no TRX/raw or
+contract RED. The earlier e043 run37254089055 actually executed six failures.
+The four harness source files, six assertions and sealed906 inputs remain
+unchanged. Auth707 and Accounting478 service results do not establish joined
+completion acceptance. The full-PUT completion protocol is unchanged and actual
+diagnostic results must establish the next boundary.
 Exact references and adapted file hashes are in public-graph.json.
 Project references, three content roots and five equivalent Assert.Single
 predicate overloads change in this harness to satisfy xUnit2031.

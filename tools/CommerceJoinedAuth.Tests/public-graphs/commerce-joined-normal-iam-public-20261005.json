@@ -1,0 +1,97 @@
+{
+  "identity": "commerce-joined-normal-iam-public-20261005",
+  "references": [
+    {
+      "repository": "Legacy.Maliev.AuthService",
+      "commit": "74e5c9eda8696ebe9cf5c2dcd30321148b32ff0b"
+    },
+    {
+      "repository": "Legacy.Maliev.AccountingService",
+      "commit": "e0438c159583a946ad66836023005755e651dff0"
+    },
+    {
+      "repository": "Legacy.Maliev.QuotationService",
+      "commit": "36c4babc80b11541a7e14fe7513683afc02a887d"
+    },
+    {
+      "repository": "Legacy.Maliev.ServiceDefaults",
+      "commit": "8f4f5f27b226ffe406c4c79b1903742e8c2e7dd3"
+    },
+    {
+      "repository": "Legacy.Maliev.CompatibilityContracts",
+      "commit": "78e48ffc4ee000df0510cba5e7c7a3c4c4d539d7"
+    }
+  ],
+  "originalSealed906Changed": false,
+  "baselineEquivalent": false,
+  "files": [
+    {
+      "path": "AccountingQuotationBaselineHttpTests.cs",
+      "originalSha256": "075290F05306B60AB941BEFC5095A55CFFAA1734468E0B2E0C5D961FE832218B",
+      "newSha256": "BCE9459EDB535C1DBB2C1DF528A0208760F97F58F8EB501099340EC654D0A03C",
+      "adaptation": "content root only",
+      "analyzerAdaptation": "Equivalent Assert.Single predicate overload; no predicate or cardinality change",
+      "securityAdaptation": "Same context-to-disposable-database mapping expressed as named dictionary; actual password remains generated"
+    },
+    {
+      "path": "FrozenAuthHost.cs",
+      "originalSha256": "176CC09A0D79B63321DD49471C58568E3B060F3385F8F3D2D1FB5140711C9AAC",
+      "newSha256": "2D1F025965171CF92B9A68C4897C0734E7FDB5BA5CED8385E829912C08D6F539",
+      "adaptation": "content root only"
+    },
+    {
+      "path": "FrozenQuotationHostFixture.cs",
+      "originalSha256": "0E72037062BEA1F4C426252D9C5C4DFA46DB218052609B5C8D4F11C723F2E46F",
+      "newSha256": "EC71B8B18F72D40F17A4641A50DADE39345AAAC13E18F89551165494BF1A4235",
+      "adaptation": "content root only"
+    },
+    {
+      "path": "JoinedAuthFinancialBoundaryTests.cs",
+      "originalSha256": "4BC5307559FFA8037075BA519FEB4541B32A0ABFEF96F1848AD4A6882092F9EC",
+      "newSha256": "F563E39DEE37BCD654093772FCDC3583058B30C868B2ED21C7BD86B1DF407BC0",
+      "adaptation": "byte content unchanged except line endings",
+      "analyzerAdaptation": "Equivalent Assert.Single predicate overload; no predicate or cardinality change"
+    }
+  ],
+  "expectedCases": 6,
+  "nativeExecuted": false,
+  "accepted": false,
+  "projectAdaptations": [
+    "six reference paths and aliases retained",
+    "workspace root",
+    "coverlet.collector 6.0.4 added for raw diagnostic evidence",
+    "workspace environment is canonical; redundant per-reference property overrides removed to prevent duplicate output graphs",
+    "single worker and BuildInParallel=false restored to match sealed runner scheduling"
+  ],
+  "projectSha256": "D7A1E9D1D4B291C10C15BE8E452749A418C66632B1B481B47116B89F17D294A2",
+  "hashRepresentation": "Committed LF blob bytes; original hashes refer to sealed source artifact bytes",
+  "predecessor": {
+    "identity": "commerce-joined-public-20261005",
+    "manifest": "public-graphs/commerce-joined-public-20261005.json",
+    "manifestSha256": "dc86d100930ccfe7133de1b7c05ec8318ac33e5a66d46dff23db427c5a207d26",
+    "harnessHead": "e0438c159583a946ad66836023005755e651dff0",
+    "actualRun": 37254089055,
+    "executed": 6,
+    "passed": 0,
+    "failed": 6,
+    "skipped": 0
+  },
+  "producerEvidence": {
+    "Auth": {
+      "run": 37260072207,
+      "passed": 707,
+      "candidateTree": "04fb685ef752421b8b4268e979da14c76bc23d43",
+      "checkout": "481c70bc7129969d5b090325c4b8075ff53ce9c5",
+      "strictBuild": "0 warnings / 0 errors",
+      "security": "success"
+    },
+    "Accounting": {
+      "run": 37254089190,
+      "passed": 478,
+      "candidateTree": "b2430fe3dc9d75cef85fb22cd66f22dda66ddebb",
+      "securityCheck": 111590388725,
+      "security": "success"
+    }
+  },
+  "stage": "Diagnostic with reviewed normal Program IAM producers; completion protocol unchanged; actual six outcomes pending."
+}
