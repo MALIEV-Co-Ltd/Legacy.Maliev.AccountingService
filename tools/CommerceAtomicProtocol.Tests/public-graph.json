@@ -23,6 +23,31 @@
     }
   ],
   "baselineEquivalent": false,
+  "previousPaymentProducerAdvance": {
+    "previousAccounting": "c1abf131d1b50b2329b21db2daf32eb1b8b4d8e6",
+    "reviewedAccounting": "fa190f391ba91f0c67ae20032153a1bd30d59f1b",
+    "acceptedMainBaseline": "da972b07cc6851a17565833b7eaca2d1a389e33d",
+    "changedInput": "Legacy.Maliev.AccountingService.Data/AccountingRepository.cs",
+    "previousBlob": "c604385ec51733f689f6ea3fc6b37845d69a045d",
+    "reviewedBlob": "11046139435205555d396acb80a61d52e47c69f6",
+    "unchangedInputCount": 89,
+    "unchangedInputSha256": "a975cc97d98b5e611fcb042cb4f72c641610a175083082d4e0a5fc17ed2d6282",
+    "scope": "Payment literal spaces and empty selected pages only; direct selected-input equality preserves every other production/build blob",
+    "nativeAcceptance": "Pending fresh prospective execution; prior accepted graph and historical source proof remain separate"
+  },
+  "producerAdvance": {
+    "previousAccounting": "fa190f391ba91f0c67ae20032153a1bd30d59f1b",
+    "reviewedAccounting": "d362a856519667b171059b827dd1f5fc74c59dcc",
+    "acceptedMainBaseline": "a48ffed579633068afecb646fce40efbddcb17cb",
+    "changedInput": "Legacy.Maliev.AccountingService.Data/AccountingRepository.cs",
+    "previousBlob": "11046139435205555d396acb80a61d52e47c69f6",
+    "reviewedBlob": "32da0810710fa9051699d105903bfb8d4676f048",
+    "unchangedInputCount": 89,
+    "unchangedInputSha256": "a975cc97d98b5e611fcb042cb4f72c641610a175083082d4e0a5fc17ed2d6282",
+    "scope": "Receipt six-field literal substring search, significant spaces and selected-empty-page 404 only; sorting and global collation remain unclaimed",
+    "independentReview": "Coordinator direct all-four-production-tree diff approved exactly this Receipt input change on 2026-10-05; guard and seven mutation controls unchanged",
+    "nativeAcceptance": "Pending fresh prospective execution; prior accepted Payment main and frozen historical graph remain separate"
+  },
   "historicalAssertionsChanged": false,
   "sealed906Changed": false,
   "nativeExecuted": false,
@@ -152,7 +177,7 @@
     "failed": 12,
     "skipped": 0
   },
-  "sourceValidation": {
+  "historicalSourceValidation": {
     "head": "c1abf131d1b50b2329b21db2daf32eb1b8b4d8e6",
     "fullRun": 37281312439,
     "focusedRun": 37281312013,
