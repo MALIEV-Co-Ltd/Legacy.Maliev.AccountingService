@@ -280,9 +280,22 @@ public sealed class QuotationAtomicCompletionContractTests
             Requests.Add(new(route, request.Content is null ? null : await request.Content.ReadAsStringAsync(cancellationToken),
                 Header(request, "Idempotency-Key"), Header(request, "X-Expected-Modified-Date")));
             if (route == "GET /quotations/84")
-                return Json(LookupBody ?? JsonSerializer.Serialize(new { Id = QuotationId, CustomerId = 42, EmployeeId = 7, InvoiceId, Period = 14,
-                    ExpirationDate = "2030-08-01T00:00:00", Subtotal = 100m, Vat = 7m, Total = 107m,
-                    WithholdingTax = 3m, CurrencyId = 1, Accepted = (bool?)null, ModifiedDate = LookupVersion }), LookupStatus);
+                return Json(LookupBody ?? JsonSerializer.Serialize(new
+                {
+                    Id = QuotationId,
+                    CustomerId = 42,
+                    EmployeeId = 7,
+                    InvoiceId,
+                    Period = 14,
+                    ExpirationDate = "2030-08-01T00:00:00",
+                    Subtotal = 100m,
+                    Vat = 7m,
+                    Total = 107m,
+                    WithholdingTax = 3m,
+                    CurrencyId = 1,
+                    Accepted = (bool?)null,
+                    ModifiedDate = LookupVersion
+                }), LookupStatus);
             // Permit the current financial PUT only to capture the real old sequence. Assertions prohibit it.
             if (route == "PUT /quotations/84") return new(HttpStatusCode.NoContent);
             if (route == "PUT /quotations/84/decision") return Json("{}", DecisionStatus);
@@ -304,8 +317,17 @@ public sealed class QuotationAtomicCompletionContractTests
         {
             var body = request.RequestUri!.AbsolutePath switch
             {
-                "/quotations/84" => JsonSerializer.Serialize(new { Id = 84, CustomerId = 42, EmployeeId = 7, CurrencyId = 1,
-                    Subtotal = 100m, Vat = 7m, Total = 107m, ModifiedDate = wireVersion }),
+                "/quotations/84" => JsonSerializer.Serialize(new
+                {
+                    Id = 84,
+                    CustomerId = 42,
+                    EmployeeId = 7,
+                    CurrencyId = 1,
+                    Subtotal = 100m,
+                    Vat = 7m,
+                    Total = 107m,
+                    ModifiedDate = wireVersion
+                }),
                 "/quotations/84/orderitems" => """[{"Id":1,"QuotationId":84,"Description":"Synthetic part","Quantity":1,"UnitPrice":100,"Subtotal":100}]""",
                 "/customers/42" => """{"Id":42,"FullName":"Synthetic Thai customer","Email":"fixture@example.invalid"}""",
                 "/employees/7" => """{"Id":7,"FullName":"Synthetic Thai employee"}""",
