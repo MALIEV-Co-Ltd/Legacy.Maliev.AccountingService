@@ -7,7 +7,7 @@
     },
     {
       "repository": "Legacy.Maliev.AccountingService",
-      "commit": "87099947550b4f0f83f48ce33722fd680230bb4d"
+      "commit": "0e9d62976fd5a2025e54397b42bb4d5fd44903ed"
     },
     {
       "repository": "Legacy.Maliev.QuotationService",
@@ -99,6 +99,23 @@
     "consumerReadback": "Existing Intranet InvoiceDetailAggregator maps child-list404 to empty collections; InvoiceView retains deliberate NoDocuments UI. No BFF/Web implementation edits.",
     "independentReview": "Coordinator read complete two-input patch plus24 owned PostgreSQL normalHTTP tests and four immutable source controller methods on 2026-10-06; strict guard7 and all17 prospective assertions remain unchanged",
     "nativeAcceptance": "Pending fresh coherent candidate full684, child24, Receipt41, Payment10, invoice316, atomic21, prospective17 plus Defaults9; no RED baseline executed"
+  },
+  "receiptInvoiceCacheProducerAdvance": {
+    "previousAccounting": "87099947550b4f0f83f48ce33722fd680230bb4d",
+    "reviewedAccounting": "0e9d62976fd5a2025e54397b42bb4d5fd44903ed",
+    "acceptedMainBaseline": "ca352726410c84dcee5ef2bbbe47e0df35043f9f",
+    "inputCount": 99,
+    "changedInputs": [
+      {"path": "Legacy.Maliev.AccountingService.Data/ReceiptWorkflowStore.cs", "previousBlob": "65812719017b11c440a2965c57d74500ed43a838", "reviewedBlob": "c516c2c25d7275c95c80b46c4cf1d43ec9c465c9"}
+    ],
+    "unchangedInputCount": 98,
+    "unchangedInputSha256": "e57ac12db458cb7ef48d3d2806585de2010bca24eb86f63aba70c5e3d42cf880",
+    "scope": "Receipt workflow link/unlink invalidates the actual invoice:id read cache after successful committed normal-workflow SQL; conflicts, pre-cancellation and wrongful/no-op unlink do not evict. Independent five-second cleanup budget survives post-SQL caller abort.",
+    "consumerReadback": "Current Intranet InvoiceDetailAggregator reads persisted Invoice.ReceiptId before selecting receipt files; source Invoice view follows the same link. No Intranet, wire, schema, provider, journal, correlation or dependency edits.",
+    "validationScope": "Eight authored normal-Program HTTP reconcile/remove/replay and direct real-PostgreSQL store refusal/cancellation controls observe owned actual Redis; full service, existing financial and prospective gates remain mandatory. No native execution or RED baseline has occurred.",
+    "limits": "No Redis outage, concurrent stale-fill race, arbitrary ambient-transaction commit, live-provider or production-deployment guarantee; existing cache adapter failure policy retained.",
+    "independentReview": "Coordinator read complete six-file runtime/test/workflow/verifier diff and actual SQL/workflow callers on 2026-10-06; approved unpublished runtime witness and final graph draft. Strict guard seven controls and all seventeen prospective assertions unchanged; publication still requires graph review and integration sequencing.",
+    "nativeAcceptance": "Pending coherent hosted full692, cache8, child24, Receipt41, Payment10, invoice316, atomic21 and prospective17 plus Defaults9. Held Payment read-default producer is not included; combined integration would require fresh reconciled input proof and full716."
   },
   "historicalAssertionsChanged": false,
   "sealed906Changed": false,
