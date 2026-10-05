@@ -16,7 +16,11 @@ public interface IInvoiceCreationStore
     Task<Invoice> CreateAsync(Invoice invoice, IReadOnlyList<InvoiceOrderItem> items, CancellationToken cancellationToken);
     Task LinkFileAsync(int invoiceId, string bucket, string objectName, CancellationToken cancellationToken);
 }
-public interface IInvoiceQuotationCompletionClient { Task CompleteAsync(int quotationId, int invoiceId, Guid operationId, CancellationToken cancellationToken); }
+public interface IInvoiceQuotationCompletionClient
+{
+    Task CompleteAsync(int quotationId, int invoiceId, Guid operationId, CancellationToken cancellationToken);
+    Task CompleteAsync(int quotationId, int invoiceId, Guid operationId, DateTime? originalModifiedDate, CancellationToken cancellationToken);
+}
 public interface IInvoiceCreationDocumentClient { Task<byte[]> RenderAsync(Invoice invoice, IReadOnlyList<InvoiceOrderItem> items, CancellationToken cancellationToken); }
 public interface IInvoiceCreationFileClient
 {

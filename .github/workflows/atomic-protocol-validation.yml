@@ -1,0 +1,110 @@
+name: Prospective atomic quotation completion
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main, develop, staging, codex/accounting-source-acceptance-hosted-20261004]
+    paths:
+      - 'tools/CommerceAtomicProtocol.Tests/**'
+      - '.github/workflows/atomic-protocol-validation.yml'
+      - 'scripts/verify-atomic-protocol-results.py'
+      - 'Legacy.Maliev.AccountingService.Api/**'
+      - 'Legacy.Maliev.AccountingService.Application/**'
+      - 'Legacy.Maliev.AccountingService.Data/**'
+      - 'Legacy.Maliev.AccountingService.Domain/**'
+      - 'Legacy.Maliev.AccountingService.Tests/**'
+      - 'Directory.Build.*'
+      - 'Directory.Packages.*'
+      - 'nuget.config'
+      - 'NuGet.Config'
+      - 'NuGet.config'
+      - 'scripts/verify_atomic_producer_inputs.py'
+      - 'scripts/test_atomic_producer_inputs.py'
+      - 'global.json'
+      - 'Legacy.Maliev.AccountingService.slnx'
+      - '.github/workflows/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: atomic-protocol-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  atomic-protocol:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TreatWarningsAsErrors: 'true'
+      BuildInParallel: 'false'
+      DOTNET_PROCESSOR_COUNT: '1'
+      DOTNET_CLI_DO_NOT_USE_MSBUILD_SERVER: '1'
+      MSBUILDDISABLENODEREUSE: '1'
+      UseSharedCompilation: 'false'
+      MalievWorkspaceRoot: ${{ github.workspace }}/.joined-public
+      VSTestCollect: XPlat Code Coverage
+      VSTestLogger: trx
+      VSTestResultsDirectory: ${{ github.workspace }}/atomic-results
+    steps:
+      - name: Check out owned harness
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Check out Legacy.Maliev.AuthService
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: MALIEV-Co-Ltd/Legacy.Maliev.AuthService
+          ref: 74e5c9eda8696ebe9cf5c2dcd30321148b32ff0b
+          path: .joined-public/Legacy.Maliev.AuthService
+          persist-credentials: false
+      - name: Check out Legacy.Maliev.AccountingService
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: MALIEV-Co-Ltd/Legacy.Maliev.AccountingService
+          ref: c1abf131d1b50b2329b21db2daf32eb1b8b4d8e6
+          path: .joined-public/Legacy.Maliev.AccountingService
+          persist-credentials: false
+      - name: Check out Legacy.Maliev.QuotationService
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: MALIEV-Co-Ltd/Legacy.Maliev.QuotationService
+          ref: 36c4babc80b11541a7e14fe7513683afc02a887d
+          path: .joined-public/Legacy.Maliev.QuotationService
+          persist-credentials: false
+      - name: Check out Legacy.Maliev.ServiceDefaults
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: MALIEV-Co-Ltd/Legacy.Maliev.ServiceDefaults
+          ref: c40a7f82cea347b949444dcd7fb730f2b8dc3c0e
+          path: .joined-public/Legacy.Maliev.ServiceDefaults
+          persist-credentials: false
+      - name: Check out Legacy.Maliev.CompatibilityContracts
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: MALIEV-Co-Ltd/Legacy.Maliev.CompatibilityContracts
+          ref: 78e48ffc4ee000df0510cba5e7c7a3c4c4d539d7
+          path: .joined-public/Legacy.Maliev.CompatibilityContracts
+          persist-credentials: false
+      - name: Verify producer guard mutation controls
+        run: python3 -B -m unittest discover -s scripts -p test_atomic_producer_inputs.py
+      - name: Require current Accounting production to match the reviewed producer
+        run: python3 -B scripts/verify_atomic_producer_inputs.py .joined-public/Legacy.Maliev.AccountingService
+      - name: Validate prospective protocol graph
+        uses: MALIEV-Co-Ltd/Legacy.Maliev.Workflows/actions/dotnet-validate@e3a6093324a24968876782153286f52db8b29fd8
+        with:
+          solution: tools/CommerceAtomicProtocol.Tests/Commerce.AtomicProtocol.Tests.csproj
+          use-local-maliev-dependencies: 'true'
+      - name: Verify every declared prospective execution and raw evidence
+        if: always()
+        run: python3 scripts/verify-atomic-protocol-results.py atomic-results
+      - name: Preserve joined evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: atomic-protocol-${{ github.sha }}
+          path: atomic-results
+          if-no-files-found: warn
+          retention-days: 7

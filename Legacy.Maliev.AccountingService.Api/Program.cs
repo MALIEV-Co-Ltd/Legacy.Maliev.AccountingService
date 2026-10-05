@@ -15,6 +15,7 @@ builder.AddPostgresDbContext<ReceiptDbContext>(connectionName: "ReceiptDbContext
 builder.AddStandardCache("legacy:accounting:");
 builder.AddStandardCors();
 builder.AddJwtAuthentication();
+builder.AddAccountingIamClient();
 builder.AddStandardMiddleware(options => options.EnableRequestLogging = true);
 builder.AddStandardOpenApi(
     title: "Legacy MALIEV Accounting Service API",

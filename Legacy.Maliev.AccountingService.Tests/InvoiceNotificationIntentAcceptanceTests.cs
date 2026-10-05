@@ -248,6 +248,9 @@ public sealed class InvoiceNotificationIntentAcceptanceTests
         // Reachability prerequisite: a real new invoice must get past the registered retry strategy.
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal(1, fixture.NotificationCalls);
+        Assert.True(fixture.LiveChecks > 0);
+        using var scope = fixture.Host.Services.CreateScope();
+        Assert.IsType<IamServiceClient>(scope.ServiceProvider.GetRequiredService<IIamServiceClient>());
         await using var database = fixture.Database();
         Assert.Single(await database.Invoices.ToListAsync());
     }
@@ -286,6 +289,53 @@ public sealed class InvoiceNotificationIntentAcceptanceTests
         Assert.Empty(await database.Invoices.ToListAsync());
     }
 
+    [Theory]
+    [InlineData("denied", 1)]
+    [InlineData("unavailable", 1)]
+    [InlineData("unauthorized", 1)]
+    [InlineData("malformed", 1)]
+    [InlineData("missing-credential", 0)]
+    public async Task NormalIamComposition_LiveFailureCannotUseValidTokenPermissionOrWrite(string failure, int expectedChecks)
+    {
+        await using var fixture = await IntentFixture.StartAsync();
+        fixture.AllowLive = failure != "denied";
+        fixture.IamFailure = failure;
+        fixture.MissingLiveCredential = failure == "missing-credential";
+        using var response = await fixture.CreateAsync();
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        Assert.Equal(expectedChecks, fixture.LiveChecks);
+        Assert.Equal(0, fixture.DownstreamCalls);
+        using var scope = fixture.Host.Services.CreateScope();
+        Assert.IsType<IamServiceClient>(scope.ServiceProvider.GetRequiredService<IIamServiceClient>());
+        await using var database = fixture.Database();
+        Assert.Empty(await database.Invoices.ToListAsync());
+        Assert.Empty(await database.Items.ToListAsync());
+        Assert.Empty(await database.InvoiceCreationAdmissions.ToListAsync());
+    }
+
+    [Theory]
+    [InlineData("http://iam-intent.invalid/")]
+    [InlineData("https://iam-intent.invalid/not-an-origin")]
+    [InlineData("https://iam-intent.invalid/?query=invalid")]
+    [InlineData("https://iam-intent.invalid/#fragment")]
+    [InlineData(" ")]
+    public async Task NormalIamComposition_ProductionRejectsInvalidOriginBeforeAnyRemoteEffects(string origin)
+    {
+        await using var fixture = await IntentFixture.StartAsync();
+        fixture.IamOrigin = origin;
+        var failure = await Record.ExceptionAsync(async () =>
+        {
+            using var response = await fixture.CreateAsync();
+        });
+        Assert.NotNull(failure);
+        Assert.Contains("Live IAM requires an approved service origin.", failure.ToString(), StringComparison.Ordinal);
+        Assert.Equal(0, fixture.LiveChecks);
+        Assert.Equal(0, fixture.TokenExchangeCalls);
+        Assert.Equal(0, fixture.DownstreamCalls);
+        await using var database = fixture.Database();
+        Assert.Empty(await database.Invoices.ToListAsync());
+    }
+
     private sealed class IntentFixture : IAsyncDisposable
     {
         private const string Issuer = "https://accounting-intent.invalid";
@@ -297,10 +347,14 @@ public sealed class InvoiceNotificationIntentAcceptanceTests
         public Guid Operation { get; } = Guid.NewGuid();
         public Factory Host { get; private set; } = null!;
         public bool AllowLive = true;
+        public string? IamFailure;
+        public bool MissingLiveCredential;
+        public string IamOrigin = "https://iam-intent.invalid/";
         public bool LoseNotificationResponse { get; set; }
         public string? ExternalIssuer;
         public string? ExternalPublicKey;
         public int LiveChecks;
+        public int TokenExchangeCalls;
         public int DownstreamCalls;
         public int NotificationCalls;
         public string? Fault;
@@ -366,12 +420,15 @@ public sealed class InvoiceNotificationIntentAcceptanceTests
             var path = request.RequestUri!.AbsolutePath;
             if (path == "/auth/v1/service/login")
             {
+                Interlocked.Increment(ref TokenExchangeCalls);
                 Assert.Equal(HttpMethod.Post, request.Method);
                 return Json("""{"accessToken":"synthetic-workload-token","expiresIn":300}""");
             }
             if (path == "/iam/v1/auth/check-permission")
             {
                 Assert.Equal(HttpMethod.Post, request.Method);
+                Assert.Equal("iam-intent.invalid", request.RequestUri.Host);
+                Assert.Equal("https", request.RequestUri.Scheme);
                 Assert.Equal("synthetic-live-credential", request.Headers.GetValues("X-Maliev-IAM-Live-Check-Key").Single());
                 using var body = JsonDocument.Parse(await request.Content!.ReadAsStringAsync(token));
                 Assert.Equal("service:legacy-intranet", body.RootElement.GetProperty("principalId").GetString());
@@ -380,6 +437,9 @@ public sealed class InvoiceNotificationIntentAcceptanceTests
                 Assert.Equal("global", body.RootElement.GetProperty("resourcePath").GetString());
                 Assert.Equal("synthetic-workload-token", request.Headers.Authorization?.Parameter);
                 Interlocked.Increment(ref LiveChecks);
+                if (IamFailure == "unavailable") return Json("{}", HttpStatusCode.ServiceUnavailable);
+                if (IamFailure == "unauthorized") return Json("{}", HttpStatusCode.Unauthorized);
+                if (IamFailure == "malformed") return Json("not-json");
                 return Json(AllowLive ? "{\"allowed\":true}" : "{\"allowed\":false}");
             }
             Assert.Equal("synthetic-workload-token", request.Headers.Authorization?.Parameter);
@@ -393,7 +453,7 @@ public sealed class InvoiceNotificationIntentAcceptanceTests
             }
             if (path == "/quotations/84/orderitems") return Json("""[{"id":1,"quotationId":84,"orderId":51,"description":"Synthetic part","quantity":1,"unitPrice":100,"subtotal":100}]""");
             if (path == "/quotations/84" && request.Method == HttpMethod.Get)
-                return Json("""{"id":84,"customerId":42,"employeeId":7,"currencyId":1,"subtotal":100,"vat":7,"total":107,"period":14,"expirationDate":"2030-01-01T00:00:00Z"}""");
+                return Json("""{"id":84,"customerId":42,"employeeId":7,"currencyId":1,"subtotal":100,"vat":7,"total":107,"modifiedDate":"2030-01-01T00:00:00","period":14,"expirationDate":"2030-01-01T00:00:00Z"}""");
             if (path == "/quotations/84" || path == "/quotations/84/decision") { Assert.Equal(HttpMethod.Put, request.Method); return Json("{}"); }
             if (path == "/customers/42") return Json("""{"id":42,"fullName":"Synthetic Customer","email":"recipient@example.invalid"}""");
             if (path == "/employees/7") return Json("""{"id":7,"fullName":"Synthetic Employee"}""");
@@ -416,7 +476,8 @@ public sealed class InvoiceNotificationIntentAcceptanceTests
                 builder.UseSetting("Services:Auth", "https://auth-intent.invalid/");
                 builder.UseSetting("ServiceAuthentication:ClientId", "synthetic-accounting-client");
                 builder.UseSetting("ServiceAuthentication:ClientSecret", "synthetic-fixture-only");
-                builder.UseSetting("IAM:LivePermissionChecks:Credential", "synthetic-live-credential");
+                builder.UseSetting("IAM:LivePermissionChecks:Credential", fixture.MissingLiveCredential ? "" : "synthetic-live-credential");
+                builder.UseSetting("Services:IAMService:BaseUrl", fixture.IamOrigin);
                 foreach (var name in new[] { "Notification", "Quotation", "Document", "File", "Customer", "Employee", "Catalog" }) builder.UseSetting("Services:" + name, "https://dependency-intent.invalid/");
                 builder.ConfigureTestServices(services =>
                 {
@@ -433,10 +494,9 @@ public sealed class InvoiceNotificationIntentAcceptanceTests
                             }
                         }, [fixture.Fault == "context-dispose" ? CoreEventId.ContextDisposed : RelationalEventId.TransactionDisposed], Microsoft.Extensions.Logging.LogLevel.Debug);
                     });
-                    // Actual client, no fake authorization handler or permission success delegate.
-                    services.AddScoped<IIamServiceClient, IamServiceClient>();
-                    services.AddHttpClient("IAMService", client => client.BaseAddress = new("https://iam-intent.invalid/"))
-                        .ConfigurePrimaryHttpMessageHandler(() => new RemoteHandler(fixture)).AddLegacyServiceAuthentication();
+                    // Only replace the remote transport: IAM registration/authentication must come from Program.
+                    services.AddHttpClient("IAMService")
+                        .ConfigurePrimaryHttpMessageHandler(() => new RemoteHandler(fixture));
                     services.AddHttpClient(LegacyServiceAccessTokenProvider.HttpClientName)
                         .ConfigurePrimaryHttpMessageHandler(() => new RemoteHandler(fixture));
                     foreach (var name in new[] { InvoiceCreationSourceClient.QuotationClient, InvoiceCreationSourceClient.CustomerClient, InvoiceCreationSourceClient.EmployeeClient, InvoiceCreationSourceClient.CatalogClient,

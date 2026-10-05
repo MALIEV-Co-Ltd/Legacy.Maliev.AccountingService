@@ -1,0 +1,258 @@
+{
+  "identity": "commerce-atomic-original-version-public-20261005",
+  "references": [
+    {
+      "repository": "Legacy.Maliev.AuthService",
+      "commit": "74e5c9eda8696ebe9cf5c2dcd30321148b32ff0b"
+    },
+    {
+      "repository": "Legacy.Maliev.AccountingService",
+      "commit": "c1abf131d1b50b2329b21db2daf32eb1b8b4d8e6"
+    },
+    {
+      "repository": "Legacy.Maliev.QuotationService",
+      "commit": "36c4babc80b11541a7e14fe7513683afc02a887d"
+    },
+    {
+      "repository": "Legacy.Maliev.ServiceDefaults",
+      "commit": "c40a7f82cea347b949444dcd7fb730f2b8dc3c0e"
+    },
+    {
+      "repository": "Legacy.Maliev.CompatibilityContracts",
+      "commit": "78e48ffc4ee000df0510cba5e7c7a3c4c4d539d7"
+    }
+  ],
+  "baselineEquivalent": false,
+  "historicalAssertionsChanged": false,
+  "sealed906Changed": false,
+  "nativeExecuted": false,
+  "accepted": false,
+  "expectedCases": 17,
+  "expectedTests": [
+    {
+      "name": "Commerce.AtomicProtocol.Tests.AtomicProtocolHttpTests.PersistedInvoice_ActualDiCompletionUsesExactAtomicCustomerWire",
+      "executions": 1
+    },
+    {
+      "name": "Commerce.AtomicProtocol.Tests.AtomicProtocolHttpTests.OrdinaryAndRealDelegatedHttpCreationPersistInvoiceAndCustomerOutcome",
+      "executions": 1
+    },
+    {
+      "name": "Commerce.AtomicProtocol.Tests.AtomicProtocolHttpTests.SameInvoiceReplayPreservesOutcomeTimestampAndOrderKeys",
+      "executions": 1
+    },
+    {
+      "name": "Commerce.AtomicProtocol.Tests.AtomicProtocolHttpTests.DifferentInvoiceCannotRebindAcceptedQuotation",
+      "executions": 1
+    },
+    {
+      "name": "Commerce.AtomicProtocol.Tests.AtomicProtocolHttpTests.PriorDeclineRejectsCustomerInvoiceDecision",
+      "executions": 1
+    },
+    {
+      "name": "Commerce.AtomicProtocol.Tests.AtomicProtocolHttpTests.AcceptedUnlinkedQuotationRejectsLateCustomerInvoiceAttachment",
+      "executions": 1
+    },
+    {
+      "name": "Commerce.AtomicProtocol.Tests.AtomicProtocolHttpTests.ParentScalarEditAfterSourceConflictsWithOriginalVersionAndFencesDelegatedReplay",
+      "executions": 1
+    },
+    {
+      "name": "Commerce.AtomicProtocol.Tests.AtomicProtocolHttpTests.MissingSourceVersionReturns409BeforeInvoicePersistence",
+      "executions": 1
+    },
+    {
+      "name": "Commerce.AtomicProtocol.Tests.AtomicProtocolHttpTests.VersionlessCompatibilityCallFailsBeforeProducerHttp",
+      "executions": 1
+    },
+    {
+      "name": "Commerce.AtomicProtocol.Tests.AtomicProtocolHttpTests.LostProducerAcknowledgmentLeavesAcceptedInvoiceAndNeedsReconciliationFence",
+      "executions": 1
+    },
+    {
+      "name": "Commerce.AtomicProtocol.Tests.AtomicProtocolHttpTests.ConcurrentSameAndDifferentInvoiceIntentsRespectPersistedBinding",
+      "executions": 1
+    },
+    {
+      "name": "Commerce.AtomicProtocol.Tests.AtomicProtocolHttpTests.MalformedCompletionResponseNeverIssuesDecision",
+      "executions": 1
+    },
+    {
+      "name": "Commerce.AtomicProtocol.Tests.AtomicProtocolHttpTests.MissingProducerQuotationNeverIssuesDecision",
+      "executions": 1
+    },
+    {
+      "name": "Commerce.AtomicProtocol.Tests.AtomicProtocolHttpTests.LiveIamDenialCannotUseTokenPermissionOrWrite",
+      "executions": 1
+    },
+    {
+      "name": "Commerce.AtomicProtocol.Tests.AtomicProtocolHttpTests.LiveIamUnavailableCannotUseTokenPermissionOrWrite",
+      "executions": 1
+    },
+    {
+      "name": "Commerce.AtomicProtocol.Tests.AtomicProtocolHttpTests.LinkedOrderPartialFailureKeepsProducerPersistenceAndDelegatedFenceWithoutLaterEffects",
+      "executions": 1
+    },
+    {
+      "name": "Commerce.AtomicProtocol.Tests.AtomicProtocolHttpTests.ChildItemEditDoesNotAdvanceParentVersion_CharacterizesAggregateProtectionGap",
+      "executions": 1
+    }
+  ],
+  "files": [
+    {
+      "path": "AtomicProtocolHttpTests.cs",
+      "sha256": "56d16c1f6d6b76c0faa083f5862c139259e76b29a82efcf899c5886c1db957a2"
+    },
+    {
+      "path": "AtomicProtocolScenario.cs",
+      "sha256": "37be1be6bfccd4ba5bc8a22601b4c806fa815e287d6d8407bbf84a04d8203478"
+    },
+    {
+      "path": "Commerce.AtomicProtocol.Tests.csproj",
+      "sha256": "7b66ae7fb1c15d7a2226ccbb2b328e498b22f7e4d26fb0107c46d3b13ddf9f4f"
+    },
+    {
+      "path": "README.md",
+      "sha256": "2c7824557936ccd53ca638d949f6d32986c3dc7018b8c9560bc831e25bb56841"
+    }
+  ],
+  "hashRepresentation": "Committed LF bytes",
+  "historicalFixtureProject": "../CommerceJoinedAuth.Tests/Commerce.JoinedAuth.Tests.csproj",
+  "historicalFixtureSources": [
+    {
+      "path": "AccountingQuotationBaselineHttpTests.cs",
+      "sha256": "BCE9459EDB535C1DBB2C1DF528A0208760F97F58F8EB501099340EC654D0A03C"
+    },
+    {
+      "path": "FrozenAuthHost.cs",
+      "sha256": "2D1F025965171CF92B9A68C4897C0734E7FDB5BA5CED8385E829912C08D6F539"
+    },
+    {
+      "path": "FrozenQuotationHostFixture.cs",
+      "sha256": "EC71B8B18F72D40F17A4641A50DADE39345AAAC13E18F89551165494BF1A4235"
+    },
+    {
+      "path": "JoinedAuthFinancialBoundaryTests.cs",
+      "sha256": "F563E39DEE37BCD654093772FCDC3583058B30C868B2ED21C7BD86B1DF407BC0"
+    }
+  ],
+  "historicalGraph": {
+    "identity": "commerce-joined-normal-iam-dependencies-public-20261005",
+    "harnessHead": "d3e2578961441423a173bfbc312f077bdab7956f",
+    "actualRun": 37262778842,
+    "passed": 5,
+    "failed": 1,
+    "skipped": 0
+  },
+  "testsFirst": {
+    "head": "da4a48d85fe0230e5c6c5ff3072fe89abf10b553",
+    "actualRun": 37263844316,
+    "total": 497,
+    "passed": 485,
+    "failed": 12,
+    "skipped": 0
+  },
+  "sourceValidation": {
+    "head": "c1abf131d1b50b2329b21db2daf32eb1b8b4d8e6",
+    "fullRun": 37281312439,
+    "focusedRun": 37281312013,
+    "status": "actual hosted service and focused GREEN; joined acceptance separate",
+    "fullPassed": 499,
+    "focusedPassed": 21,
+    "skipped": 0,
+    "buildWarnings": 0,
+    "buildErrors": 0,
+    "rawSha256": "285596cd9ef060cd4d5f6292eac7f47f7a8d21a757460804c696c4cc26571c23",
+    "exclusions": []
+  },
+  "boundaries": {
+    "real": [
+      "Accounting Program/workflow/stores/admissions",
+      "Auth Program/issuer/sessions/delegation",
+      "Quotation Program/repository/decision/standard and live IAM"
+    ],
+    "controlled": [
+      "IAM HTTP transport responses",
+      "Order acceptance HTTP responses",
+      "Document PDF bytes",
+      "File existence HTTP response",
+      "Malformed completion transport response",
+      "Lost decision acknowledgment"
+    ],
+    "childCharacterization": "Real producer repository through DI, not child-write HTTP authorization",
+    "unclaimed": [
+      "Aggregate parent/items snapshot consistency",
+      "Global invoice/order/document/notification saga atomicity",
+      "Provider/deployment/production IAM grants",
+      "Idempotency-Key deduplication by Quotation",
+      "Historical six-case acceptance"
+    ]
+  },
+  "validationFiles": [
+    {
+      "path": ".github/workflows/atomic-protocol-validation.yml",
+      "sha256": "1227984f1c2b08b0d61f5abf92da11ba7fbe1ebf6da0829623413aecd7ff859a"
+    },
+    {
+      "path": "scripts/verify-atomic-protocol-results.py",
+      "sha256": "828e77b7198cf3b397f120131f26e18a24d908426f51108584c4031ac85e0f3b"
+    },
+    {
+      "path": "scripts/verify_atomic_producer_inputs.py",
+      "sha256": "975e54b2d6e538733ee839bba08abb7640ba052ec9ab3ca11889859eed7c28b4"
+    },
+    {
+      "path": "scripts/test_atomic_producer_inputs.py",
+      "sha256": "972e2ad0b0ac04031034adc90ad4cbd722f549545586051a7448016e14841c8d"
+    }
+  ],
+  "preTestBuildReceipt": {
+    "harnessHead": "4cfcc76a203f76e82c792693edb1b13135d97aa0",
+    "actualRun": 37282240834,
+    "warnings": 0,
+    "errors": 1,
+    "testsExecuted": false,
+    "trxAvailable": false,
+    "rawAvailable": false,
+    "cause": "Ambiguous UpdateResult in child repository characterization",
+    "correction": "Explicit Quotation UpdateResult enum; producer pins and assertions unchanged"
+  },
+  "priorProspectiveExecution": {
+    "harnessHead": "5e093178d5456357c2e92c43b91163308301c3fb",
+    "actualRun": 37282774536,
+    "warnings": 0,
+    "errors": 0,
+    "executed": 17,
+    "passed": 8,
+    "failed": 9,
+    "skipped": 0,
+    "rawSha256": "1e8fe8c652fe30e96a2e5227652efa5c1f76ec6f103538a00f1b95e8611aa93b",
+    "accepted": false,
+    "correction": "Persisted seed baseline and shared actual host lifecycle; original assertions and producer pins unchanged. Authorization failures require fresh execution evidence."
+  },
+  "retryCardinalityReceipt": {
+    "harnessHead": "cd7f6f49f445863376de6cfbbe8cbc8c69f01dbb",
+    "actualRun": 37284482467,
+    "warnings": 0,
+    "errors": 0,
+    "executed": 17,
+    "passed": 16,
+    "failed": 1,
+    "skipped": 0,
+    "rawSha256": "a146b447e430e6fd21a0ea8c62034676164d6875b87d1ac0776345f75e080504",
+    "accepted": false,
+    "cause": "Duplicate Order 7202 key while constructing physical-attempt dictionary. Pinned Quotation Program.cs standard resilience retries POST503. Later reconciliation assertions not reached.",
+    "correction": "NEW prospective case groups exactly two Order IDs and requires original stable keys across every attempt, then exactly two additional successful reconciliation sends. Production retry/security policy and all historical assertions unchanged."
+  },
+  "retryAnalyzerReceipt": {
+    "harnessHead": "39783a742dca78ae6c96e0ce18b39190efde206c",
+    "actualRun": 37285281439,
+    "warnings": 0,
+    "errors": 1,
+    "testsExecuted": false,
+    "trxAvailable": false,
+    "rawAvailable": false,
+    "cause": "xUnit2031: use Assert.Single predicate overload instead of Where",
+    "correction": "Equivalent predicate overload preserves exact one7201/201 requirement"
+  }
+}

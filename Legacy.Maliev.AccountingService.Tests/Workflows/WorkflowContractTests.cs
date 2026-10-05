@@ -20,6 +20,55 @@ public sealed class WorkflowContractTests
     }
 
     [Fact]
+    public void HistoricalJoinedDiagnostic_IsManualAndKeepsStrictReproduction()
+    {
+        var source = File.ReadAllText(FindRepositoryFile(".github", "workflows", "joined-public-validation.yml"));
+        var yaml = new YamlStream();
+        yaml.Load(new StringReader(source));
+        var root = Assert.IsType<YamlMappingNode>(Assert.Single(yaml.Documents).RootNode);
+        Assert.Equal("Archived public joined authorization diagnostic", ReadScalar(root, "name"));
+        var triggers = Assert.IsType<YamlMappingNode>(ReadNode(root, "on"));
+        Assert.Equal("workflow_dispatch", Assert.IsType<YamlScalarNode>(Assert.Single(triggers.Children).Key).Value);
+        Assert.DoesNotContain("continue-on-error", source, StringComparison.Ordinal);
+        Assert.Contains("python3 scripts/verify-joined-public-results.py joined-results", source, StringComparison.Ordinal);
+        Assert.Contains("ref: e0438c159583a946ad66836023005755e651dff0", source, StringComparison.Ordinal);
+        Assert.Contains("ref: 36c4babc80b11541a7e14fe7513683afc02a887d", source, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void CurrentAtomicAcceptance_CoversProductionChangesAndMainPushWithProducerGuard()
+    {
+        var source = File.ReadAllText(FindRepositoryFile(".github", "workflows", "atomic-protocol-validation.yml"));
+        var yaml = new YamlStream();
+        yaml.Load(new StringReader(source));
+        var root = Assert.IsType<YamlMappingNode>(Assert.Single(yaml.Documents).RootNode);
+        var triggers = Assert.IsType<YamlMappingNode>(ReadNode(root, "on"));
+        var push = Assert.IsType<YamlMappingNode>(ReadNode(triggers, "push"));
+        Assert.Equal("main", Assert.IsType<YamlScalarNode>(Assert.Single(Assert.IsType<YamlSequenceNode>(ReadNode(push, "branches")).Children)).Value);
+        var pull = Assert.IsType<YamlMappingNode>(ReadNode(triggers, "pull_request"));
+        var paths = Assert.IsType<YamlSequenceNode>(ReadNode(pull, "paths")).Children.Select(node => Assert.IsType<YamlScalarNode>(node).Value).ToArray();
+        foreach (var path in new[]
+                 {
+                     "Legacy.Maliev.AccountingService.Api/**",
+                     "Legacy.Maliev.AccountingService.Application/**",
+                     "Legacy.Maliev.AccountingService.Data/**",
+                     "Legacy.Maliev.AccountingService.Domain/**",
+                     "Legacy.Maliev.AccountingService.Tests/**",
+                     ".github/workflows/**",
+                 })
+        {
+            Assert.Contains(path, paths);
+        }
+        Assert.DoesNotContain("continue-on-error", source, StringComparison.Ordinal);
+        Assert.Contains("python3 -B scripts/verify_atomic_producer_inputs.py .joined-public/Legacy.Maliev.AccountingService", source, StringComparison.Ordinal);
+        Assert.Contains("python3 -B -m unittest discover -s scripts -p test_atomic_producer_inputs.py", source, StringComparison.Ordinal);
+        Assert.Contains("python3 scripts/verify-atomic-protocol-results.py atomic-results", source, StringComparison.Ordinal);
+        Assert.True(source.IndexOf("Require current Accounting production", StringComparison.Ordinal)
+                    < source.IndexOf("Validate prospective protocol graph", StringComparison.Ordinal));
+        Assert.Contains("ref: c1abf131d1b50b2329b21db2daf32eb1b8b4d8e6", source, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void DependabotConfiguration_ScansOnlyIndependentlyResolvableProjectDirectories()
     {
         var source = File.ReadAllText(FindRepositoryFile(".github", "dependabot.yml"));
@@ -66,16 +115,16 @@ public sealed class WorkflowContractTests
     public void BuildAndTest_RejectsSharedActionMainWithPinnedShaComment()
     {
         AssertMutationRejected(
-            "MALIEV-Co-Ltd/Legacy.Maliev.Workflows/actions/dotnet-validate@73dd7304ffe85ec504389fd7664cc39070b9f148",
-            "MALIEV-Co-Ltd/Legacy.Maliev.Workflows/actions/dotnet-validate@main # 73dd7304ffe85ec504389fd7664cc39070b9f148");
+            "MALIEV-Co-Ltd/Legacy.Maliev.Workflows/actions/dotnet-validate@e3a6093324a24968876782153286f52db8b29fd8",
+            "MALIEV-Co-Ltd/Legacy.Maliev.Workflows/actions/dotnet-validate@main # e3a6093324a24968876782153286f52db8b29fd8");
     }
 
     [Fact]
     public void BuildAndTest_RejectsCommentedDependencySha()
     {
         AssertMutationRejected(
-            "ref: 8f4f5f27b226ffe406c4c79b1903742e8c2e7dd3",
-            "ref: main # 8f4f5f27b226ffe406c4c79b1903742e8c2e7dd3");
+            "ref: c40a7f82cea347b949444dcd7fb730f2b8dc3c0e",
+            "ref: main # c40a7f82cea347b949444dcd7fb730f2b8dc3c0e");
     }
 
     [Fact]
@@ -184,7 +233,7 @@ public sealed class WorkflowContractTests
 internal static partial class WorkflowContractValidator
 {
     private const string CheckoutAction = "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1";
-    private const string SharedValidationAction = "MALIEV-Co-Ltd/Legacy.Maliev.Workflows/actions/dotnet-validate@73dd7304ffe85ec504389fd7664cc39070b9f148";
+    private const string SharedValidationAction = "MALIEV-Co-Ltd/Legacy.Maliev.Workflows/actions/dotnet-validate@e3a6093324a24968876782153286f52db8b29fd8";
 
     public static void Validate(string workflow)
     {
@@ -229,10 +278,49 @@ internal static partial class WorkflowContractValidator
         RejectDuplicatedValidationActionsAndCommands(jobs);
 
         var steps = RequireSequence(validateJob, "steps");
-        if (steps.Children.Count != 4)
+        if (steps.Children.Count != 6)
         {
-            throw new InvalidOperationException("Validate job must contain exactly four caller-owned steps.");
+            throw new InvalidOperationException("Validate job must contain four validation and two evidence steps.");
         }
+
+        var environment = RequireMapping(validateJob, "env");
+        if (environment.Children.Count != 4)
+        {
+            throw new InvalidOperationException("Validate environment must contain only dependency root and evidence properties.");
+        }
+
+        RequireScalarValue(environment, "MalievWorkspaceRoot", "${{ github.workspace }}/.dependencies");
+        RequireScalarValue(environment, "VSTestCollect", "XPlat Code Coverage");
+        RequireScalarValue(environment, "VSTestLogger", "trx");
+        RequireScalarValue(environment, "VSTestResultsDirectory", "${{ github.workspace }}/runner-results");
+
+        var gate = RequireMapping(steps.Children[4], "coverage gate");
+        if (gate.Children.Count != 2)
+        {
+            throw new InvalidOperationException("Coverage gate must contain only name and run.");
+        }
+
+        RequireScalarValue(gate, "name", "Gate owned production coverage");
+        RequireScalarValue(gate, "run", "python3 scripts/verify-runner-coverage.py runner-results");
+        var evidence = RequireMapping(steps.Children[5], "evidence upload");
+        if (evidence.Children.Count != 4)
+        {
+            throw new InvalidOperationException("Evidence upload must contain exactly name, if, uses and with.");
+        }
+
+        RequireScalarValue(evidence, "name", "Preserve validation evidence");
+        RequireScalarValue(evidence, "if", "always()");
+        RequireScalarValue(evidence, "uses", "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02");
+        var evidenceInputs = RequireMapping(evidence, "with");
+        if (evidenceInputs.Children.Count != 4)
+        {
+            throw new InvalidOperationException("Evidence upload must have exactly four bounded inputs.");
+        }
+
+        RequireScalarValue(evidenceInputs, "name", "accounting-validation-${{ github.sha }}");
+        RequireScalarValue(evidenceInputs, "path", "runner-results");
+        RequireScalarValue(evidenceInputs, "if-no-files-found", "warn");
+        RequireScalarValue(evidenceInputs, "retention-days", "7");
 
         ValidateStep(
             steps.Children[0],
@@ -247,7 +335,7 @@ internal static partial class WorkflowContractValidator
             new Dictionary<string, string>(StringComparer.Ordinal)
             {
                 ["repository"] = "MALIEV-Co-Ltd/Legacy.Maliev.ServiceDefaults",
-                ["ref"] = "8f4f5f27b226ffe406c4c79b1903742e8c2e7dd3",
+                ["ref"] = "c40a7f82cea347b949444dcd7fb730f2b8dc3c0e",
                 ["path"] = ".dependencies/Legacy.Maliev.ServiceDefaults",
                 ["persist-credentials"] = "false",
             });

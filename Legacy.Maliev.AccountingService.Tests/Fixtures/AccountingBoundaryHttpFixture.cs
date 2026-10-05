@@ -100,6 +100,9 @@ public sealed class AccountingBoundaryHttpFixture : IAsyncLifetime
 
     public PaymentDbContext Database() => new(Options<PaymentDbContext>("PaymentDbContext"));
 
+    // Same owned loopback container and isolated database authority established during InitializeAsync.
+    public InvoiceDbContext InvoiceDatabase() => new(Options<InvoiceDbContext>("InvoiceDbContext"));
+
     public int ReceiptOutboundCalls => receiptHost is { IsCompletedSuccessfully: true }
         ? receiptHost.Result.OutboundCalls : 0;
 

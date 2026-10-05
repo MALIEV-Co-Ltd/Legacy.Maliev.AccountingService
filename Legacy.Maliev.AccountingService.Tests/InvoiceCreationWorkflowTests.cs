@@ -47,7 +47,7 @@ public sealed class InvoiceCreationWorkflowTests
         store.Setup(value => value.CreateAsync(It.IsAny<Invoice>(), It.IsAny<IReadOnlyList<InvoiceOrderItem>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((Invoice invoice, IReadOnlyList<InvoiceOrderItem> _, CancellationToken _) => { invoice.Id = 901; return invoice; });
         var quotation = new Mock<IInvoiceQuotationCompletionClient>();
-        quotation.Setup(value => value.CompleteAsync(84, 901, OperationId, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        quotation.Setup(value => value.CompleteAsync(84, 901, OperationId, Snapshot().Quotation.ModifiedDate, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
         var files = new Mock<IInvoiceCreationFileClient>();
         files.Setup(value => value.ExistsAsync("maliev.com", "invoices/901/invoice_inv-84.pdf", It.IsAny<CancellationToken>())).ReturnsAsync(true);
         var documents = new Mock<IInvoiceCreationDocumentClient>();
@@ -58,6 +58,7 @@ public sealed class InvoiceCreationWorkflowTests
 
         var result = await workflow.CreateAsync(84, Request(deductWithholdingTax: false), OperationId, CancellationToken.None);
 
+        quotation.Verify(value => value.CompleteAsync(84, 901, OperationId, Snapshot().Quotation.ModifiedDate, It.IsAny<CancellationToken>()), Times.Once);
         Assert.Equal(901, result.InvoiceId);
         Assert.Equal(InvoiceCreationState.Completed, result.State);
         store.Verify(value => value.CreateAsync(
@@ -92,7 +93,7 @@ public sealed class InvoiceCreationWorkflowTests
         var store = new Mock<IInvoiceCreationStore>();
         store.Setup(value => value.FindByNumberAsync("INV-84", It.IsAny<CancellationToken>())).ReturnsAsync(new Invoice { Id = 901, Number = "INV-84", CustomerId = 42, Total = 1070.27m });
         var quotation = new Mock<IInvoiceQuotationCompletionClient>();
-        quotation.Setup(value => value.CompleteAsync(84, 901, OperationId, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        quotation.Setup(value => value.CompleteAsync(84, 901, OperationId, Snapshot().Quotation.ModifiedDate, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
         var files = new Mock<IInvoiceCreationFileClient>();
         files.Setup(value => value.ExistsAsync("maliev.com", "invoices/901/invoice_inv-84.pdf", It.IsAny<CancellationToken>())).ReturnsAsync(true);
         store.Setup(value => value.LinkFileAsync(901, "maliev.com", "invoices/901/invoice_inv-84.pdf", It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
@@ -146,7 +147,7 @@ public sealed class InvoiceCreationWorkflowTests
         "TAX", "REG", deductWithholdingTax, true);
 
     private static InvoiceCreationSourceSnapshot Snapshot() => new(
-        new(84, 42, 7, 1, 1000.25m, 70.02m, 1070.27m, 30m, "quotation", "Bangkok", "Courier", "Net 7", null, 701, Guid.Parse("a3308993-39b9-41fc-bbfd-f3500de40f55")),
+        new(84, 42, 7, 1, 1000.25m, 70.02m, 1070.27m, 30m, "quotation", "Bangkok", "Courier", "Net 7", null, 701, Guid.Parse("a3308993-39b9-41fc-bbfd-f3500de40f55"), new DateTime(2030, 7, 18, 0, 0, 0, DateTimeKind.Unspecified)),
         new(42, "Customer One", "customer@example.com", "0812345678", null, null,
             new("MALIEV Customer", "TAX", "REG"),
             new("Tower", "Road", null, "Bangkok", "Bangkok", "10110", "Thailand"),

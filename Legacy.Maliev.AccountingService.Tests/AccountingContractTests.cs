@@ -140,13 +140,13 @@ public sealed class AccountingContractTests
     }
 
     private static DbContextOptions<PaymentDbContext> PaymentOptions() =>
-        new DbContextOptionsBuilder<PaymentDbContext>().UseNpgsql("Host=localhost;Database=accounting_test;Username=test;Password=test").Options;
+        new DbContextOptionsBuilder<PaymentDbContext>().UseNpgsql("Host=localhost;Database=accounting_test;Username=test").Options;
 
     private static DbContextOptions<InvoiceDbContext> InvoiceOptions() =>
-        new DbContextOptionsBuilder<InvoiceDbContext>().UseNpgsql("Host=localhost;Database=invoice_test;Username=test;Password=test").Options;
+        new DbContextOptionsBuilder<InvoiceDbContext>().UseNpgsql("Host=localhost;Database=invoice_test;Username=test").Options;
 
     private static DbContextOptions<ReceiptDbContext> ReceiptOptions() =>
-        new DbContextOptionsBuilder<ReceiptDbContext>().UseNpgsql("Host=localhost;Database=receipt_test;Username=test;Password=test").Options;
+        new DbContextOptionsBuilder<ReceiptDbContext>().UseNpgsql("Host=localhost;Database=receipt_test;Username=test").Options;
 
     private static string FindRepositoryRoot()
     {
