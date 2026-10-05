@@ -12,6 +12,30 @@ namespace Legacy.Maliev.AccountingService.Tests;
 public sealed class InvoiceNotificationControllerRecoveryTests
 {
     [Fact]
+    public async Task DisabledRestart_RetainedOriginCannotSelectLegacyAdmissionOrSend()
+    {
+        await using var fixture = await IntentFixture.StartAsync();
+        fixture.EnableNotificationV2 = true;
+        var transport = new NotificationTransport();
+        fixture.NotificationV2Transport = transport.SendAsync;
+        using var created = await fixture.CreateAsync(delegation: fixture.Delegation());
+        Assert.Equal(HttpStatusCode.OK, created.StatusCode);
+        var effects = fixture.DownstreamCalls;
+        fixture.EnableNotificationV2 = false;
+        await fixture.RestartHostAsync();
+        using var disabled = await fixture.CreateAsync(delegation: fixture.Delegation());
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, disabled.StatusCode);
+        Assert.Equal(effects, fixture.DownstreamCalls);
+        Assert.Equal(new[] { "PUT", "POST" }, transport.Methods);
+        fixture.EnableNotificationV2 = true;
+        await fixture.RestartHostAsync();
+        using var replay = await fixture.CreateAsync(delegation: fixture.Delegation());
+        Assert.Equal(HttpStatusCode.OK, replay.StatusCode);
+        Assert.Equal(effects, fixture.DownstreamCalls);
+        Assert.Equal(new[] { "PUT", "POST" }, transport.Methods);
+    }
+
+    [Fact]
     public async Task AcceptedResult_UsesValueThreeAndBoundTerminalReplayHasNoNotificationRequests()
     {
         await using var fixture = await IntentFixture.StartAsync();
@@ -143,8 +167,14 @@ public sealed class InvoiceNotificationControllerRecoveryTests
 
         private HttpResponseMessage Receipt(string intent, string state, int version) => Json(JsonSerializer.Serialize(new
         {
-            intentId = intent, purpose = "invoice-issued", resourceType = "invoice", resourceId = resource,
-            workflowOperationId = workflow, state, version, admittedAt = "2026-10-05T00:00:00Z",
+            intentId = intent,
+            purpose = "invoice-issued",
+            resourceType = "invoice",
+            resourceId = resource,
+            workflowOperationId = workflow,
+            state,
+            version,
+            admittedAt = "2026-10-05T00:00:00Z",
             updatedAt = version == 1 ? "2026-10-05T00:00:00Z" : "2026-10-05T00:00:01Z",
             providerMessageId = state == "providerAccepted" ? "accepted-fixture" : null,
         }, new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull }));

@@ -131,7 +131,7 @@ public sealed class InvoiceNotificationPhaseStoreTests(InvoiceNotificationPhaseF
         _ = await store.ObserveAsync(identity, 2, Receipt(identity, "admitted", 1), CancellationToken.None);
         _ = await store.IssueExecutionAsync(identity, Digest, 3, CancellationToken.None);
         _ = await store.ObserveAsync(identity, 4, Receipt(identity, "providerAccepted", 3) with
-            { ProviderMessageId = "synthetic-provider-id" }, CancellationToken.None);
+        { ProviderMessageId = "synthetic-provider-id" }, CancellationToken.None);
         var before = await database.InvoiceNotificationCorrelations.AsNoTracking().SingleAsync();
         await store.ValidateAcceptedResultAsync(identity, "synthetic-provider-id", CancellationToken.None);
         await Assert.ThrowsAsync<InvoiceNotificationCorrelationConflictException>(() =>

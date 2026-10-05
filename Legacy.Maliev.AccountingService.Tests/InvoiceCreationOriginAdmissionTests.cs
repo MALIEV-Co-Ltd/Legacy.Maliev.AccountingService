@@ -98,8 +98,11 @@ public sealed class InvoiceCreationOriginAdmissionTests(InvoiceNotificationPhase
         var operation = Guid.NewGuid();
         var store = new InvoiceCreationAdmissionStore(database);
         _ = await store.AdmitAsync(operation, 84, Origin, Fingerprint, CancellationToken.None);
-        var expected = Result(17) with { EmailState = (InvoiceCreationEmailState)emailState,
-            ProviderMessageId = emailState == 3 ? "synthetic-provider-receipt" : null };
+        var expected = Result(17) with
+        {
+            EmailState = (InvoiceCreationEmailState)emailState,
+            ProviderMessageId = emailState == 3 ? "synthetic-provider-receipt" : null
+        };
         await store.CompleteAsync(operation, expected, CancellationToken.None);
         var replay = await store.AdmitAsync(operation, 84, Origin, Fingerprint, CancellationToken.None);
         Assert.False(replay.IsNew);
@@ -224,8 +227,11 @@ public sealed class InvoiceCreationOriginAdmissionTests(InvoiceNotificationPhase
         var store = new InvoiceCreationAdmissionStore(database);
         _ = await store.AdmitAsync(operation, 84, Origin, Fingerprint, CancellationToken.None);
         var financial = await PersistFinancialAsync(database);
-        var completed = financial with { EmailState = (InvoiceCreationEmailState)emailState,
-            ProviderMessageId = emailState == 3 ? "synthetic-provider-receipt" : null };
+        var completed = financial with
+        {
+            EmailState = (InvoiceCreationEmailState)emailState,
+            ProviderMessageId = emailState == 3 ? "synthetic-provider-receipt" : null
+        };
         await Assert.ThrowsAsync<InvoiceCreationConflictException>(() => store.CompleteReconciledAsync(operation, 84, Origin, completed, CancellationToken.None));
         await store.SaveFinancialResultAsync(operation, 84, Origin, financial, CancellationToken.None);
         if (uncertain) await store.MarkUncertainAsync(operation, CancellationToken.None);
@@ -331,8 +337,14 @@ public sealed class InvoiceCreationOriginAdmissionTests(InvoiceNotificationPhase
             new Invoice { Number = "INV-" + Guid.NewGuid().ToString("N"), CustomerId = 42 }, [], CancellationToken.None);
         var result = Result(invoice.Id);
         var now = new DateTime(2026, 10, 5, 0, 0, 0, DateTimeKind.Unspecified);
-        database.Files.Add(new InvoiceFile { InvoiceId = invoice.Id, Bucket = result.StoredFile.Bucket,
-            ObjectName = result.StoredFile.ObjectName, CreatedDate = now, ModifiedDate = now });
+        database.Files.Add(new InvoiceFile
+        {
+            InvoiceId = invoice.Id,
+            Bucket = result.StoredFile.Bucket,
+            ObjectName = result.StoredFile.ObjectName,
+            CreatedDate = now,
+            ModifiedDate = now
+        });
         await database.SaveChangesAsync();
         return result;
     }

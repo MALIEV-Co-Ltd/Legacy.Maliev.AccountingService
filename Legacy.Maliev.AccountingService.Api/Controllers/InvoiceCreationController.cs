@@ -36,7 +36,7 @@ public sealed class InvoiceCreationController(IInvoiceCreationWorkflow workflow,
         return await ExecuteAsync(async () =>
         {
             var fingerprint = InvoiceCreationAdmissionStore.Fingerprint(request);
-            if (notificationOptions?.Enabled != true)
+            if (notificationOptions?.Enabled != true && !await admissions.RequiresOriginValidationAsync(operationId, cancellationToken))
             {
                 var legacy = await admissions.AdmitAsync(operationId, quotationId, origin.EmployeeSubject,
                     origin.ServiceSubject, fingerprint, cancellationToken);

@@ -198,8 +198,14 @@ public sealed class InvoiceNotificationConsumerTests(InvoiceNotificationPhaseFen
         {
             Content = new StringContent(JsonSerializer.Serialize(new
             {
-                intentId = intent, purpose = "invoice-issued", resourceType = "invoice", resourceId = resource,
-                workflowOperationId = workflow, state, version, admittedAt = "2026-10-05T00:00:00Z",
+                intentId = intent,
+                purpose = "invoice-issued",
+                resourceType = "invoice",
+                resourceId = resource,
+                workflowOperationId = workflow,
+                state,
+                version,
+                admittedAt = "2026-10-05T00:00:00Z",
                 updatedAt = version == 1 ? "2026-10-05T00:00:00Z" : "2026-10-05T00:00:01Z",
                 providerMessageId = state == "providerAccepted" ? "fixture-provider-acceptance" : null,
             }, new JsonSerializerOptions { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull }), Encoding.UTF8, "application/json"),

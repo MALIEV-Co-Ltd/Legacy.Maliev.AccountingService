@@ -387,6 +387,12 @@ public sealed class InvoiceNotificationIntentAcceptanceTests
 
         public InvoiceDbContext Database() => new(new DbContextOptionsBuilder<InvoiceDbContext>().UseNpgsql(postgres.GetConnectionString()).Options);
 
+        public async Task RestartHostAsync()
+        {
+            await Host.DisposeAsync();
+            Host = new Factory(this);
+        }
+
         public string Delegation()
         {
             var now = DateTimeOffset.UtcNow;

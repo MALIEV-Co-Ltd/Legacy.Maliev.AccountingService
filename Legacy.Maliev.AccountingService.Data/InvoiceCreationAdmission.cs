@@ -25,6 +25,10 @@ public sealed class InvoiceCreationAdmission
 /// <summary>Admits only the first delegated request and never replays an uncertain side effect.</summary>
 public sealed class InvoiceCreationAdmissionStore(InvoiceDbContext database)
 {
+    /// <summary>Retained V2 origin fences keep strict actor validation even after feature deactivation.</summary>
+    public Task<bool> RequiresOriginValidationAsync(Guid operationId, CancellationToken cancellationToken) =>
+        database.InvoiceCreationAdmissions.AsNoTracking().AnyAsync(value => value.OperationId == operationId && value.OriginIssuer != null, cancellationToken);
+
     /// <summary>Retains a verified origin; uncertain replay is read-only and grants no new authority.</summary>
     public async Task<(bool IsNew, InvoiceCreationResult? Completed, bool NeedsReconciliation)> AdmitAsync(
         Guid operationId, int quotationId, InvoiceNotificationOrigin origin, string fingerprint, CancellationToken cancellationToken)

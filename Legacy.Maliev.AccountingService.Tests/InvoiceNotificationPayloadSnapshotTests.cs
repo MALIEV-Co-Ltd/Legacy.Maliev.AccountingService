@@ -43,7 +43,10 @@ public sealed class InvoiceNotificationPayloadSnapshotTests
     [InlineData("not-an-email", "valid", "valid")]
     [InlineData("recipient@example.invalid", "", "valid")]
     [InlineData("recipient@example.invalid", "valid", "")]
-    [InlineData("recipient@example.invalid", "valid", "\ud800")]
     public void InvalidPayload_RefusesBeforeAdmission(string to, string subject, string body) =>
         Assert.Throws<ArgumentException>(() => new InvoiceNotificationPayloadSnapshot(to, subject, body));
+
+    [Fact]
+    public void UnpairedUtf16_RefusesBeforeAdmission() => Assert.Throws<ArgumentException>(() =>
+        new InvoiceNotificationPayloadSnapshot("recipient@example.invalid", "valid", "\ud800"));
 }
