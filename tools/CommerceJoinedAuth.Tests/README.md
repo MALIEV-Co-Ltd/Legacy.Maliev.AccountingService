@@ -4,7 +4,8 @@ This is a fresh public-only graph, distinct from the sealed 906-input graph.
 Auth51afbbd and Accountingff8fcf6 are retained; public Quotation36c4bab
 includes production differences and is not original baseline equivalence.
 Exact references and adapted file hashes are in public-graph.json.
-Only project references and three content roots change in the owned harness.
+Project references, three content roots and five equivalent Assert.Single
+predicate overloads change in this harness to satisfy xUnit2031.
 No issuer, claims, assertions, permissions, or transport behavior is changed.
 
 The six cases use actual Auth login/session/delegation and real Accounting and

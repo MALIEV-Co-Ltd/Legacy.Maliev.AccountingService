@@ -28,26 +28,28 @@
     {
       "path": "AccountingQuotationBaselineHttpTests.cs",
       "originalSha256": "075290F05306B60AB941BEFC5095A55CFFAA1734468E0B2E0C5D961FE832218B",
-      "newSha256": "7D961EB906E17ED85657571282F856519ECD822AF2451B6CA9032295A1E943DB",
-      "adaptation": "content root only"
+      "newSha256": "983C445B2B354750D570D011F4DD9DE7020A14021483372B4A2E0E0648B029E9",
+      "adaptation": "content root only",
+      "analyzerAdaptation": "Equivalent Assert.Single predicate overload; no predicate or cardinality change"
     },
     {
       "path": "FrozenAuthHost.cs",
       "originalSha256": "176CC09A0D79B63321DD49471C58568E3B060F3385F8F3D2D1FB5140711C9AAC",
-      "newSha256": "0D3E5A5A0FFBE7F6F2912B97759E005BED81D583B07AF8F8D069C86DC9957146",
+      "newSha256": "2D1F025965171CF92B9A68C4897C0734E7FDB5BA5CED8385E829912C08D6F539",
       "adaptation": "content root only"
     },
     {
       "path": "FrozenQuotationHostFixture.cs",
       "originalSha256": "0E72037062BEA1F4C426252D9C5C4DFA46DB218052609B5C8D4F11C723F2E46F",
-      "newSha256": "5AA1C04B02C76EBD09CDC27D6DCB0C8F573966E970E578DB55ADAE99E0D02F1D",
+      "newSha256": "EC71B8B18F72D40F17A4641A50DADE39345AAAC13E18F89551165494BF1A4235",
       "adaptation": "content root only"
     },
     {
       "path": "JoinedAuthFinancialBoundaryTests.cs",
       "originalSha256": "4BC5307559FFA8037075BA519FEB4541B32A0ABFEF96F1848AD4A6882092F9EC",
-      "newSha256": "3D04D81D0AF902117C4B62050464FD07E4C7B761B8660579027A637C01341D3C",
-      "adaptation": "byte content unchanged except line endings"
+      "newSha256": "F563E39DEE37BCD654093772FCDC3583058B30C868B2ED21C7BD86B1DF407BC0",
+      "adaptation": "byte content unchanged except line endings",
+      "analyzerAdaptation": "Equivalent Assert.Single predicate overload; no predicate or cardinality change"
     }
   ],
   "expectedCases": 6,
@@ -58,5 +60,6 @@
     "workspace root",
     "coverlet.collector 6.0.4 added for raw diagnostic evidence"
   ],
-  "projectSha256": "948E4847B1E73BAB44DE9CC804037F2191A7C5CA0C57F0A8EF98431CE4C376B8"
+  "projectSha256": "5936B46660EA251F8C27BFBF4C0E3AD2AB85F179CB934296078A48FF953D7916",
+  "hashRepresentation": "Committed LF blob bytes; original hashes refer to sealed source artifact bytes"
 }

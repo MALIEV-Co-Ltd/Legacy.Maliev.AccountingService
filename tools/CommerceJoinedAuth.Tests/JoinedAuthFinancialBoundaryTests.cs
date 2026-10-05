@@ -27,8 +27,8 @@ public sealed class JoinedAuthFinancialBoundaryTests(AccountingQuotationBaseline
         var jwt = new JwtSecurityTokenHandler().ReadJwtToken(issued.Token);
         Assert.Equal("employee:42", jwt.Subject);
         Assert.Equal("legacy-accounting:invoice-create", Assert.Single(jwt.Audiences));
-        Assert.Equal(operation.ToString("D"), Assert.Single(jwt.Claims.Where(value => value.Type == "operation_id")).Value);
-        Assert.Equal(row.Id.ToString(System.Globalization.CultureInfo.InvariantCulture), Assert.Single(jwt.Claims.Where(value => value.Type == "quotation_id")).Value);
+        Assert.Equal(operation.ToString("D"), Assert.Single(jwt.Claims, value => value.Type == "operation_id").Value);
+        Assert.Equal(row.Id.ToString(System.Globalization.CultureInfo.InvariantCulture), Assert.Single(jwt.Claims, value => value.Type == "quotation_id").Value);
         var number = $"AUTH-JOINED-{Guid.NewGuid():N}";
         using var first = await SendAsync(row.Id, operation, issued.Token!, number);
         Assert.Equal(HttpStatusCode.Conflict, first.StatusCode);
@@ -98,7 +98,7 @@ public sealed class JoinedAuthFinancialBoundaryTests(AccountingQuotationBaseline
     {
         fixture.ResetObservations();
         var row = await fixture.Quotation.SeedAsync();
-        var sessionId = Guid.Parse(Assert.Single(new JwtSecurityTokenHandler().ReadJwtToken(fixture.Auth.EmployeeToken).Claims.Where(value => value.Type == "sid")).Value);
+        var sessionId = Guid.Parse(Assert.Single(new JwtSecurityTokenHandler().ReadJwtToken(fixture.Auth.EmployeeToken).Claims, value => value.Type == "sid").Value);
         await using var state = fixture.Auth.State();
         var session = await state.RefreshSessions.SingleAsync(value => value.Id == sessionId);
         var previous = session.RevokedAt;

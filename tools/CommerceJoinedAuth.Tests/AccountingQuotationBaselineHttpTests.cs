@@ -49,9 +49,9 @@ public sealed class AccountingQuotationBaselineHttpTests(AccountingQuotationBase
         var error = await Record.ExceptionAsync(() => completion.CompleteAsync(row.Id, invoice.Id, Guid.NewGuid(), CancellationToken.None));
         foreach (var call in fixture.Trace) Console.WriteLine($"Joined observed boundary: {call}");
         Assert.Null(error);
-        Assert.Equal($"PUT /quotations/{row.Id}/decision =>200", Assert.Single(fixture.Trace.Where(call => call.StartsWith($"PUT /quotations/{row.Id}/decision =>", StringComparison.Ordinal))));
+        Assert.Equal($"PUT /quotations/{row.Id}/decision =>200", Assert.Single(fixture.Trace, call => call.StartsWith($"PUT /quotations/{row.Id}/decision =>", StringComparison.Ordinal)));
         Assert.DoesNotContain(fixture.Trace, call => call.StartsWith($"PUT /quotations/{row.Id} =>", StringComparison.Ordinal));
-        var sent = Assert.Single(fixture.DecisionRequests.Where(value => value.Path == $"/quotations/{row.Id}/decision"));
+        var sent = Assert.Single(fixture.DecisionRequests, value => value.Path == $"/quotations/{row.Id}/decision");
         Assert.Equal(new[] { "Accepted", "EmployeeInitiated", "InvoiceId" }, sent.Body.EnumerateObject().Select(property => property.Name).Order(StringComparer.Ordinal));
         Assert.True(sent.Body.GetProperty("Accepted").GetBoolean());
         Assert.False(sent.Body.GetProperty("EmployeeInitiated").GetBoolean());
