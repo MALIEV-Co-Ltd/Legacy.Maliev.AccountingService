@@ -7,7 +7,7 @@
     },
     {
       "repository": "Legacy.Maliev.AccountingService",
-      "commit": "0e9d62976fd5a2025e54397b42bb4d5fd44903ed"
+      "commit": "efa54267b26eab8815ca5a4b3c5340d6f51aae79"
     },
     {
       "repository": "Legacy.Maliev.QuotationService",
@@ -116,6 +116,23 @@
     "limits": "No Redis outage, concurrent stale-fill race, arbitrary ambient-transaction commit, live-provider or production-deployment guarantee; existing cache adapter failure policy retained.",
     "independentReview": "Coordinator read complete six-file runtime/test/workflow/verifier diff and actual SQL/workflow callers on 2026-10-06; approved unpublished runtime witness and final graph draft. Strict guard seven controls and all seventeen prospective assertions unchanged; publication still requires graph review and integration sequencing.",
     "nativeAcceptance": "Pending coherent hosted full692, cache8, child24, Receipt41, Payment10, invoice316, atomic21 and prospective17 plus Defaults9. Held Payment read-default producer is not included; combined integration would require fresh reconciled input proof and full716."
+  },
+  "receiptDeleteRetryProducerAdvance": {
+    "previousAccounting": "0e9d62976fd5a2025e54397b42bb4d5fd44903ed",
+    "reviewedAccounting": "efa54267b26eab8815ca5a4b3c5340d6f51aae79",
+    "acceptedMainBaseline": "ca352726410c84dcee5ef2bbbe47e0df35043f9f",
+    "inputCount": 99,
+    "changedInputs": [
+      {"path": "Legacy.Maliev.AccountingService.Data/ReceiptWorkflowStore.cs", "previousBlob": "c516c2c25d7275c95c80b46c4cf1d43ec9c465c9", "reviewedBlob": "1e438c03a45b3eefa7d494dd234089bcc0b976b7"}
+    ],
+    "unchangedInputCount": 98,
+    "unchangedInputSha256": "e57ac12db458cb7ef48d3d2806585de2010bca24eb86f63aba70c5e3d42cf880",
+    "scope": "Run the existing three receipt-owned filtered deletes and transaction commit inside the configured retry execution strategy. Pass caller cancellation to both the outer retry operation and each transaction/SQL command. Workflow unlink/cache occurs only after successful deletion commit.",
+    "validationScope": "Preserve normal-Program HTTP removal regression; assert actual pinned public Npgsql retry strategy. Ninth direct real-PG case proves pre-cancel no effects and injected failure after one file-row delete rolls back owned file/item/receipt rows and preserves primed invoice cache; no retry configuration bypass.",
+    "failedPredecessor": "Candidate6cba native cache run37359927396 built with zero warnings/errors, then 7 passed/1 failed/0 skipped; HTTP DELETE removal returned400 with InvalidOperationException. Full run37359928087 passed691/failed1/skip0 of692. Original logs/TRX/raw retained; neither candidate accepted and no deliberate RED baseline executed.",
+    "limits": "CreateReceiptAsync manual transaction remains a separate correctness follow-up requiring tracked-entity/idempotency/ambiguous-commit design; it is unchanged. No Redis outage, stale-fill race, arbitrary ambient transaction or provider/deployment guarantee.",
+    "independentReview": "Coordinator read full four-file retry runtime/test/workflow/verifier incremental draft and token-aware correction on 2026-10-06; approved unpublished witness/final graph review before publication. Exact EF10.0.12 token overload and public Npgsql10.0.3 strategy type verified from pinned package XML. Prior graph metadata and seventeen assertions retained; guard implementation unchanged.",
+    "nativeAcceptance": "Pending fresh corrected coherent full693, cache9, child24, Receipt41, Payment10, invoice316, atomic21 and prospective17 plus Defaults9. Held Payment producer not included; later combined integration requires fresh reconciled input proof and full717."
   },
   "historicalAssertionsChanged": false,
   "sealed906Changed": false,
