@@ -7,7 +7,7 @@
     },
     {
       "repository": "Legacy.Maliev.AccountingService",
-      "commit": "dcdc727ebf50e1892af69596c1e54cb4cc747030"
+      "commit": "87099947550b4f0f83f48ce33722fd680230bb4d"
     },
     {
       "repository": "Legacy.Maliev.QuotationService",
@@ -82,6 +82,23 @@
     "bindingEvidence": "Modern typed MVC binder rejects undefined999/-1 with400; no historical source HTTP execution or undefined-default guarantee claimed",
     "independentReview": "Coordinator read complete four-input patch and immutable source controller/enum objects on 2026-10-06 and approved this unpublished witness; strict guard and seven controls unchanged",
     "nativeAcceptance": "Pending fresh coherent candidate full660, Receipt41, Payment10, invoice316, atomic21, prospective17 plus Defaults9; no RED baseline executed"
+  },
+  "childListProducerAdvance": {
+    "previousAccounting": "dcdc727ebf50e1892af69596c1e54cb4cc747030",
+    "reviewedAccounting": "87099947550b4f0f83f48ce33722fd680230bb4d",
+    "acceptedMainBaseline": "d3716143413162368467a2972de7ade511b9eed4",
+    "normalMergeParents": ["9ec382b172edcd0d38aac1807b53cbeed8c8439b", "d3716143413162368467a2972de7ade511b9eed4"],
+    "inputCount": 99,
+    "changedInputs": [
+      {"path": "Legacy.Maliev.AccountingService.Api/Controllers/InvoiceControllers.cs", "previousBlob": "9b0d7989a9c8db1e504dc046828e088ef2e316e4", "reviewedBlob": "4b4a447855a9886968c24ee9b237f00d61e29477"},
+      {"path": "Legacy.Maliev.AccountingService.Api/Controllers/ReceiptControllers.cs", "previousBlob": "402556ac0bfa06246a7eb8ebbc603a719cabd04d", "reviewedBlob": "2338fce42f3b3f095df683c96b9afeb59f7c9b4d"}
+    ],
+    "unchangedInputCount": 97,
+    "unchangedInputSha256": "3580c0f86d035112454100d82957673e3e4949a1ef3850963ceb2bdadfe5bbbc",
+    "scope": "Four Invoice/Receipt child-list GET actions: items parent0 literal400, all empty lists404; populated wire and owner scoping unchanged. No repository/model/interface/write changes.",
+    "consumerReadback": "Existing Intranet InvoiceDetailAggregator maps child-list404 to empty collections; InvoiceView retains deliberate NoDocuments UI. No BFF/Web implementation edits.",
+    "independentReview": "Coordinator read complete two-input patch plus24 owned PostgreSQL normalHTTP tests and four immutable source controller methods on 2026-10-06; strict guard7 and all17 prospective assertions remain unchanged",
+    "nativeAcceptance": "Pending fresh coherent candidate full684, child24, Receipt41, Payment10, invoice316, atomic21, prospective17 plus Defaults9; no RED baseline executed"
   },
   "historicalAssertionsChanged": false,
   "sealed906Changed": false,
