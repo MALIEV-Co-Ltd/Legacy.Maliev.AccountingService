@@ -14,6 +14,13 @@ expected = {
     "SelectedEmptyPage_SourceReturns404WithoutFinancialMutation": 1,
     "ThaiLiteral_RemainsExactAcrossAuthenticatedHttpAndStorage": 1,
     "AnonymousAndLiveDenial_RejectWithoutFinancialDisclosure": 2,
+    "SixSourceOrders_NameAndNumericBindingPreserveDatesNullPlacementAndStableTies": 12,
+    "MissingOrEmptySort_SourceDefaultsToAscendingIdentifier": 3,
+    "InvalidSort_RejectsBeforeFinancialDisclosureOrMutation": 3,
+    "SelectedPage_OrdersBeforePagingAndPreservesPascalMetadata": 2,
+    "LiteralSearch_SortsOnlyMatchingRowsBeforeSelectingPage": 1,
+    "DefaultSizeAndMaximumPageCap_RemainTwentyAndTwoHundredFifty": 1,
+    "SortedRead_AnonymousOrLiveDeniedCannotDiscloseOrMutateFinancialRows": 2,
 }
 fixture = repository / "Legacy.Maliev.AccountingService.Tests/ReceiptMasterQuerySourceHttpTests.cs"
 text = fixture.read_bytes().decode("utf-8", errors="strict")
@@ -38,16 +45,17 @@ actual = collections.Counter()
 for result in results:
     name = result.attrib["testName"]
     matches = [method for method in expected if
-               f"ReceiptMasterQuerySourceHttpTests.{method}" in name]
+               any(f"{fixture_class}.{method}" in name for fixture_class in
+                   ("ReceiptMasterQuerySourceHttpTests", "ReceiptSortSourceHttpTests"))]
     if len(matches) != 1 or result.get("outcome") != "Passed":
         raise SystemExit(f"Unexpected or non-passing query case: {name}")
     actual[matches[0]] += 1
 if dict(actual) != expected:
     raise SystemExit(f"Query cardinality mismatch: {dict(actual)}")
 counters = trx.find(".//t:Counters", ns)
-if counters is None or any(int(counters.get(key, "-1")) != 17
+if counters is None or any(int(counters.get(key, "-1")) != 41
                            for key in ("total", "executed", "passed")):
-    raise SystemExit("Expected exactly 17 executed/passed cases")
+    raise SystemExit("Expected exactly 41 executed/passed cases")
 if any(int(counters.get(key, "0")) != 0 for key in
        ("failed", "error", "timeout", "aborted", "inconclusive", "notExecuted")):
     raise SystemExit("Failed or skipped query case")
@@ -62,7 +70,7 @@ for assembly in ("Api", "Application", "Data", "Domain"):
     if not selected or not any(p.findall(".//line") for p in selected):
         raise SystemExit(f"Missing executable coverage inventory: {name}")
 receipt = {
-    "passed": 17, "failed": 0, "skipped": 0, "methods": dict(actual),
+    "passed": 41, "failed": 0, "skipped": 0, "methods": dict(actual),
     "trx_sha256": hashlib.sha256(reports[0].read_bytes()).hexdigest(),
     "raw_sha256": next(iter(digests)), "raw_copies": len(raw),
     "note": "Focused coverage retained; the full-suite workflow gates all four assemblies at 80%.",

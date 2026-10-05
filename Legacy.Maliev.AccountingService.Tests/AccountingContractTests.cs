@@ -46,6 +46,20 @@ public sealed class AccountingContractTests
     }
 
     [Fact]
+    public void ReceiptPagination_PreservesSixTypedLegacySortValues()
+    {
+        var controller = typeof(Program).Assembly.GetType(
+            "Legacy.Maliev.AccountingService.Api.Controllers.Receipt.ReceiptsController")!;
+        var action = controller.GetMethod("GetPaginatedAsync", BindingFlags.Instance | BindingFlags.Public)!;
+        Assert.Equal(typeof(ReceiptSortType?), action.GetParameters().Single(parameter => parameter.Name == "sort").ParameterType);
+        Assert.Equal(
+            ["ReceiptId_Ascending", "ReceiptId_Descending", "ReceiptCreatedDate_Ascending", "ReceiptCreatedDate_Descending", "ReceiptPaymentDate_Ascending", "ReceiptPaymentDate_Descending"],
+            Enum.GetNames<ReceiptSortType>());
+        Assert.Equal(Enumerable.Range(0, 6), Enum.GetValues<ReceiptSortType>().Select(value => (int)value));
+        Assert.Single(action.GetCustomAttributes<HttpGetAttribute>());
+    }
+
+    [Fact]
     public void EfModels_KeepThreeIndependentLegacyDatabaseBoundaries()
     {
         using var payment = new PaymentDbContext(PaymentOptions());
