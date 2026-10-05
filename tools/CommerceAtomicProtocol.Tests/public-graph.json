@@ -191,7 +191,7 @@
   "validationFiles": [
     {
       "path": ".github/workflows/atomic-protocol-validation.yml",
-      "sha256": "7e1bf0c3784897462639122452c06e5dfca52211dfc76d5e8dc0cdb032b9a58e"
+      "sha256": "ed205a15353b8bbde894d6a5d64c947526f7ea47263ad7c75d4758bbfd5662eb"
     },
     {
       "path": "scripts/verify-atomic-protocol-results.py",

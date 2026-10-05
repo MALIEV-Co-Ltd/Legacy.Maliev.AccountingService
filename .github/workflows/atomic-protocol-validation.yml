@@ -108,7 +108,7 @@ jobs:
           mkdir -p "$GITHUB_WORKSPACE/defaults-cache-results"
           dotnet build tests/Legacy.Maliev.ServiceDefaults.Tests/Legacy.Maliev.ServiceDefaults.Tests.csproj \
             --configuration Release --nologo --disable-build-servers -warnaserror \
-            -p:TreatWarningsAsErrors=true -p:UseLocalMalievDependencies=true \
+            -p:TreatWarningsAsErrors=true -p:UseLocalMalievDependencies=true -p:GITHUB_ACTIONS=false \
             | tee "$GITHUB_WORKSPACE/defaults-cache-results/build.log"
       - name: Execute all nine pinned IAM cache compatibility cases
         shell: bash
@@ -117,7 +117,7 @@ jobs:
           VSTestResultsDirectory: ${{ github.workspace }}/defaults-cache-results
         run: |
           dotnet test tests/Legacy.Maliev.ServiceDefaults.Tests/Legacy.Maliev.ServiceDefaults.Tests.csproj \
-            --configuration Release --no-build --no-restore -p:UseLocalMalievDependencies=true \
+            --configuration Release --no-build --no-restore -p:UseLocalMalievDependencies=true -p:GITHUB_ACTIONS=false \
             --filter "FullyQualifiedName~IamPermissionCacheIsolationTests" \
             --logger "trx;LogFileName=defaults-cache.trx" \
             --results-directory "$GITHUB_WORKSPACE/defaults-cache-results"
