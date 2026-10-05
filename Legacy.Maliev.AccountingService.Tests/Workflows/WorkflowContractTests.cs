@@ -20,6 +20,34 @@ public sealed class WorkflowContractTests
     }
 
     [Fact]
+    public void MainManualAcceptance_UsesUnfilteredFullValidationWithoutReleaseAuthority()
+    {
+        var source = File.ReadAllText(FindRepositoryFile(".github", "workflows", "ci-main.yml"));
+        var yaml = new YamlStream();
+        yaml.Load(new StringReader(source));
+        var root = Assert.IsType<YamlMappingNode>(Assert.Single(yaml.Documents).RootNode);
+        var triggers = Assert.IsType<YamlMappingNode>(ReadNode(root, "on"));
+        Assert.Equal(new[] { "push", "workflow_dispatch" }, triggers.Children.Keys
+            .Select(key => Assert.IsType<YamlScalarNode>(key).Value).OrderBy(value => value).ToArray());
+        Assert.IsType<YamlScalarNode>(ReadNode(triggers, "workflow_dispatch"));
+        var push = Assert.IsType<YamlMappingNode>(ReadNode(triggers, "push"));
+        Assert.Single(push.Children);
+        Assert.Equal("main", Assert.IsType<YamlScalarNode>(Assert.Single(
+            Assert.IsType<YamlSequenceNode>(ReadNode(push, "branches")).Children)).Value);
+        var permissions = Assert.IsType<YamlMappingNode>(ReadNode(root, "permissions"));
+        Assert.Single(permissions.Children);
+        Assert.Equal("read", ReadScalar(permissions, "contents"));
+        var jobs = Assert.IsType<YamlMappingNode>(ReadNode(root, "jobs"));
+        Assert.Single(jobs.Children);
+        var validate = Assert.IsType<YamlMappingNode>(ReadNode(jobs, "validate"));
+        Assert.Single(validate.Children);
+        Assert.Equal("./.github/workflows/_build-and-test.yml", ReadScalar(validate, "uses"));
+        Assert.DoesNotContain("continue-on-error", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("VSTestTestCaseFilter", Workflow, StringComparison.Ordinal);
+        WorkflowContractValidator.Validate(Workflow);
+    }
+
+    [Fact]
     public void HistoricalJoinedDiagnostic_IsManualAndKeepsStrictReproduction()
     {
         var source = File.ReadAllText(FindRepositoryFile(".github", "workflows", "joined-public-validation.yml"));
