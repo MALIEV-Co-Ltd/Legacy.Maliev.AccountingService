@@ -1,0 +1,62 @@
+{
+  "identity": "commerce-joined-public-20261005",
+  "references": [
+    {
+      "repository": "Legacy.Maliev.AuthService",
+      "commit": "51afbbd6e2829382a3431338abedccf339de33b1"
+    },
+    {
+      "repository": "Legacy.Maliev.AccountingService",
+      "commit": "ff8fcf61684566b150fe06d88f2ee0c41bc6a33f"
+    },
+    {
+      "repository": "Legacy.Maliev.QuotationService",
+      "commit": "36c4babc80b11541a7e14fe7513683afc02a887d"
+    },
+    {
+      "repository": "Legacy.Maliev.ServiceDefaults",
+      "commit": "8f4f5f27b226ffe406c4c79b1903742e8c2e7dd3"
+    },
+    {
+      "repository": "Legacy.Maliev.CompatibilityContracts",
+      "commit": "78e48ffc4ee000df0510cba5e7c7a3c4c4d539d7"
+    }
+  ],
+  "originalSealed906Changed": false,
+  "baselineEquivalent": false,
+  "files": [
+    {
+      "path": "AccountingQuotationBaselineHttpTests.cs",
+      "originalSha256": "075290F05306B60AB941BEFC5095A55CFFAA1734468E0B2E0C5D961FE832218B",
+      "newSha256": "7D961EB906E17ED85657571282F856519ECD822AF2451B6CA9032295A1E943DB",
+      "adaptation": "content root only"
+    },
+    {
+      "path": "FrozenAuthHost.cs",
+      "originalSha256": "176CC09A0D79B63321DD49471C58568E3B060F3385F8F3D2D1FB5140711C9AAC",
+      "newSha256": "0D3E5A5A0FFBE7F6F2912B97759E005BED81D583B07AF8F8D069C86DC9957146",
+      "adaptation": "content root only"
+    },
+    {
+      "path": "FrozenQuotationHostFixture.cs",
+      "originalSha256": "0E72037062BEA1F4C426252D9C5C4DFA46DB218052609B5C8D4F11C723F2E46F",
+      "newSha256": "5AA1C04B02C76EBD09CDC27D6DCB0C8F573966E970E578DB55ADAE99E0D02F1D",
+      "adaptation": "content root only"
+    },
+    {
+      "path": "JoinedAuthFinancialBoundaryTests.cs",
+      "originalSha256": "4BC5307559FFA8037075BA519FEB4541B32A0ABFEF96F1848AD4A6882092F9EC",
+      "newSha256": "3D04D81D0AF902117C4B62050464FD07E4C7B761B8660579027A637C01341D3C",
+      "adaptation": "byte content unchanged except line endings"
+    }
+  ],
+  "expectedCases": 6,
+  "nativeExecuted": false,
+  "accepted": false,
+  "projectAdaptations": [
+    "six reference paths and aliases retained",
+    "workspace root",
+    "coverlet.collector 6.0.4 added for raw diagnostic evidence"
+  ],
+  "projectSha256": "948E4847B1E73BAB44DE9CC804037F2191A7C5CA0C57F0A8EF98431CE4C376B8"
+}
