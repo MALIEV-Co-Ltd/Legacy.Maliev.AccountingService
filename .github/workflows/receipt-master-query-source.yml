@@ -18,7 +18,7 @@ jobs:
       VSTestCollect: XPlat Code Coverage
       VSTestLogger: trx
       VSTestResultsDirectory: ${{ github.workspace }}/query-results
-      VSTestTestCaseFilter: FullyQualifiedName~ReceiptMasterQuerySourceHttpTests
+      VSTestTestCaseFilter: FullyQualifiedName~ReceiptMasterQuerySourceHttpTests|FullyQualifiedName~ReceiptSortSourceHttpTests
     steps:
       - name: Check out AccountingService
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -45,7 +45,7 @@ jobs:
         with:
           solution: Legacy.Maliev.AccountingService.Tests/Legacy.Maliev.AccountingService.Tests.csproj
           use-local-maliev-dependencies: 'true'
-      - name: Verify all 17 query cases and raw evidence
+      - name: Verify all 41 query and sort cases and raw evidence
         run: python3 -B scripts/verify-receipt-query.py query-results
       - name: Preserve query evidence
         if: always()

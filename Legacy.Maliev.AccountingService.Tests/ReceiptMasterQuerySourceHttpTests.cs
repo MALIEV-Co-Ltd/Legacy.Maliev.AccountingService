@@ -17,9 +17,9 @@ public sealed class ReceiptMasterQuerySourceHttpTests(AccountingBoundaryHttpFixt
     [InlineData("registration-only", "1101")]
     [InlineData("701", "1101")]
     [InlineData("1103", "1103")]
-    [InlineData("110", "1104,1103,1102,1101")]
+    [InlineData("110", "1101,1102,1103,1104")]
     [InlineData("tax-one", "1101")]
-    [InlineData("INV", "1102,1101")]
+    [InlineData("INV", "1101,1102")]
     public async Task SourceFields_AllSixParticipateWithNumericSubstringSearch(string search, string ids)
     {
         await SeedAsync();

@@ -7,7 +7,7 @@
     },
     {
       "repository": "Legacy.Maliev.AccountingService",
-      "commit": "8f467cd66c5ad3210d685d616179ca772d533ff5"
+      "commit": "dcdc727ebf50e1892af69596c1e54cb4cc747030"
     },
     {
       "repository": "Legacy.Maliev.QuotationService",
@@ -63,6 +63,25 @@
     "scope": "Normal reconciliation of accepted Payment57 and Receipt58 queries; all invoice notification runtime inputs remain identical to reviewed 68c producer",
     "independentReview": "Coordinator direct staged all-four-production-tree diff approved exactly these accepted query hunks on 2026-10-05; strict guard and seven mutation controls unchanged",
     "nativeAcceptance": "Pending fresh combined full635, invoice316, Payment10, Receipt17, atomic21 and prospective17 plus Defaults9; old 4e consumer evidence remains historical"
+  },
+  "receiptSortProducerAdvance": {
+    "previousAccounting": "8f467cd66c5ad3210d685d616179ca772d533ff5",
+    "reviewedAccounting": "dcdc727ebf50e1892af69596c1e54cb4cc747030",
+    "acceptedMainBaseline": "0cf1f9990fce8228e28e136bf6c517bde3780d46",
+    "inputCount": 99,
+    "changedInputs": [
+      {"path": "Legacy.Maliev.AccountingService.Api/Controllers/ReceiptControllers.cs", "previousBlob": "b83d7ac99640209d77349473707a14bbd181a808", "reviewedBlob": "402556ac0bfa06246a7eb8ebbc603a719cabd04d"},
+      {"path": "Legacy.Maliev.AccountingService.Application/Interfaces/IAccountingBoundaries.cs", "previousBlob": "69adb612f9a7904d6906ddfd4351fed3f4851bf1", "reviewedBlob": "54b39db3e6fee0085c8403740a47cc0631b08100"},
+      {"path": "Legacy.Maliev.AccountingService.Application/Models/AccountingModels.cs", "previousBlob": "0589b814e801de1e819155f2fb432ba05aeb3a94", "reviewedBlob": "bb840e073017dbe3269a32fadbecd3f17b5e3dbe"},
+      {"path": "Legacy.Maliev.AccountingService.Data/AccountingRepository.cs", "previousBlob": "32da0810710fa9051699d105903bfb8d4676f048", "reviewedBlob": "aa60bbe59bcb9e14ded92511dd005dad7e8b053c"}
+    ],
+    "unchangedInputCount": 95,
+    "unchangedInputSha256": "0ef1127aa04926a19e218b4aa75e63cdf0d1ee797108f0a51fd9e792edd3f008",
+    "scope": "Six typed source Receipt sort orders and ascending ID default; explicit PostgreSQL NULL placement and deterministic ID ties; all search, selected-empty404, financial writes and notification inputs unchanged",
+    "pagingDeviation": "Source defaults size to query count; accepted bounded service default20/max250 intentionally retained. Literal source paging-default parity is not claimed.",
+    "bindingEvidence": "Modern typed MVC binder rejects undefined999/-1 with400; no historical source HTTP execution or undefined-default guarantee claimed",
+    "independentReview": "Coordinator read complete four-input patch and immutable source controller/enum objects on 2026-10-06 and approved this unpublished witness; strict guard and seven controls unchanged",
+    "nativeAcceptance": "Pending fresh coherent candidate full660, Receipt41, Payment10, invoice316, atomic21, prospective17 plus Defaults9; no RED baseline executed"
   },
   "historicalAssertionsChanged": false,
   "sealed906Changed": false,
