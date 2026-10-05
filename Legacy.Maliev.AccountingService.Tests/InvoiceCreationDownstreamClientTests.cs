@@ -49,17 +49,18 @@ public sealed class InvoiceCreationDownstreamClientTests
     }
 
     [Fact]
-    public async Task QuotationCompletion_PreservesQuotationFieldsAndTransitionsDecision()
+    public async Task QuotationCompletion_UsesOriginalVersionAndAtomicCustomerDecision()
     {
         var handler = new SequenceHandler();
         await new InvoiceQuotationCompletionClient(Http(handler, "http://quotations/"))
-            .CompleteAsync(84, 901, Guid.Parse("4f7870e2-d349-41bb-b4cf-567450f261e9"), CancellationToken.None);
+            .CompleteAsync(84, 901, Guid.Parse("4f7870e2-d349-41bb-b4cf-567450f261e9"), new DateTime(2030, 7, 18, 0, 0, 0, DateTimeKind.Utc), CancellationToken.None);
 
-        Assert.Equal(["GET /quotations/84", "PUT /quotations/84", "PUT /quotations/84/decision"], handler.Requests);
+        Assert.Equal(["GET /quotations/84", "PUT /quotations/84/decision"], handler.Requests);
         using var update = JsonDocument.Parse(handler.Bodies[0]);
-        Assert.Equal(901, update.RootElement.GetProperty("invoiceId").GetInt32());
-        Assert.True(update.RootElement.GetProperty("accepted").GetBoolean());
-        Assert.Equal(14, update.RootElement.GetProperty("period").GetInt32());
+        Assert.Equal(901, update.RootElement.GetProperty("InvoiceId").GetInt32());
+        Assert.True(update.RootElement.GetProperty("Accepted").GetBoolean());
+        Assert.False(update.RootElement.GetProperty("EmployeeInitiated").GetBoolean());
+        Assert.Equal(["Accepted", "EmployeeInitiated", "InvoiceId"], update.RootElement.EnumerateObject().Select(value => value.Name).Order(StringComparer.Ordinal));
     }
 
     private static HttpClient Http(HttpMessageHandler handler, string baseAddress) => new(handler) { BaseAddress = new(baseAddress) };
@@ -98,7 +99,7 @@ public sealed class InvoiceCreationDownstreamClientTests
             Requests.Add($"{request.Method.Method} {request.RequestUri!.AbsolutePath}");
             if (request.Content is not null) Bodies.Add(await request.Content.ReadAsStringAsync(cancellationToken));
             if (request.Method == HttpMethod.Get)
-                return new(HttpStatusCode.OK) { Content = new StringContent("""{"customerId":42,"employeeId":7,"invoiceId":null,"period":14,"expirationDate":"2030-08-01T00:00:00Z","subtotal":1000.25,"vat":70.02,"total":1070.27,"withholdingTax":30,"currencyId":1,"comment":"note","fob":"Bangkok","shippedVia":"Courier","terms":"Net 7","accepted":null,"modifiedDate":"2030-07-18T00:00:00Z"}""", Encoding.UTF8, "application/json") };
+                return new(HttpStatusCode.OK) { Content = new StringContent("""{"id":84,"customerId":42,"employeeId":7,"invoiceId":null,"period":14,"expirationDate":"2030-08-01T00:00:00Z","subtotal":1000.25,"vat":70.02,"total":1070.27,"withholdingTax":30,"currencyId":1,"comment":"note","fob":"Bangkok","shippedVia":"Courier","terms":"Net 7","accepted":null,"modifiedDate":"2030-07-18T00:00:00Z"}""", Encoding.UTF8, "application/json") };
             return new(HttpStatusCode.OK);
         }
     }

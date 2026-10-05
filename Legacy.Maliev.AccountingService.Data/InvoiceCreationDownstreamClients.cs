@@ -34,7 +34,7 @@ public sealed class InvoiceCreationSourceClient(IHttpClientFactory clients) : II
             : CountryAsync(catalog, customer.ShippingAddress?.CountryId, cancellationToken);
         await Task.WhenAll(billingCountryTask, shippingCountryTask);
         return new(
-            new(quotation.Id, quotation.CustomerId, quotation.EmployeeId, quotation.CurrencyId, quotation.Subtotal, quotation.Vat, quotation.Total, quotation.WithholdingTax, quotation.Comment, quotation.Fob, quotation.ShippedVia, quotation.Terms, quotation.InvoiceId, quotation.SourceRequestId, quotation.SourceJourneyId),
+            new(quotation.Id, quotation.CustomerId, quotation.EmployeeId, quotation.CurrencyId, quotation.Subtotal, quotation.Vat, quotation.Total, quotation.WithholdingTax, quotation.Comment, quotation.Fob, quotation.ShippedVia, quotation.Terms, quotation.InvoiceId, quotation.SourceRequestId, quotation.SourceJourneyId, quotation.ModifiedDate),
             new(customer.Id, customer.FullName, customer.Email, customer.Mobile, customer.Telephone, customer.Fax,
                 customer.Company is null ? null : new(customer.Company.Name, customer.Company.TaxNumber, customer.Company.Registrar),
                 Address(customer.BillingAddress, await billingCountryTask), Address(customer.ShippingAddress, await shippingCountryTask)),
@@ -67,31 +67,33 @@ public sealed class InvoiceCreationSourceClient(IHttpClientFactory clients) : II
 public sealed class InvoiceQuotationCompletionClient(HttpClient httpClient) : IInvoiceQuotationCompletionClient
 {
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web) { PropertyNameCaseInsensitive = true };
-    public async Task CompleteAsync(int quotationId, int invoiceId, Guid operationId, CancellationToken cancellationToken)
+    private static readonly JsonSerializerOptions DecisionJson = new() { PropertyNamingPolicy = null };
+    public Task CompleteAsync(int quotationId, int invoiceId, Guid operationId, CancellationToken cancellationToken)
+        => CompleteAsync(quotationId, invoiceId, operationId, null, cancellationToken);
+
+    public async Task CompleteAsync(int quotationId, int invoiceId, Guid operationId, DateTime? originalModifiedDate, CancellationToken cancellationToken)
     {
+        if (originalModifiedDate is null || originalModifiedDate.Value.Kind == DateTimeKind.Local)
+            throw new InvoiceCreationConflictException("Invoice completion requires the original authoritative quotation version.");
+        if (quotationId <= 0 || invoiceId <= 0 || operationId == Guid.Empty)
+            throw new ArgumentException("Positive quotation/invoice identifiers and a stable operation UUID are required.");
         using var get = await httpClient.GetAsync($"/quotations/{quotationId}", HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         if (!get.IsSuccessStatusCode) throw new InvoiceCreationDependencyException($"QuotationService rejected invoice completion lookup with status {(int)get.StatusCode}.");
         var bytes = await ReceiptDocumentClient.ReadBoundedAsync(get.Content, 64 * 1024, "QuotationService", cancellationToken);
         var q = JsonSerializer.Deserialize<QuotationResponse>(bytes, Json) ?? throw new InvoiceCreationDependencyException("QuotationService returned invalid completion data.");
+        if (q.Id != quotationId) throw new InvoiceCreationDependencyException("QuotationService returned a mismatched completion identity.");
         if (q.InvoiceId is not null && q.InvoiceId != invoiceId) throw new InvoiceCreationConflictException("Quotation is already linked to another invoice.");
-        if (q.InvoiceId != invoiceId || q.Accepted != true)
+        using var decision = new HttpRequestMessage(HttpMethod.Put, $"/quotations/{quotationId}/decision")
         {
-            using var update = new HttpRequestMessage(HttpMethod.Put, $"/quotations/{quotationId}")
-            {
-                Content = JsonContent.Create(new { q.CustomerId, q.EmployeeId, InvoiceId = invoiceId, q.Period, q.ExpirationDate, q.Subtotal, q.Vat, q.Total, q.WithholdingTax, q.CurrencyId, q.Comment, q.Fob, q.ShippedVia, q.Terms, Accepted = true }),
-            };
-            if (q.ModifiedDate is not null) update.Headers.TryAddWithoutValidation("X-Expected-Modified-Date", new DateTimeOffset(DateTime.SpecifyKind(q.ModifiedDate.Value, DateTimeKind.Utc)).ToString("O"));
-            using var response = await httpClient.SendAsync(update, cancellationToken);
-            if (response.StatusCode == HttpStatusCode.Conflict) throw new InvoiceCreationConflictException("Quotation changed while the invoice was being created.");
-            if (!response.IsSuccessStatusCode) throw new InvoiceCreationDependencyException($"QuotationService rejected invoice linking with status {(int)response.StatusCode}.");
-        }
-        using var decision = new HttpRequestMessage(HttpMethod.Put, $"/quotations/{quotationId}/decision") { Content = JsonContent.Create(new { Accepted = true }) };
+            Content = JsonContent.Create(new { Accepted = true, EmployeeInitiated = false, InvoiceId = invoiceId }, options: DecisionJson),
+        };
+        decision.Headers.TryAddWithoutValidation("X-Expected-Modified-Date", new DateTimeOffset(DateTime.SpecifyKind(originalModifiedDate.Value, DateTimeKind.Utc)).ToString("O", System.Globalization.CultureInfo.InvariantCulture));
         decision.Headers.TryAddWithoutValidation("Idempotency-Key", operationId.ToString("D"));
         using var decided = await httpClient.SendAsync(decision, cancellationToken);
-        if (decided.StatusCode == HttpStatusCode.Conflict) throw new InvoiceCreationConflictException("Linked orders could not be transitioned to accepted.");
-        if (!decided.IsSuccessStatusCode) throw new InvoiceCreationDependencyException($"QuotationService rejected linked-order acceptance with status {(int)decided.StatusCode}.");
+        if (decided.StatusCode == HttpStatusCode.Conflict) throw new InvoiceCreationConflictException("Quotation decision conflicted or linked orders could not be transitioned to accepted. Reconciliation may be required.");
+        if (!decided.IsSuccessStatusCode) throw new InvoiceCreationDependencyException($"QuotationService rejected invoice completion with status {(int)decided.StatusCode}. Reconciliation may be required.");
     }
-    private sealed record QuotationResponse(int? CustomerId, int? EmployeeId, int? InvoiceId, int Period, DateTime ExpirationDate, decimal Subtotal, decimal Vat, decimal Total, decimal? WithholdingTax, int CurrencyId, string? Comment, string? Fob, string? ShippedVia, string? Terms, bool? Accepted, DateTime? ModifiedDate);
+    private sealed record QuotationResponse(int Id, int? InvoiceId);
 }
 
 public sealed class InvoiceCreationDocumentClient(HttpClient httpClient) : IInvoiceCreationDocumentClient

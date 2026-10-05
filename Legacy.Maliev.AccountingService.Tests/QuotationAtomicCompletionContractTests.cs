@@ -23,7 +23,7 @@ public sealed class QuotationAtomicCompletionContractTests
     {
         using var handler = new CompletionTransport();
         using var http = Http(handler);
-        await CompleteWithCurrentApiAsync(new InvoiceQuotationCompletionClient(http));
+        await CompleteWithOriginalVersionAsync(new InvoiceQuotationCompletionClient(http));
 
         Assert.Equal(["GET /quotations/84", "PUT /quotations/84/decision"], handler.Requests.Select(value => value.Route));
     }
@@ -33,7 +33,7 @@ public sealed class QuotationAtomicCompletionContractTests
     {
         using var handler = new CompletionTransport();
         using var http = Http(handler);
-        await CompleteWithCurrentApiAsync(new InvoiceQuotationCompletionClient(http));
+        await CompleteWithOriginalVersionAsync(new InvoiceQuotationCompletionClient(http));
 
         var decision = Assert.Single(handler.Requests, value => value.Route == "PUT /quotations/84/decision");
         using var json = JsonDocument.Parse(decision.Body!);
@@ -48,7 +48,7 @@ public sealed class QuotationAtomicCompletionContractTests
     {
         using var handler = new CompletionTransport { LookupVersion = OriginalVersion.AddMinutes(1) };
         using var http = Http(handler);
-        await CompleteWithCurrentApiAsync(new InvoiceQuotationCompletionClient(http));
+        await CompleteWithOriginalVersionAsync(new InvoiceQuotationCompletionClient(http));
 
         var decision = Assert.Single(handler.Requests, value => value.Route == "PUT /quotations/84/decision");
         Assert.Equal(Operation.ToString("D"), decision.Operation);
@@ -83,7 +83,7 @@ public sealed class QuotationAtomicCompletionContractTests
         store.Setup(value => value.CreateAsync(It.IsAny<Invoice>(), It.IsAny<IReadOnlyList<InvoiceOrderItem>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((Invoice invoice, IReadOnlyList<InvoiceOrderItem> _, CancellationToken _) => { invoice.Id = 901; return invoice; });
         var completion = new Mock<IInvoiceQuotationCompletionClient>();
-        completion.Setup(value => value.CompleteAsync(84, 901, Operation, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        completion.Setup(value => value.CompleteAsync(84, 901, Operation, (DateTime?)null, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
         var documents = new Mock<IInvoiceCreationDocumentClient>();
         documents.Setup(value => value.RenderAsync(It.IsAny<Invoice>(), It.IsAny<IReadOnlyList<InvoiceOrderItem>>(), It.IsAny<CancellationToken>())).ReturnsAsync([1, 2, 3]);
         var files = new Mock<IInvoiceCreationFileClient>();
@@ -143,6 +143,21 @@ public sealed class QuotationAtomicCompletionContractTests
     }
 
     [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Completion_MissingOrLocalOriginalVersionConflictsBeforeHttp(bool local)
+    {
+        using var handler = new CompletionTransport();
+        using var http = Http(handler);
+        var client = new InvoiceQuotationCompletionClient(http);
+        DateTime? version = local ? DateTime.SpecifyKind(OriginalVersion, DateTimeKind.Local) : null;
+
+        await Assert.ThrowsAsync<InvoiceCreationConflictException>(() => client.CompleteAsync(84, 901, Operation, version, CancellationToken.None));
+
+        Assert.Empty(handler.Requests);
+    }
+
+    [Theory]
     [InlineData(HttpStatusCode.NotFound)]
     [InlineData(HttpStatusCode.Forbidden)]
     [InlineData(HttpStatusCode.ServiceUnavailable)]
@@ -150,7 +165,7 @@ public sealed class QuotationAtomicCompletionContractTests
     {
         using var handler = new CompletionTransport { LookupStatus = status };
         using var http = Http(handler);
-        await Assert.ThrowsAsync<InvoiceCreationDependencyException>(() => CompleteWithCurrentApiAsync(new InvoiceQuotationCompletionClient(http)));
+        await Assert.ThrowsAsync<InvoiceCreationDependencyException>(() => CompleteWithOriginalVersionAsync(new InvoiceQuotationCompletionClient(http)));
 
         Assert.Equal("GET /quotations/84", Assert.Single(handler.Requests).Route);
     }
@@ -160,7 +175,7 @@ public sealed class QuotationAtomicCompletionContractTests
     {
         using var handler = new CompletionTransport { InvoiceId = 902 };
         using var http = Http(handler);
-        await Assert.ThrowsAsync<InvoiceCreationConflictException>(() => CompleteWithCurrentApiAsync(new InvoiceQuotationCompletionClient(http)));
+        await Assert.ThrowsAsync<InvoiceCreationConflictException>(() => CompleteWithOriginalVersionAsync(new InvoiceQuotationCompletionClient(http)));
 
         Assert.Equal("GET /quotations/84", Assert.Single(handler.Requests).Route);
     }
@@ -170,7 +185,7 @@ public sealed class QuotationAtomicCompletionContractTests
     {
         using var handler = new CompletionTransport { QuotationId = 85 };
         using var http = Http(handler);
-        await Assert.ThrowsAsync<InvoiceCreationDependencyException>(() => CompleteWithCurrentApiAsync(new InvoiceQuotationCompletionClient(http)));
+        await Assert.ThrowsAsync<InvoiceCreationDependencyException>(() => CompleteWithOriginalVersionAsync(new InvoiceQuotationCompletionClient(http)));
 
         Assert.Equal("GET /quotations/84", Assert.Single(handler.Requests).Route);
     }
@@ -183,7 +198,7 @@ public sealed class QuotationAtomicCompletionContractTests
     {
         using var handler = new CompletionTransport { LookupBody = body };
         using var http = Http(handler);
-        var failure = await Record.ExceptionAsync(() => CompleteWithCurrentApiAsync(new InvoiceQuotationCompletionClient(http)));
+        var failure = await Record.ExceptionAsync(() => CompleteWithOriginalVersionAsync(new InvoiceQuotationCompletionClient(http)));
 
         Assert.NotNull(failure);
         Assert.Equal("GET /quotations/84", Assert.Single(handler.Requests).Route);
@@ -196,7 +211,7 @@ public sealed class QuotationAtomicCompletionContractTests
     {
         using var handler = new CompletionTransport { DecisionStatus = status };
         using var http = Http(handler);
-        await Assert.ThrowsAsync<InvoiceCreationDependencyException>(() => CompleteWithCurrentApiAsync(new InvoiceQuotationCompletionClient(http)));
+        await Assert.ThrowsAsync<InvoiceCreationDependencyException>(() => CompleteWithOriginalVersionAsync(new InvoiceQuotationCompletionClient(http)));
 
         Assert.Equal(["GET /quotations/84", "PUT /quotations/84/decision"], handler.Requests.Select(value => value.Route));
     }
@@ -206,16 +221,15 @@ public sealed class QuotationAtomicCompletionContractTests
     {
         using var handler = new CompletionTransport { DecisionStatus = HttpStatusCode.Conflict };
         using var http = Http(handler);
-        await Assert.ThrowsAsync<InvoiceCreationConflictException>(() => CompleteWithCurrentApiAsync(new InvoiceQuotationCompletionClient(http)));
+        await Assert.ThrowsAsync<InvoiceCreationConflictException>(() => CompleteWithOriginalVersionAsync(new InvoiceQuotationCompletionClient(http)));
 
         Assert.Equal(["GET /quotations/84", "PUT /quotations/84/decision"], handler.Requests.Select(value => value.Route));
     }
 
-    // Explicit first-RED invocation seam, not conditional behavior: replace this call with
-    // CompleteAsync(84, 901, Operation, OriginalVersion, CancellationToken.None) when that public API exists.
-    // Keep the separate versionless compatibility test on the four-argument overload.
-    private static Task CompleteWithCurrentApiAsync(InvoiceQuotationCompletionClient client)
-        => client.CompleteAsync(84, 901, Operation, CancellationToken.None);
+    // The first RED used the then-existing four-argument call. Only this invocation advances;
+    // all assertions remain intact, and versionless compatibility is tested separately.
+    private static Task CompleteWithOriginalVersionAsync(InvoiceQuotationCompletionClient client)
+        => client.CompleteAsync(84, 901, Operation, OriginalVersion, CancellationToken.None);
 
     private static HttpClient Http(HttpMessageHandler handler) => new(handler) { BaseAddress = new("https://quotation-contract.invalid/") };
 

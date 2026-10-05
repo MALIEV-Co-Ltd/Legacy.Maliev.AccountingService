@@ -41,6 +41,8 @@ public sealed class InvoiceCreationWorkflowService(
         if (replay is not null) return replay;
 
         var snapshot = await source.GetAsync(quotationId, cancellationToken);
+        if (snapshot.Quotation.ModifiedDate is null || snapshot.Quotation.ModifiedDate.Value.Kind == DateTimeKind.Local)
+            throw new InvoiceCreationConflictException("Quotation has no valid authoritative version. Reconcile the quotation before creating an invoice.");
         var preview = Preview(snapshot, timeProvider.GetUtcNow());
         var invoiceNumber = request.InvoiceNumber.Trim();
         var existing = await store.FindByNumberAsync(invoiceNumber, cancellationToken);
@@ -65,7 +67,7 @@ public sealed class InvoiceCreationWorkflowService(
             foreach (var item in items) item.InvoiceId = invoice.Id;
         }
 
-        await quotations.CompleteAsync(quotationId, invoice.Id, operationId, cancellationToken);
+        await quotations.CompleteAsync(quotationId, invoice.Id, operationId, snapshot.Quotation.ModifiedDate, cancellationToken);
         var path = $"invoices/{invoice.Id}";
         var fileName = $"invoice_{SafeFilePart(invoice.Number)}.pdf";
         var objectName = $"{path}/{fileName}".ToLowerInvariant();

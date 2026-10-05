@@ -453,7 +453,7 @@ public sealed class InvoiceNotificationIntentAcceptanceTests
             }
             if (path == "/quotations/84/orderitems") return Json("""[{"id":1,"quotationId":84,"orderId":51,"description":"Synthetic part","quantity":1,"unitPrice":100,"subtotal":100}]""");
             if (path == "/quotations/84" && request.Method == HttpMethod.Get)
-                return Json("""{"id":84,"customerId":42,"employeeId":7,"currencyId":1,"subtotal":100,"vat":7,"total":107,"period":14,"expirationDate":"2030-01-01T00:00:00Z"}""");
+                return Json("""{"id":84,"customerId":42,"employeeId":7,"currencyId":1,"subtotal":100,"vat":7,"total":107,"modifiedDate":"2030-01-01T00:00:00","period":14,"expirationDate":"2030-01-01T00:00:00Z"}""");
             if (path == "/quotations/84" || path == "/quotations/84/decision") { Assert.Equal(HttpMethod.Put, request.Method); return Json("{}"); }
             if (path == "/customers/42") return Json("""{"id":42,"fullName":"Synthetic Customer","email":"recipient@example.invalid"}""");
             if (path == "/employees/7") return Json("""{"id":7,"fullName":"Synthetic Employee"}""");
