@@ -7,7 +7,7 @@
     },
     {
       "repository": "Legacy.Maliev.AccountingService",
-      "commit": "c1abf131d1b50b2329b21db2daf32eb1b8b4d8e6"
+      "commit": "fa190f391ba91f0c67ae20032153a1bd30d59f1b"
     },
     {
       "repository": "Legacy.Maliev.QuotationService",
@@ -23,6 +23,18 @@
     }
   ],
   "baselineEquivalent": false,
+  "producerAdvance": {
+    "previousAccounting": "c1abf131d1b50b2329b21db2daf32eb1b8b4d8e6",
+    "reviewedAccounting": "fa190f391ba91f0c67ae20032153a1bd30d59f1b",
+    "acceptedMainBaseline": "da972b07cc6851a17565833b7eaca2d1a389e33d",
+    "changedInput": "Legacy.Maliev.AccountingService.Data/AccountingRepository.cs",
+    "previousBlob": "c604385ec51733f689f6ea3fc6b37845d69a045d",
+    "reviewedBlob": "11046139435205555d396acb80a61d52e47c69f6",
+    "unchangedInputCount": 89,
+    "unchangedInputSha256": "a975cc97d98b5e611fcb042cb4f72c641610a175083082d4e0a5fc17ed2d6282",
+    "scope": "Payment literal spaces and empty selected pages only; direct selected-input equality preserves every other production/build blob",
+    "nativeAcceptance": "Pending fresh prospective execution; prior accepted graph and historical source proof remain separate"
+  },
   "historicalAssertionsChanged": false,
   "sealed906Changed": false,
   "nativeExecuted": false,
@@ -152,7 +164,7 @@
     "failed": 12,
     "skipped": 0
   },
-  "sourceValidation": {
+  "historicalSourceValidation": {
     "head": "c1abf131d1b50b2329b21db2daf32eb1b8b4d8e6",
     "fullRun": 37281312439,
     "focusedRun": 37281312013,
@@ -191,7 +203,7 @@
   "validationFiles": [
     {
       "path": ".github/workflows/atomic-protocol-validation.yml",
-      "sha256": "ed205a15353b8bbde894d6a5d64c947526f7ea47263ad7c75d4758bbfd5662eb"
+      "sha256": "28fcac74180236f6de95ed18ab39edf8ec08e4b94da2102eee01602f1162e856"
     },
     {
       "path": "scripts/verify-atomic-protocol-results.py",
