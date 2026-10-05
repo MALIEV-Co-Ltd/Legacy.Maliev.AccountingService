@@ -25,6 +25,8 @@ public sealed class InvoiceCreationAdmission
 /// <summary>Admits only the first delegated request and never replays an uncertain side effect.</summary>
 public sealed class InvoiceCreationAdmissionStore(InvoiceDbContext database)
 {
+    private static readonly UTF8Encoding StrictUtf8 = new(false, true);
+
     /// <summary>Retained V2 origin fences keep strict actor validation even after feature deactivation.</summary>
     public Task<bool> RequiresOriginValidationAsync(Guid operationId, CancellationToken cancellationToken) =>
         database.InvoiceCreationAdmissions.AsNoTracking().AnyAsync(value => value.OperationId == operationId && value.OriginIssuer != null, cancellationToken);
@@ -121,7 +123,14 @@ public sealed class InvoiceCreationAdmissionStore(InvoiceDbContext database)
     private static void ValidateInput(Guid operationId, int quotationId, InvoiceNotificationOrigin origin)
     {
         if (operationId == Guid.Empty || quotationId <= 0 || origin is null ||
-            !ValidText(origin.Issuer, 512) || !ValidText(origin.EmployeeSubject, 256) || !ValidText(origin.ServiceSubject, 128)) throw Conflict();
+            !ValidOriginText(origin.Issuer, 512) || !ValidOriginText(origin.EmployeeSubject, 256) || !ValidOriginText(origin.ServiceSubject, 128)) throw Conflict();
+    }
+
+    private static bool ValidOriginText(string? value, int maximumBytes)
+    {
+        if (!ValidText(value, maximumBytes)) return false;
+        try { return StrictUtf8.GetByteCount(value!) <= maximumBytes; }
+        catch (EncoderFallbackException) { return false; }
     }
 
     private static bool ValidText(string? value, int maximum) => !string.IsNullOrWhiteSpace(value) &&

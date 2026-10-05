@@ -12,6 +12,28 @@ public sealed class InvoiceCreationOriginAdmissionTests(InvoiceNotificationPhase
     private static readonly InvoiceNotificationOrigin Origin = new("https://auth.example.invalid", "employee:42", "service:legacy-intranet");
     private static readonly string Fingerprint = new('A', 64);
 
+    [Theory]
+    [InlineData("issuer")]
+    [InlineData("employee")]
+    [InlineData("service")]
+    [InlineData("invalid-utf16")]
+    public async Task OriginOutsideStrictUtf8Bounds_RejectsBeforeAnyAdmissionWrite(string field)
+    {
+        await using var database = await fixture.NewDatabaseAsync();
+        var store = new InvoiceCreationAdmissionStore(database);
+        var origin = field switch
+        {
+            "issuer" => Origin with { Issuer = new string('ก', 171) },
+            "employee" => Origin with { EmployeeSubject = new string('ก', 86) },
+            "service" => Origin with { ServiceSubject = new string('ก', 43) },
+            _ => Origin with { EmployeeSubject = "\ud800" },
+        };
+        await Assert.ThrowsAsync<InvoiceCreationConflictException>(() => store.AdmitAsync(
+            Guid.NewGuid(), 84, origin, Fingerprint, CancellationToken.None));
+        Assert.Empty(await database.InvoiceCreationAdmissions.AsNoTracking().ToListAsync());
+        Assert.Empty(await database.Invoices.AsNoTracking().ToListAsync());
+    }
+
     [Fact]
     public async Task AdditiveMigration_OldRowsKeepNullIssuerAndFinancialEvidence()
     {
