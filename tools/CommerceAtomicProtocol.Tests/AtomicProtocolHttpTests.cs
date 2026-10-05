@@ -311,7 +311,7 @@ public sealed class AtomicProtocolHttpTests(AccountingQuotationBaselineFixture f
             using var scope = scenario.Quotation.Services.CreateScope();
             var result = await scope.ServiceProvider.GetRequiredService<IQuotationService>().UpdateOrderItemAsync(
                 item.Id, new UpsertQuotationOrderItemRequest(row.Id, null, "Edited synthetic part", 2, 100m), null, CancellationToken.None);
-            Assert.Equal(UpdateResult.Updated, result);
+            Assert.Equal(Legacy.Maliev.QuotationService.Application.Models.UpdateResult.Updated, result);
             await using var changedDatabase = fixture.Quotation.Context();
             var unchangedParent = await changedDatabase.Quotations.AsNoTracking().SingleAsync(value => value.Id == row.Id);
             Assert.Equal(row.ModifiedDate, unchangedParent.ModifiedDate);

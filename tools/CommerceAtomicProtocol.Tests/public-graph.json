@@ -101,7 +101,7 @@
   "files": [
     {
       "path": "AtomicProtocolHttpTests.cs",
-      "sha256": "6c74f25a435c232b25a0b80cc7cf00adc2ff0d5d3c4d958145fd4f46232f344a"
+      "sha256": "bbdc8800c2cb158b44d88e5a78e19f3ac72f16a4447b3b27dec222cc2991fc98"
     },
     {
       "path": "AtomicProtocolScenario.cs",
@@ -197,5 +197,16 @@
       "path": "scripts/verify-atomic-protocol-results.py",
       "sha256": "828e77b7198cf3b397f120131f26e18a24d908426f51108584c4031ac85e0f3b"
     }
-  ]
+  ],
+  "preTestBuildReceipt": {
+    "harnessHead": "4cfcc76a203f76e82c792693edb1b13135d97aa0",
+    "actualRun": 37282240834,
+    "warnings": 0,
+    "errors": 1,
+    "testsExecuted": false,
+    "trxAvailable": false,
+    "rawAvailable": false,
+    "cause": "Ambiguous UpdateResult in child repository characterization",
+    "correction": "Explicit Quotation UpdateResult enum; producer pins and assertions unchanged"
+  }
 }
