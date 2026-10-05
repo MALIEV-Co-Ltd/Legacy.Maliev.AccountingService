@@ -179,8 +179,7 @@ public sealed class PaymentRecordHttpBoundaryTests(AccountingBoundaryHttpFixture
         Assert.Equal(HttpStatusCode.Forbidden, create.StatusCode);
         using var fileReader = fixture.Client([AccountingPermissions.FilesRead]);
         using var allowed = await fileReader.GetAsync($"/payments/{id}/files");
-        Assert.Equal(HttpStatusCode.OK, allowed.StatusCode);
-        Assert.Empty((await allowed.Content.ReadFromJsonAsync<JsonArray>())!);
+        Assert.Equal(HttpStatusCode.NotFound, allowed.StatusCode);
         Assert.Contains(fixture.LiveChecks, check => check.Permission == AccountingPermissions.FilesRead);
         Assert.Contains(fixture.LiveChecks, check => check.Permission == AccountingPermissions.FilesWrite);
         await using var database = fixture.Database();
