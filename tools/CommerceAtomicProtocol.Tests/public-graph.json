@@ -7,7 +7,7 @@
     },
     {
       "repository": "Legacy.Maliev.AccountingService",
-      "commit": "94376b1367173ce60eb083ebafa09d66b500a987"
+      "commit": "68c54823853861587db866aa194adf6844af1efb"
     },
     {
       "repository": "Legacy.Maliev.QuotationService",
@@ -113,7 +113,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "5372f2776563fbb576c3567cf020daa7d6879683e13f58886b1c581d97d082b6"
+      "sha256": "ae6b7367f539401250d6e911743f895606a39d7545aa990a9d6afc0d25a88e58"
     }
   ],
   "hashRepresentation": "Committed LF bytes",
@@ -191,7 +191,7 @@
   "validationFiles": [
     {
       "path": ".github/workflows/atomic-protocol-validation.yml",
-      "sha256": "b3f05e54d53f4e63d65eb9de00ef815c4314ed53668aee5b112b8319d7fcb115"
+      "sha256": "3616d0035c4540b2b6c67c6a0a69b840f5a8ea5da39688a6dc5f1e7961eb083c"
     },
     {
       "path": "scripts/verify-atomic-protocol-results.py",
@@ -289,18 +289,37 @@
     "coverageAcceptance": false
   },
   "invoiceConsumerSourceValidation": {
-    "head": "94376b1367173ce60eb083ebafa09d66b500a987",
-    "fullRun": 37301659686,
-    "fullPassed": 604,
-    "invoiceFocusedRun": 37301659428,
-    "invoiceFocusedPassed": 312,
-    "atomicFocusedRun": 37301659362,
+    "head": "68c54823853861587db866aa194adf6844af1efb",
+    "fullRun": 37303169718,
+    "fullExecuted": 608,
+    "fullPassed": 607,
+    "fullFailed": 1,
+    "invoiceFocusedRun": 37303169357,
+    "invoiceFocusedPassed": 316,
+    "atomicFocusedRun": 37303169412,
     "atomicFocusedPassed": 21,
     "skipped": 0,
     "buildWarnings": 0,
     "buildErrors": 0,
-    "rawSha256": "b5b5db395f6a1ea1fb30e3699d693e5771262cf2e0d3f0a534c0d6d12cd42b3f",
-    "exclusions": [],
-    "status": "Actual hosted source and focused GREEN; this successor graph and real Notification producer join require separate fresh execution."
-  }
+    "accepted": false,
+    "cause": "Matching workflow contract still asserted historical c1 producer after separately versioned graph advance.",
+    "correction": "Matching explicit contract and graph advance to compiled UTF8-corrected producer; fresh full-suite and graph acceptance remain required."
+  },
+  "invoiceConsumerSourceValidationHistory": [
+    {
+      "head": "94376b1367173ce60eb083ebafa09d66b500a987",
+      "fullRun": 37301659686,
+      "fullPassed": 604,
+      "invoiceFocusedRun": 37301659428,
+      "invoiceFocusedPassed": 312,
+      "atomicFocusedRun": 37301659362,
+      "atomicFocusedPassed": 21,
+      "skipped": 0,
+      "buildWarnings": 0,
+      "buildErrors": 0,
+      "rawSha256": "b5b5db395f6a1ea1fb30e3699d693e5771262cf2e0d3f0a534c0d6d12cd42b3f",
+      "exclusions": [],
+      "status": "Actual hosted source and focused GREEN; this successor graph and real Notification producer join require separate fresh execution."
+    }
+  ]
 }

@@ -106,3 +106,12 @@ nine Defaults cache compatibility cases remain unchanged. This version requires
 fresh hosted graph execution; source validation does not prove the Notification
 producer join, Intranet counterpart, production IAM, provider acceptance or
 deployment. Delivery intents remain disabled by default.
+
+
+The current Accounting producer pin is the compiled UTF8 origin-bound correction
+68c54823853861587db866aa194adf6844af1efb. Its actual invoice-focused316 and
+atomic-focused21 cases passed; the full run37303169718 executed608 with607 passed
+and one failed matching workflow-pin assertion. That failure is retained rather
+than called source acceptance. This successor updates the explicit workflow
+contract with the producer pin and requires fresh full-suite and graph execution.
+The 17 graph assertions and seven mutation controls remain unchanged.
