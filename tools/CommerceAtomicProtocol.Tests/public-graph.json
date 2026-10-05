@@ -7,7 +7,7 @@
     },
     {
       "repository": "Legacy.Maliev.AccountingService",
-      "commit": "efa54267b26eab8815ca5a4b3c5340d6f51aae79"
+      "commit": "f99e8154816289a8ecf63ece5b90e12aab344cf8"
     },
     {
       "repository": "Legacy.Maliev.QuotationService",
@@ -133,6 +133,22 @@
     "limits": "CreateReceiptAsync manual transaction remains a separate correctness follow-up requiring tracked-entity/idempotency/ambiguous-commit design; it is unchanged. No Redis outage, stale-fill race, arbitrary ambient transaction or provider/deployment guarantee.",
     "independentReview": "Coordinator read full four-file retry runtime/test/workflow/verifier incremental draft and token-aware correction on 2026-10-06; approved unpublished witness/final graph review before publication. Exact EF10.0.12 token overload and public Npgsql10.0.3 strategy type verified from pinned package XML. Prior graph metadata and seventeen assertions retained; guard implementation unchanged.",
     "nativeAcceptance": "Pending fresh corrected coherent full693, cache9, child24, Receipt41, Payment10, invoice316, atomic21 and prospective17 plus Defaults9. Held Payment producer not included; later combined integration requires fresh reconciled input proof and full717."
+  },
+  "summaryCatalogIdentityProducerAdvance": {
+    "previousAccounting": "efa54267b26eab8815ca5a4b3c5340d6f51aae79",
+    "reviewedAccounting": "f99e8154816289a8ecf63ece5b90e12aab344cf8",
+    "baseMain": "1427db3151a0124c0db2cc3eefb7f413b8b3aa1b",
+    "baseMainStatus": "Six native gates including full694 verified; child24 and Receipt41 could not acquire hosted runners on two attempts. Base main is not fully accepted.",
+    "inputCount": 99,
+    "changedInputs": [
+      {"path": "Legacy.Maliev.AccountingService.Data/AccountingRepository.cs", "previousBlob": "aa60bbe59bcb9e14ded92511dd005dad7e8b053c", "reviewedBlob": "8560692d5deb7c663385f373641649a7fb8aa0c4"}
+    ],
+    "unchangedInputCount": 98,
+    "unchangedInputSha256": "0f7c3584167027f5690aa372033f7cca028d3d26d86d5f3f78782434285d7c17",
+    "scope": "Resolve unique authoritative Income/Expense/Job catalog IDs and filter financial summary payments by those IDs. Preserve four summary routes' empty-current 404 before lookup and yearly detail lookup before query. No schema, collation, controller, authentication, error-payload, provider or cache policy change.",
+    "validationScope": "17 new normal fixed-clock Program/JWT/live-permission PostgreSQL HTTP cases; existing24 summary contract and6 source-window cases retained in focused47. Complete Directions/Types/Payments scalar snapshots and delegated in-memory cache operation/sentinel snapshot. No live Redis claim. Strict actual TRX definitions/testId and unique nonempty execution IDs; sixteen offline synthetic verifier controls are not native acceptance.",
+    "independentReview": "Coordinator and independent critical reviewer read complete seven-file source/runtime/regression draft plus final evidence correction on 2026-10-06. Runtime witness and exact99-input graph sequence approved. Strict producer guard seven controls and all seventeen prospective assertions remain unchanged.",
+    "nativeAcceptance": "Pending fresh coherent full711, summary47, cache9, child24, Receipt41, Payment10, invoice316, atomic21 and prospective17 plus Defaults9. ReceiptCreate and Payment read-default producer drafts are separate and held. No waiver, local .NET execution or same-head allocation retry loop."
   },
   "historicalAssertionsChanged": false,
   "sealed906Changed": false,
