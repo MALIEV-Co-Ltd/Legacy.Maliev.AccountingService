@@ -17,9 +17,16 @@ public sealed class InvoiceSourceAttributionWireTests
         var journey = Guid.Parse("28e3a736-882c-4b4e-b254-b85432d994ee");
         var quotation = new
         {
-            Id = 84, CustomerId = 42, EmployeeId = 7, InvoiceId = (int?)null,
-            Period = 14, ExpirationDate = "2030-08-01T00:00:00Z", Subtotal = 100m,
-            Vat = 7m, Total = 107m, CurrencyId = 1,
+            Id = 84,
+            CustomerId = 42,
+            EmployeeId = 7,
+            InvoiceId = (int?)null,
+            Period = 14,
+            ExpirationDate = "2030-08-01T00:00:00Z",
+            Subtotal = 100m,
+            Vat = 7m,
+            Total = 107m,
+            CurrencyId = 1,
             SourceRequestId = requestPresent ? 701 : (int?)null,
             SourceJourneyId = journeyPresent ? journey : (Guid?)null,
         };

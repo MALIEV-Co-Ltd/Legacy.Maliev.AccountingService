@@ -152,8 +152,13 @@ public sealed class PaidInvoiceSourceReadbackHttpTests(AccountingBoundaryHttpFix
 
     private static Invoice Row(int ordinal, DateTime? date) => new()
     {
-        Number = $"{Marker}{ordinal}", CustomerId = 42, IsPaid = true, PaymentDate = date,
-        Currency = "THB", Total = 10m, Comment = "SYNTHETIC-PRIVATE-COMMENT",
+        Number = $"{Marker}{ordinal}",
+        CustomerId = 42,
+        IsPaid = true,
+        PaymentDate = date,
+        Currency = "THB",
+        Total = 10m,
+        Comment = "SYNTHETIC-PRIVATE-COMMENT",
         BillingAddressRecipient = "SYNTHETIC-PRIVATE-RECIPIENT",
     };
 
