@@ -2,10 +2,12 @@ using System.Text.Json.Serialization;
 using Legacy.Maliev.AccountingService.Application.Interfaces;
 using Legacy.Maliev.AccountingService.Application.Services;
 using Legacy.Maliev.AccountingService.Api.Authorization;
+using Legacy.Maliev.AccountingService.Api;
 using Legacy.Maliev.AccountingService.Data;
 using Maliev.Aspire.ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddInvoiceNotificationV2(builder.Configuration);
 builder.AddServiceDefaults();
 builder.AddDefaultApiVersioning();
 builder.AddLegacyAuthServiceTokenExchange();

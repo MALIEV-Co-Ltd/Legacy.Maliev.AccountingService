@@ -62,7 +62,7 @@ public sealed record InvoiceCreationSourceSnapshot(InvoiceCreationQuotation Quot
 public sealed record InvoiceCreationStoredFile(string Bucket, string ObjectName);
 
 public enum InvoiceCreationState { Completed, Reconciled }
-public enum InvoiceCreationEmailState { NotRequested, Delivered, ExplicitRetryRequired }
+public enum InvoiceCreationEmailState { NotRequested = 0, Delivered = 1, ExplicitRetryRequired = 2, ProviderAccepted = 3 }
 public sealed record InvoiceCreationResult(int InvoiceId, InvoiceCreationState State, InvoiceCreationEmailState EmailState, string? ProviderMessageId, InvoiceCreationStoredFile StoredFile);
 
 public sealed class InvoiceCreationNotFoundException(string message) : Exception(message);
