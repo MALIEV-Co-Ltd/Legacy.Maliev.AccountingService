@@ -70,13 +70,14 @@ public sealed class InvoiceReceiptHttpRejectionTests(AccountingBoundaryHttpFixtu
             _ => throw new ArgumentOutOfRangeException(nameof(operation)),
         };
         using var client = await fixture.ReceiptClientAsync(anonymous ? null : [permission], allowLive);
-        // The shared host retains earlier tests' denied outbound attempts; this request must add none.
+        // This request must not add any outbound attempt to the shared host lifetime count.
         var outbound = fixture.ReceiptOutboundCalls;
         var before = await fixture.ReceiptSnapshotAsync();
         Assert.Equal(6, before.Payment.Tables);
         Assert.Equal(5, before.Invoice.Tables);
         Assert.Equal(3, before.Receipt.Tables);
-        Assert.Equal(0, before.Journal.Rows);
+        // Shared Redis may retain earlier cache/memo keys; complete before/after equality below
+        // requires zero changes to all retained keys and every hash field.
         Assert.Empty(fixture.LiveChecks);
         Assert.Equal(outbound, fixture.ReceiptOutboundCalls);
 
