@@ -25,6 +25,8 @@ using Moq;
 using Npgsql;
 using StackExchange.Redis;
 using Testcontainers.PostgreSql;
+using Legacy.Maliev.AccountingService.Api.Authorization;
+using Legacy.Maliev.AccountingService.Application.Models;
 
 namespace Legacy.Maliev.AccountingService.Tests.Fixtures;
 
@@ -51,6 +53,26 @@ public sealed class AccountingBoundaryHttpFixture : IAsyncLifetime
 
     public ConcurrentQueue<(string Subject, string Permission)> LiveChecks { get; } = new();
     public ConcurrentQueue<string> FailureMetadata { get; } = new();
+    public string AuthorityIssuer => Issuer;
+
+    // Signed controlled issuer proof exercises Accounting's real verifier, not the Auth mint/session boundary.
+    public string ReceiptCompletionCapability(InvoiceFinancialOwnership ownership, int issuedOffsetSeconds = 0, bool unbound = false)
+    {
+        var issued = DateTime.UtcNow.AddSeconds(issuedOffsetSeconds);
+        var claims = new List<Claim>
+        {
+            new("sub", ownership.EmployeeSubject), new("jti", Guid.NewGuid().ToString("D")),
+            new("iat", new DateTimeOffset(issued).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
+            new("azp", ownership.RequesterSubject), new("executor", "service:legacy-accounting"),
+            new("scope", InvoiceCompletionCapabilityVerifier.Scope), new("quotation_id", ownership.QuotationId.ToString()),
+            new("operation_id", ownership.OperationId.ToString("D")),
+        };
+        if (!unbound) claims.AddRange([
+            new("invoice_id", ownership.InvoiceId.ToString()), new("quotation_version", ownership.OriginalQuotationVersion),
+            new("financial_binding", ownership.FinancialBinding), new("financial_binding_version", InvoiceCompletionCapabilityVerifier.BindingVersion)]);
+        return new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(Issuer, InvoiceCompletionCapabilityVerifier.Audience,
+            claims, issued, issued.AddSeconds(120), new SigningCredentials(new RsaSecurityKey(rsa), SecurityAlgorithms.RsaSha256)));
+    }
     private SummaryCacheObserver? summaryCache;
 
     public async Task<string> SummaryCacheSnapshotAsync()
@@ -147,6 +169,28 @@ public sealed class AccountingBoundaryHttpFixture : IAsyncLifetime
     }
 
     public sealed record PhysicalState(int Tables, int Rows, string Digest);
+
+    // Normal receipt host/JWT/live-IAM pipeline; only signed synthetic actor/grants vary.
+    public async Task<HttpClient> ReceiptActorClientAsync(string subject, string[] permissions, bool allowLive = true,
+        string? identityKind = "service", IEnumerable<Claim>? additionalClaims = null)
+    {
+        var client = await ReceiptClientAsync(null);
+        grants[subject] = allowLive ? new HashSet<string>(permissions, StringComparer.Ordinal) : [];
+        var now = DateTime.UtcNow;
+        var claims = new List<Claim>
+        {
+            new("sub", subject),
+            new("iat", new DateTimeOffset(now).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
+            new("jti", Guid.NewGuid().ToString("D")),
+        };
+        if (identityKind is not null) claims.Add(new("identity_kind", identityKind));
+        claims.AddRange(permissions.Select(permission => new Claim("permissions", permission)));
+        if (additionalClaims is not null) claims.AddRange(additionalClaims);
+        var token = new JwtSecurityToken(Issuer, Audience, claims, now.AddSeconds(-5), now.AddMinutes(5),
+            new SigningCredentials(new RsaSecurityKey(rsa), SecurityAlgorithms.RsaSha256));
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", new JwtSecurityTokenHandler().WriteToken(token));
+        return client;
+    }
     public sealed record ReceiptBoundaryState(PhysicalState Payment, PhysicalState Invoice, PhysicalState Receipt,
         PhysicalState Journal);
 

@@ -12,7 +12,16 @@ public sealed class InvoiceCreationStore(InvoiceDbContext context, TimeProvider 
 {
     public Task<Invoice?> FindByNumberAsync(string invoiceNumber, CancellationToken cancellationToken) => context.Invoices.AsNoTracking().SingleOrDefaultAsync(value => value.Number == invoiceNumber, cancellationToken);
 
-    public async Task<Invoice> CreateAsync(Invoice invoice, IReadOnlyList<InvoiceOrderItem> items, CancellationToken cancellationToken)
+    public Task<Invoice> CreateAsync(Invoice invoice, IReadOnlyList<InvoiceOrderItem> items, CancellationToken cancellationToken) =>
+        CreateCoreAsync(invoice, items, null, cancellationToken);
+
+    /// <summary>Commits invoice, items and verified ownership together; unknown acknowledgement never retries creation.</summary>
+    public Task<Invoice> CreateAsync(Invoice invoice, IReadOnlyList<InvoiceOrderItem> items,
+        InvoiceFinancialCommitContext authority, CancellationToken cancellationToken) =>
+        CreateCoreAsync(invoice, items, authority, cancellationToken);
+
+    private async Task<Invoice> CreateCoreAsync(Invoice invoice, IReadOnlyList<InvoiceOrderItem> items,
+        InvoiceFinancialCommitContext? authority, CancellationToken cancellationToken)
     {
         var options = (DbContextOptions<InvoiceDbContext>)context.GetService<IDbContextOptions>();
         var strategy = context.Database.CreateExecutionStrategy();
@@ -30,11 +39,16 @@ public sealed class InvoiceCreationStore(InvoiceDbContext context, TimeProvider 
             {
                 owned = new InvoiceDbContext(options);
                 transaction = await owned.Database.BeginTransactionAsync(cancellationToken);
+                if (authority is not null)
+                    await new InvoiceCreationAdmissionStore(owned).ValidateOriginAsync(authority.OperationId,
+                        authority.QuotationId, authority.Origin, true, cancellationToken);
                 owned.Invoices.Add(invoice);
                 await owned.SaveChangesAsync(cancellationToken);
                 foreach (var item in items) item.InvoiceId = invoice.Id;
                 owned.Items.AddRange(items);
                 await owned.SaveChangesAsync(cancellationToken);
+                if (authority is not null)
+                    await InvoiceFinancialOwnershipStore.RetainAsync(owned, invoice.Id, authority, cancellationToken);
                 commitSubmitted = true;
                 await transaction.CommitAsync(cancellationToken);
             }
