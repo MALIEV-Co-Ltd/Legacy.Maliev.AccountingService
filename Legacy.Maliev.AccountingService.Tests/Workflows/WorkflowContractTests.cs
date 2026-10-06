@@ -18,6 +18,7 @@ public sealed class WorkflowContractTests
     {
         WorkflowContractValidator.Validate(Workflow);
         AssertMutationRejected("python3 -B scripts/verify-employee-completion.py runner-results --full", "echo omitted native employee gate");
+        AssertMutationRejected("python3 -B scripts/verify-file-metadata.py runner-results --full", "echo omitted native file metadata gate");
     }
 
     [Fact]
@@ -307,9 +308,9 @@ internal static partial class WorkflowContractValidator
         RejectDuplicatedValidationActionsAndCommands(jobs);
 
         var steps = RequireSequence(validateJob, "steps");
-        if (steps.Children.Count != 7)
+        if (steps.Children.Count != 8)
         {
-            throw new InvalidOperationException("Validate job must contain four validation and three exact evidence steps.");
+            throw new InvalidOperationException("Validate job must contain four validation and four exact evidence steps.");
         }
 
         var environment = RequireMapping(validateJob, "env");
@@ -336,9 +337,16 @@ internal static partial class WorkflowContractValidator
         {
             throw new InvalidOperationException("Employee gate must contain only name and run.");
         }
-        RequireScalarValue(employeeGate, "name", "Verify full 1057 executions and employee inventory");
+        RequireScalarValue(employeeGate, "name", "Verify full 1103 executions and employee inventory");
         RequireScalarValue(employeeGate, "run", "python3 -B scripts/verify-employee-completion.py runner-results --full");
-        var evidence = RequireMapping(steps.Children[6], "evidence upload");
+        var fileGate = RequireMapping(steps.Children[6], "file metadata execution gate");
+        if (fileGate.Children.Count != 2)
+        {
+            throw new InvalidOperationException("File metadata gate must contain only name and run.");
+        }
+        RequireScalarValue(fileGate, "name", "Verify full 1103 executions and file metadata inventory");
+        RequireScalarValue(fileGate, "run", "python3 -B scripts/verify-file-metadata.py runner-results --full");
+        var evidence = RequireMapping(steps.Children[7], "evidence upload");
         if (evidence.Children.Count != 4)
         {
             throw new InvalidOperationException("Evidence upload must contain exactly name, if, uses and with.");

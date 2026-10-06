@@ -1,0 +1,19 @@
+{
+  "forecast": 46,
+  "acceptedBaseline": 1057,
+  "fullForecast": 1103,
+  "base": "85e4d574c079f25e0834c7c92b27a6d5bdd7f828",
+  "methods": {
+    "Legacy.Maliev.AccountingService.Tests.InvoiceReceiptFileMetadataMigrationTests.RuntimeModelMatchesSnapshotAndExactSourceFileMetadata": 2,
+    "Legacy.Maliev.AccountingService.Tests.InvoiceReceiptFileMetadataMigrationTests.UpgradeUsesUtf16BoundaryAndNeverChangesRetainedRows": 12,
+    "Legacy.Maliev.AccountingService.Tests.InvoiceReceiptFileMetadataMigrationTests.HistoricalNullsBlockAtomicallyWithoutReconciliation": 6,
+    "Legacy.Maliev.AccountingService.Tests.InvoiceReceiptFileMetadataMigrationTests.UnexpectedPreimageOrConflictingCheckRefusesChanges": 4,
+    "Legacy.Maliev.AccountingService.Tests.InvoiceReceiptFileMetadataMigrationTests.WriterFenceTimesOutAndReleasesItsFailedMigrationTransaction": 2,
+    "Legacy.Maliev.AccountingService.Tests.InvoiceReceiptFileMetadataMigrationTests.EmptyMetadataRemainsValidInStorageAndDownOnlyRelaxesNewConstraints": 2,
+    "Legacy.Maliev.AccountingService.Tests.InvoiceReceiptFileMetadataMigrationTests.StatementDeadlineRollsBackOwnedDdlAndRetainsHistory": 2,
+    "Legacy.Maliev.AccountingService.Tests.InvoiceReceiptFileMetadataHttpTests.Source50UnitLiteralCreateReadAndReplayKeepsOneOwnedRow": 6,
+    "Legacy.Maliev.AccountingService.Tests.InvoiceReceiptFileMetadataHttpTests.OversizedCreateKeepsPinnedOpaqueProviderFailureAndCannotSeedSuccessMemo": 4,
+    "Legacy.Maliev.AccountingService.Tests.InvoiceReceiptFileMetadataHttpTests.RejectedFullPutPreservesRowsParentAndPrimedFileCache": 6
+  },
+  "status": "Source forecast only; zero native executions; actual counts required by exact evidence gates"
+}
