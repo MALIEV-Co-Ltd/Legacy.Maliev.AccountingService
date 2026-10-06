@@ -81,7 +81,7 @@ public sealed class InvoiceEmployeeQuotationCompletionClientTests
         var handler = new Handler([new(HttpStatusCode.NotFound), null, Response(Receipt())]);
         using var http = Http(handler);
         Assert.Equal("Completed", (await new InvoiceEmployeeQuotationCompletionClient(http).CompleteAsync(Ownership, Proof, CancellationToken.None)).State);
-        Assert.Single(handler.Calls.Where(value => value.Method == HttpMethod.Put));
+        Assert.Single(handler.Calls, value => value.Method == HttpMethod.Put);
         Assert.Equal(3, handler.Calls.Count);
     }
 
@@ -92,7 +92,7 @@ public sealed class InvoiceEmployeeQuotationCompletionClientTests
         using var http = Http(handler);
         await Assert.ThrowsAsync<InvoiceCreationUnavailableException>(() =>
             new InvoiceEmployeeQuotationCompletionClient(http).CompleteAsync(Ownership, Proof, CancellationToken.None));
-        Assert.Single(handler.Calls.Where(value => value.Method == HttpMethod.Put));
+        Assert.Single(handler.Calls, value => value.Method == HttpMethod.Put);
         Assert.Equal(3, handler.Calls.Count);
     }
 

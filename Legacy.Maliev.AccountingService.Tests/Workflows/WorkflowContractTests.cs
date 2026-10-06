@@ -93,7 +93,7 @@ public sealed class WorkflowContractTests
         Assert.Contains("python3 scripts/verify-atomic-protocol-results.py atomic-results", source, StringComparison.Ordinal);
         Assert.True(source.IndexOf("Require current Accounting production", StringComparison.Ordinal)
                     < source.IndexOf("Validate prospective protocol graph", StringComparison.Ordinal));
-        Assert.Contains("ref: 9d3c1b9b3e8f4ddf8ae5c6bb6387b036f7116dad", source, StringComparison.Ordinal);
+        Assert.Contains("ref: 7d7ca52ef07ebf01f774f9765ea2b3526b012b48", source, StringComparison.Ordinal);
     }
 
     [Fact]

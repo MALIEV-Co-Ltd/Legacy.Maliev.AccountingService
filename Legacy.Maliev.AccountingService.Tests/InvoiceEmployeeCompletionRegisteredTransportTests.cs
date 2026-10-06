@@ -176,7 +176,8 @@ public sealed class InvoiceEmployeeCompletionRegisteredTransportTests
                 services.PostConfigureAll<HttpClientFactoryOptions>(options => options.HttpMessageHandlerBuilderActions.Add(builder =>
                 {
                     var clientName = legacyNotification ? nameof(IInvoiceCreationNotificationClient) : nameof(IInvoiceEmployeeQuotationCompletionClient);
-                    if (!builder.Name.Contains(clientName, StringComparison.Ordinal)) return;
+                    var registeredName = builder.Name;
+                    if (registeredName is null || !registeredName.Contains(clientName, StringComparison.Ordinal)) return;
                     redirectsEnabled = builder.PrimaryHandler switch
                     {
                         HttpClientHandler handler => handler.AllowAutoRedirect,
