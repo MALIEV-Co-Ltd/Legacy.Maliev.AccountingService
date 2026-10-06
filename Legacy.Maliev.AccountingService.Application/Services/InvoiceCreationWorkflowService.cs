@@ -103,8 +103,11 @@ public sealed class InvoiceCreationWorkflowService(
                 {
                     var delivery = await invoiceNotifications.SendAsync(quotationId, operationId, origin, recipient.Customer.Email,
                         recipient.Customer.FullName, financial.Invoice, pdf, cancellationToken);
-                    result = result with { EmailState = delivery.ProviderAccepted ? InvoiceCreationEmailState.ProviderAccepted : InvoiceCreationEmailState.ExplicitRetryRequired,
-                        ProviderMessageId = delivery.ProviderMessageId };
+                    result = result with
+                    {
+                        EmailState = delivery.ProviderAccepted ? InvoiceCreationEmailState.ProviderAccepted : InvoiceCreationEmailState.ExplicitRetryRequired,
+                        ProviderMessageId = delivery.ProviderMessageId
+                    };
                 }
                 else
                 {

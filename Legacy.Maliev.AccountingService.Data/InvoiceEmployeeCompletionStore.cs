@@ -139,8 +139,10 @@ public sealed class InvoiceEmployeeCompletionStore(InvoiceDbContext database) : 
                     !phase.StoredFile.ObjectName.StartsWith($"invoices/{ownership.InvoiceId}/", StringComparison.Ordinal)) throw Conflict();
                 Exact(document.RootElement.GetProperty("StoredFile"), ["Bucket", "ObjectName"]);
                 if (phase.State == "Completed")
-                { if (phase.Result is null || phase.Result.EmailState == InvoiceCreationEmailState.ExplicitRetryRequired ||
-                    ParseResult(document.RootElement.GetProperty("Result").GetRawText(), phase) != phase.Result) throw Conflict(); }
+                {
+                    if (phase.Result is null || phase.Result.EmailState == InvoiceCreationEmailState.ExplicitRetryRequired ||
+                        ParseResult(document.RootElement.GetProperty("Result").GetRawText(), phase) != phase.Result) throw Conflict();
+                }
                 else if (phase.Result is not null) throw Conflict();
             }
             return phase;
