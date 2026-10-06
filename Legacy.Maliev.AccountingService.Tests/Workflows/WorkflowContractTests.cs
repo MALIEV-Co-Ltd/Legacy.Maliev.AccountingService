@@ -17,6 +17,7 @@ public sealed class WorkflowContractTests
     public void BuildAndTest_SatisfiesStructuralContract()
     {
         WorkflowContractValidator.Validate(Workflow);
+        AssertMutationRejected("python3 -B scripts/verify-employee-completion.py runner-results --full", "echo omitted native employee gate");
     }
 
     [Fact]
@@ -306,9 +307,9 @@ internal static partial class WorkflowContractValidator
         RejectDuplicatedValidationActionsAndCommands(jobs);
 
         var steps = RequireSequence(validateJob, "steps");
-        if (steps.Children.Count != 6)
+        if (steps.Children.Count != 7)
         {
-            throw new InvalidOperationException("Validate job must contain four validation and two evidence steps.");
+            throw new InvalidOperationException("Validate job must contain four validation and three exact evidence steps.");
         }
 
         var environment = RequireMapping(validateJob, "env");
@@ -330,7 +331,14 @@ internal static partial class WorkflowContractValidator
 
         RequireScalarValue(gate, "name", "Gate owned production coverage");
         RequireScalarValue(gate, "run", "python3 scripts/verify-runner-coverage.py runner-results");
-        var evidence = RequireMapping(steps.Children[5], "evidence upload");
+        var employeeGate = RequireMapping(steps.Children[5], "employee execution gate");
+        if (employeeGate.Children.Count != 2)
+        {
+            throw new InvalidOperationException("Employee gate must contain only name and run.");
+        }
+        RequireScalarValue(employeeGate, "name", "Verify full 1057 executions and employee inventory");
+        RequireScalarValue(employeeGate, "run", "python3 -B scripts/verify-employee-completion.py runner-results --full");
+        var evidence = RequireMapping(steps.Children[6], "evidence upload");
         if (evidence.Children.Count != 4)
         {
             throw new InvalidOperationException("Evidence upload must contain exactly name, if, uses and with.");

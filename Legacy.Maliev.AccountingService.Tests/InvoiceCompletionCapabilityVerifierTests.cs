@@ -125,12 +125,21 @@ public sealed class InvoiceCompletionCapabilityVerifierTests : IDisposable
 
     private Dictionary<string, object> Payload() => new()
     {
-        ["iss"] = receipt.OriginIssuer, ["aud"] = InvoiceCompletionCapabilityVerifier.Audience,
-        ["sub"] = receipt.EmployeeSubject, ["jti"] = Guid.NewGuid().ToString("D"),
-        ["iat"] = now.ToUnixTimeSeconds(), ["nbf"] = now.ToUnixTimeSeconds(), ["exp"] = now.ToUnixTimeSeconds() + 120,
-        ["azp"] = receipt.RequesterSubject, ["executor"] = "service:legacy-accounting", ["scope"] = InvoiceCompletionCapabilityVerifier.Scope,
-        ["quotation_id"] = "84", ["operation_id"] = receipt.OperationId.ToString("D"), ["invoice_id"] = "901",
-        ["quotation_version"] = receipt.OriginalQuotationVersion, ["financial_binding"] = receipt.FinancialBinding,
+        ["iss"] = receipt.OriginIssuer,
+        ["aud"] = InvoiceCompletionCapabilityVerifier.Audience,
+        ["sub"] = receipt.EmployeeSubject,
+        ["jti"] = Guid.NewGuid().ToString("D"),
+        ["iat"] = now.ToUnixTimeSeconds(),
+        ["nbf"] = now.ToUnixTimeSeconds(),
+        ["exp"] = now.ToUnixTimeSeconds() + 120,
+        ["azp"] = receipt.RequesterSubject,
+        ["executor"] = "service:legacy-accounting",
+        ["scope"] = InvoiceCompletionCapabilityVerifier.Scope,
+        ["quotation_id"] = "84",
+        ["operation_id"] = receipt.OperationId.ToString("D"),
+        ["invoice_id"] = "901",
+        ["quotation_version"] = receipt.OriginalQuotationVersion,
+        ["financial_binding"] = receipt.FinancialBinding,
         ["financial_binding_version"] = InvoiceCompletionCapabilityVerifier.BindingVersion,
     };
     private string Sign(Dictionary<string, object> payload) => SignJson(JsonSerializer.Serialize(payload), rsa);

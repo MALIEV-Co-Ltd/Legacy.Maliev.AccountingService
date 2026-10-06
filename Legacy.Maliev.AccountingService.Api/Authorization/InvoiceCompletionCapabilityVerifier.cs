@@ -42,9 +42,14 @@ public sealed class InvoiceCompletionCapabilityVerifier(IConfiguration configura
             new JwtSecurityTokenHandler { MapInboundClaims = false, MaximumTokenSizeInBytes = 16384 }.ValidateToken(bearer,
                 new TokenValidationParameters
                 {
-                    ValidateIssuerSigningKey = true, IssuerSigningKey = key, RequireSignedTokens = true,
-                    ValidAlgorithms = [SecurityAlgorithms.RsaSha256], ValidateIssuer = true, ValidIssuer = issuer,
-                    ValidateAudience = true, ValidAudience = Audience,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = key,
+                    RequireSignedTokens = true,
+                    ValidAlgorithms = [SecurityAlgorithms.RsaSha256],
+                    ValidateIssuer = true,
+                    ValidIssuer = issuer,
+                    ValidateAudience = true,
+                    ValidAudience = Audience,
                     // Numeric payload checks below use the injected clock with no post-expiry grace.
                     ValidateLifetime = false,
                 }, out var validated);
