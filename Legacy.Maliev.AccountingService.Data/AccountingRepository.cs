@@ -63,6 +63,9 @@ public sealed class AccountingRepository(
         return item;
     }
 
+    public Task<bool> ExistsAsync<T>(int id, CancellationToken cancellationToken) where T : class =>
+        ContextFor<T>().Set<T>().AsNoTracking().AnyAsync(item => EF.Property<int>(item, "Id") == id, cancellationToken);
+
     public async Task<IReadOnlyList<T>> ListAsync<T>(CancellationToken cancellationToken) where T : class =>
         await ContextFor<T>().Set<T>().AsNoTracking()
             .OrderBy(item => EF.Property<int>(item, "Id"))

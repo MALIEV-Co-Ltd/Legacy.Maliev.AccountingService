@@ -76,7 +76,12 @@ public sealed class OrderItemsController(IAccountingService service, IIdempotenc
 public sealed class FilesController(IAccountingService service, IIdempotencyStore idempotency) : CrudController<InvoiceFile>(service, idempotency)
 {
     [HttpPost("/invoices/{invoiceId:int}/files"), RequirePermission(AccountingPermissions.FilesWrite, RequireLiveCheck = true)]
-    public Task<ActionResult<InvoiceFile>> CreateInvoiceFileEntryAsync(int invoiceId, string bucket, string objectName, [FromHeader(Name = "Idempotency-Key")] string? key, CancellationToken cancellationToken) => Create("invoice-files", new InvoiceFile { InvoiceId = invoiceId, Bucket = bucket, ObjectName = objectName }, "GetInvoiceFile", new { invoiceFileId = 0 }, key, cancellationToken);
+    public async Task<ActionResult<InvoiceFile>> CreateInvoiceFileEntryAsync(int invoiceId, string bucket, string objectName, [FromHeader(Name = "Idempotency-Key")] string? key, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrEmpty(bucket) || string.IsNullOrEmpty(objectName)) return BadRequest();
+        if (!await Service.ExistsAsync<Domain.Invoice.Invoice>(invoiceId, cancellationToken)) return NotFound();
+        return await Create("invoice-files", new InvoiceFile { InvoiceId = invoiceId, Bucket = bucket, ObjectName = objectName }, "GetInvoiceFile", new { invoiceFileId = 0 }, key, cancellationToken);
+    }
     [HttpDelete("{invoiceFileId:int}"), RequirePermission(AccountingPermissions.FilesDelete, RequireLiveCheck = true)]
     public Task<IActionResult> DeleteInvoiceFileAsync(int invoiceFileId, CancellationToken cancellationToken) => Delete(invoiceFileId, cancellationToken);
     [HttpGet("{invoiceFileId:int}", Name = "GetInvoiceFile"), RequirePermission(AccountingPermissions.FilesRead, RequireLiveCheck = true)]
