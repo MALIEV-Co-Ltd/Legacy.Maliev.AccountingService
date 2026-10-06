@@ -7,7 +7,7 @@
     },
     {
       "repository": "Legacy.Maliev.AccountingService",
-      "commit": "794ab16d29646bf74b598686fcfa96998be66b43"
+      "commit": "2102aa6bc408636c60d2bc71ab7c89c0dd05a292"
     },
     {
       "repository": "Legacy.Maliev.QuotationService",
@@ -862,5 +862,59 @@
     "employeeActualProducerJoinProven": false,
     "previousHistoryPreserved": true,
     "productionTokenSequenceUnchanged": true
+  },
+  "fileMetadataOwnProducerSourceAdvance": {
+    "previousAccounting": "794ab16d29646bf74b598686fcfa96998be66b43",
+    "reviewedAccounting": "2102aa6bc408636c60d2bc71ab7c89c0dd05a292",
+    "acceptedMainBaseline": "85e4d574c079f25e0834c7c92b27a6d5bdd7f828",
+    "previousInputCount": 109,
+    "inputCount": 113,
+    "changedInputs": [
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/AccountingDbContexts.cs",
+        "previousObject": "100644 blob ce98be43e5535a89e9f37cdef9bd005e30beb0b3",
+        "reviewedObject": "100644 blob dd49e84b2c3fd9a35d04b4356271aaa41e22c698"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/20261006160000_RequireFileMetadata.Designer.cs",
+        "previousObject": null,
+        "reviewedObject": "100644 blob 5a7b02e37c7f2e6c1483c4f5c7930e12727e5fec"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/20261006160000_RequireFileMetadata.cs",
+        "previousObject": null,
+        "reviewedObject": "100644 blob c00034589bc63d1fbaa870c71bb75de16dd799b6"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/InvoiceDbContextModelSnapshot.cs",
+        "previousObject": "100644 blob 86649a1c119e05402d4f1c84008e15a4cfb6a0b6",
+        "reviewedObject": "100644 blob c45762111bcdc0c9eacd1c2087dbedf12cbe8382"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/Migrations/Receipt/20261006160000_RequireFileMetadata.Designer.cs",
+        "previousObject": null,
+        "reviewedObject": "100644 blob 23e6c9e9dd475b8497c51afb729d0c7f62178056"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/Migrations/Receipt/20261006160000_RequireFileMetadata.cs",
+        "previousObject": null,
+        "reviewedObject": "100644 blob b83889c90dcfd591bd4fe5d539adc5342882c6cc"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/Migrations/Receipt/ReceiptDbContextModelSnapshot.cs",
+        "previousObject": "100644 blob 9ff814a5e20fbdc96330e3b125c4381183eefd80",
+        "reviewedObject": "100644 blob 976cc64be9b5474d05efb48a4fdd69c95e8f9b7b"
+      }
+    ],
+    "unchangedInputCount": 106,
+    "unchangedInputSha256": "f7af354c94133280378dddab2dea6851ea54530ba423699d22967d2c74ea2013",
+    "digestSerialization": "UTF8 compact JSON sorted keys mapping path to full Git ls-tree metadata",
+    "review": "Root full15 v5 source and causal exact HTTP response baselines cleared; private source-only witness",
+    "nativeAcceptance": "Pending exact changed-head build0/focus46/full1103/raw/static; previous accepted85 actual1057 retained",
+    "peerPinsAdvanced": false,
+    "employeeActualProducerJoinProven": false,
+    "previousHistoryPreserved": true,
+    "producerGuardRelaxed": false,
+    "ddlOrDeploymentPerformed": false
   }
 }

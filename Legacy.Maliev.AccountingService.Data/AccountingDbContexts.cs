@@ -148,6 +148,10 @@ public sealed class InvoiceDbContext(DbContextOptions<InvoiceDbContext> options)
             .HasForeignKey(value => value.InvoiceId).OnDelete(DeleteBehavior.NoAction).HasConstraintName("FK_OrderItem_Invoice");
         modelBuilder.Entity<InvoiceFile>().HasOne(value => value.Invoice).WithMany(value => value.InvoiceFiles)
             .HasForeignKey(value => value.InvoiceId).OnDelete(DeleteBehavior.NoAction).HasConstraintName("FK_InvoiceFile_Invoice");
+        modelBuilder.Entity<InvoiceFile>().Property(value => value.Bucket).IsRequired().HasMaxLength(50).HasColumnType("text");
+        modelBuilder.Entity<InvoiceFile>().Property(value => value.ObjectName).IsRequired();
+        modelBuilder.Entity<InvoiceFile>().ToTable("InvoiceFile", table => table.HasCheckConstraint(
+            "CK_InvoiceFile_BucketLength", FileMetadataConstraints.BucketLengthSql));
     }
 }
 
@@ -175,7 +179,20 @@ public sealed class ReceiptDbContext(DbContextOptions<ReceiptDbContext> options)
             .HasForeignKey(value => value.ReceiptId).OnDelete(DeleteBehavior.NoAction).HasConstraintName("FK_OrderItem_Receipt");
         modelBuilder.Entity<ReceiptFile>().HasOne(value => value.Receipt).WithMany(value => value.ReceiptFile)
             .HasForeignKey(value => value.ReceiptId).OnDelete(DeleteBehavior.NoAction).HasConstraintName("FK_ReceiptFile_Receipt");
+        modelBuilder.Entity<ReceiptFile>().Property(value => value.Bucket).IsRequired().HasMaxLength(50).HasColumnType("text");
+        modelBuilder.Entity<ReceiptFile>().Property(value => value.ObjectName).IsRequired();
+        modelBuilder.Entity<ReceiptFile>().ToTable("ReceiptFile", table => table.HasCheckConstraint(
+            "CK_ReceiptFile_BucketLength", FileMetadataConstraints.BucketLengthSql));
     }
+}
+
+internal static class FileMetadataConstraints
+{
+    // Source nvarchar(50) counts UTF-16 units. Keep text storage and count supplementary
+    // characters twice, independent of the database's locale; never truncate historical data.
+    internal const string BucketLengthSql = """
+        char_length("Bucket") + char_length(regexp_replace("Bucket" COLLATE "C", U&'[\0001-\FFFF]', '', 'g')) <= 50
+        """;
 }
 
 file static class ModelRules

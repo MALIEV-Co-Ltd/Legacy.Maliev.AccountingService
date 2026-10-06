@@ -1,7 +1,7 @@
 {
   "forecast": 168,
   "baseline": 889,
-  "fullForecast": 1057,
+  "fullForecast": 1103,
   "methods": {
     "Legacy.Maliev.AccountingService.Tests.InvoiceFinancialOwnershipPostgresTests.CommitRetainsActualComputedItemsWithoutNotificationCompletion": 1,
     "Legacy.Maliev.AccountingService.Tests.InvoiceFinancialOwnershipPostgresTests.InvalidRetainedAuthorityLeavesNoInvoiceItemsOrOwnership": 7,
@@ -65,5 +65,11 @@
     "Legacy.Maliev.AccountingService.Tests.InvoiceCreationWorkflowTests.EmployeePrepareUnknownAcknowledgementReadsCommittedOwnershipBeforeAnyRecreation": 1,
     "Legacy.Maliev.AccountingService.Tests.InvoiceCreationWorkflowTests.EmployeePrepareUnboundSameNumberRefusesDespiteMatchingCustomerAndTotal": 1,
     "Legacy.Maliev.AccountingService.Tests.InvoiceCreationWorkflowTests.LegacyCustomerByNumberCannotBypassRetainedEmployeeFinancialFence": 1
+  },
+  "fileMetadataSourceAdvanceForecast": {
+    "acceptedFullBaseline": 1057,
+    "additionalCases": 46,
+    "base": "85e4d574c079f25e0834c7c92b27a6d5bdd7f828",
+    "nativeAcceptance": "Pending source review and exact native46/1103 gates"
   }
 }
