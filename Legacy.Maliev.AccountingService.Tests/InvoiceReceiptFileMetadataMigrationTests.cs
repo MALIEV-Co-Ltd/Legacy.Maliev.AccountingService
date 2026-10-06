@@ -157,8 +157,9 @@ public sealed class InvoiceReceiptFileMetadataMigrationTests(InvoiceNotification
             };
             await command.ExecuteNonQueryAsync(lifetime.Token);
             var clock = Stopwatch.StartNew();
-            var failure = await Assert.ThrowsAsync<PostgresException>(() => MigrateAsync(context, Target));
-            Assert.Equal("55P03", failure.SqlState);
+            var failure = await Assert.ThrowsAsync<InvalidOperationException>(() => MigrateAsync(context, Target));
+            var provider = Assert.IsType<PostgresException>(failure.InnerException);
+            Assert.Equal("55P03", provider.SqlState);
             Assert.InRange(clock.Elapsed, TimeSpan.FromSeconds(4), TimeSpan.FromSeconds(15));
             Assert.Equal(before, await SnapshotAsync(context, invoice));
         }
