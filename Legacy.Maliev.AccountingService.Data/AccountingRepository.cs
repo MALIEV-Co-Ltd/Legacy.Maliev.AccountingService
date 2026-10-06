@@ -530,9 +530,13 @@ public sealed class AccountingRepository(
     // Explicit UTC values retain their existing behavior; no local timezone conversion occurs.
     private static void PreservePaymentClock<T>(T item) where T : class
     {
-        if (item is Payment { PaymentDate: { Kind: DateTimeKind.Unspecified } date } payment)
+        if (item is Payment { PaymentDate: { } date } payment)
         {
-            payment.PaymentDate = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+            // JSON explicit offsets produce Local DateTime values. Preserve their instant;
+            // offset-free source clocks keep the previously reviewed tick representation.
+            payment.PaymentDate = date.Kind == DateTimeKind.Local
+                ? date.ToUniversalTime()
+                : DateTime.SpecifyKind(date, DateTimeKind.Utc);
         }
         else if (item is Invoice { PaymentDate: { Kind: DateTimeKind.Unspecified } invoiceDate } invoice)
         {
