@@ -13,12 +13,22 @@ expected = {
     "InvoiceMasterQuerySourceHttpTests.CustomerAndPaidFilters_ApplyBeforeSelectingPage": 2,
     "InvoiceMasterQuerySourceHttpTests.AnonymousAndLiveDenied_RejectBeforeFinancialDisclosure": 2,
     "InvoiceMasterQuerySourceHttpTests.ThaiLiteralAndNonnumericSearch_DoNotMatchReceiptZeroOrMutateStorage": 1,
+    "InvoiceNumberSourceHttpTests.ExactNumber_BeyondEarlierSubstringRows_IsFoundWithoutPagingOrCacheMutation": 1,
+    "InvoiceNumberSourceHttpTests.MissingWholeNumber_SubstringAndPurchaseOrderMatchesDoNotSubstitute": 3,
+    "InvoiceNumberSourceHttpTests.DuplicateWholeNumber_BeyondEarlierSubstringRows_RefusesOpaqueWithoutMutation": 3,
+    "InvoiceNumberSourceHttpTests.FiniteCaseAdaptation_PreservesExistingPostgresCaseInsensitiveRead": 2,
+    "InvoiceNumberSourceHttpTests.WholeNumber_KeepsLiteralCharactersThaiAndSignificantPadding": 5,
+    "InvoiceNumberSourceHttpTests.NumericRoute_PreservesIdentifierPrecedenceOverAnotherInvoicesNumber": 2,
+    "InvoiceNumberSourceHttpTests.AnonymousOrLiveDenied_NumberReadCannotDiscloseOrMutate": 2,
 }
 fixture = Path(__file__).resolve().parents[1] / "Legacy.Maliev.AccountingService.Tests/InvoiceMasterQuerySourceHttpTests.cs"
 source = fixture.read_bytes().decode("utf-8", errors="strict")
 thai = r"\u0e0a\u0e34\u0e49\u0e19\u0e07\u0e32\u0e19"
 if not source.isascii() or source.count(thai) != 1:
     raise SystemExit("Require exact escaped Thai fixture bytes")
+number_source = fixture.with_name("InvoiceNumberSourceHttpTests.cs").read_bytes().decode("utf-8", errors="strict")
+if not number_source.isascii() or number_source.count(thai) != 1:
+    raise SystemExit("Require exact escaped Thai number fixture bytes")
 if sys.argv[1] == "--encoding":
     print("Exact UTF-8/ASCII Invoice fixture and Thai literal verified")
     raise SystemExit(0)
@@ -72,14 +82,14 @@ for result in result_rows:
 if used_definitions != set(definitions) or dict(actual) != expected:
     raise SystemExit("Invoice query case cardinality mismatch: " + str(dict(actual)))
 counters = trx.find("./t:ResultSummary/t:Counters", ns)
-required_counters = {key: 21 for key in ("total", "executed", "passed")}
+required_counters = {key: 39 for key in ("total", "executed", "passed")}
 required_counters.update({key: 0 for key in (
     "failed", "error", "timeout", "aborted", "inconclusive", "passedButRunAborted",
     "notRunnable", "notExecuted", "disconnected", "warning", "completed", "inProgress", "pending",
 )})
 if counters is None or any(key not in counters.attrib or int(counters.get(key)) != value
                            for key, value in required_counters.items()):
-    raise SystemExit("Require all 16 standard counters: 21 total/executed/passed and zero in every other state")
+    raise SystemExit("Require all 16 standard counters: 39 total/executed/passed and zero in every other state")
 raw = list(root.rglob("coverage.cobertura.xml"))
 digests = {hashlib.sha256(path.read_bytes()).hexdigest() for path in raw}
 if len(digests) != 1:
@@ -89,7 +99,7 @@ for assembly in ("Api", "Application", "Data", "Domain"):
     if not any(package.get("name") == "Legacy.Maliev.AccountingService." + assembly
                and package.findall(".//line") for package in packages):
         raise SystemExit("Missing executable coverage inventory: " + assembly)
-receipt = {"passed": 21, "failed": 0, "skipped": 0, "methods": dict(actual),
+receipt = {"passed": 39, "failed": 0, "skipped": 0, "methods": dict(actual),
            "trx_sha256": hashlib.sha256(reports[0].read_bytes()).hexdigest(),
            "raw_sha256": next(iter(digests)), "raw_copies": len(raw),
            "note": "Focused evidence; full unfiltered suite separately gates all four owned assemblies at 80 percent."}
