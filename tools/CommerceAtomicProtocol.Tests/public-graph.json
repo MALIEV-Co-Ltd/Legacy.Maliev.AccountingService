@@ -7,7 +7,7 @@
     },
     {
       "repository": "Legacy.Maliev.AccountingService",
-      "commit": "3ad97fcdcd013ab22def779a77564cbd9621b028"
+      "commit": "e321685468c01be3ff59b398acd175ba8f64b438"
     },
     {
       "repository": "Legacy.Maliev.QuotationService",
@@ -23,6 +23,20 @@
     }
   ],
   "baselineEquivalent": false,
+  "receiptCreationRetryProducerAdvance": {
+    "previousAccounting": "3ad97fcdcd013ab22def779a77564cbd9621b028",
+    "reviewedAccounting": "e321685468c01be3ff59b398acd175ba8f64b438",
+    "acceptedMainBaseline": "168defab3ee50cd178cc0b20a975ba94ad5e1a3d",
+    "inputCount": 99,
+    "changedInput": "Legacy.Maliev.AccountingService.Data/ReceiptWorkflowStore.cs",
+    "previousBlob": "1e438c03a45b3eefa7d494dd234089bcc0b976b7",
+    "reviewedBlob": "8785613951ff71d0884b78c2eeb8bcd3d9cdcfb3",
+    "unchangedInputCount": 98,
+    "unchangedInputSha256": "bb5c018a45b2ff76e3802e4d15f35feac67fdad4fb0f7b02aa5d153f422e2a7c",
+    "scope": "One-attempt generated-ID receipt creation transaction under configured PostgreSQL retries, owned context and fail-closed uncertain commit; existing provider/cache/journal ordering preserved",
+    "independentReview": "Coordinator FULL original coherent draft and strict verifier correction approved; production/test blobs unchanged after integration on accepted168; graph/workflow/current expected pin reconciled together; seven mutation controls unchanged",
+    "nativeAcceptance": "Pending actual full758, receipt creation8 and all existing focused gates; no live provider or new HTTP creation-authorization witness claimed"
+  },
   "invoiceQueryNumberProducerAdvance": {
     "previousAccounting": "f99e8154816289a8ecf63ece5b90e12aab344cf8",
     "reviewedAccounting": "3ad97fcdcd013ab22def779a77564cbd9621b028",
