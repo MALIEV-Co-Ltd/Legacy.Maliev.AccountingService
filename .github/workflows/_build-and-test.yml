@@ -42,13 +42,13 @@ jobs:
           use-local-maliev-dependencies: 'true'
       - name: Gate owned production coverage
         run: python3 scripts/verify-runner-coverage.py runner-results
-      - name: Verify full 1132 executions and employee inventory
+      - name: Verify full 1178 executions and employee inventory
         run: python3 -B scripts/verify-employee-completion.py runner-results --full
-      - name: Verify full 1132 executions and file metadata inventory
+      - name: Verify full 1178 executions and file metadata inventory
         run: python3 -B scripts/verify-file-metadata.py runner-results --full
-      - name: Verify full 1132 executions and Payment file metadata inventory
+      - name: Verify full 1178 executions and Payment file metadata inventory
         run: python3 -B scripts/verify-payment-file-metadata.py runner-results --full
-      - name: Verify full 1132 executions and actual PaidInvoice wire provenance
+      - name: Verify full 1178 executions and actual PaidInvoice wire provenance
         run: python3 -B scripts/verify-paid-invoice-wire.py runner-results --full --wire
       - name: Preserve validation evidence
         if: always()
