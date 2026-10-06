@@ -7,7 +7,7 @@
     },
     {
       "repository": "Legacy.Maliev.AccountingService",
-      "commit": "7d7ca52ef07ebf01f774f9765ea2b3526b012b48"
+      "commit": "fa49506a3d97b817f89a92ee9ff7db8747224342"
     },
     {
       "repository": "Legacy.Maliev.QuotationService",
@@ -815,5 +815,26 @@
     "peerPinsAdvanced": false,
     "employeeActualProducerJoinProven": false,
     "previousHistoryPreserved": true
+  },
+  "employeeCompletionFormatterOwnProducerSourceAdvance": {
+    "previousAccounting": "7d7ca52ef07ebf01f774f9765ea2b3526b012b48",
+    "reviewedAccounting": "fa49506a3d97b817f89a92ee9ff7db8747224342",
+    "inputCount": 109,
+    "changedInputs": [
+      {
+        "path": "Legacy.Maliev.AccountingService.Api/Authorization/InvoiceCompletionCapabilityVerifier.cs",
+        "previousObject": "100644 blob d9d4c16a752a32d1c15fb4a2bb6b03862229d75e",
+        "reviewedObject": "100644 blob 4096f715b0ab771e4973bb0212564a9d4cdddf07"
+      }
+    ],
+    "unchangedInputCount": 108,
+    "unchangedInputSha256": "bade5a50706b8ed1c73cfabb56ad755ec080ef4d1daa4a11e5092dc626d13cf4",
+    "digestSerialization": "UTF8 compact JSON sorted keys mapping path to full Git ls-tree metadata",
+    "review": "Root reviewed collective two-file whitespace correction and causal exact structural inventories; source-only immutable witness",
+    "nativeAcceptance": "Pending changed-head native gates; previous bc102 employee168 passed but formatting failed, full1053 passed and four structural inventory cases failed",
+    "peerPinsAdvanced": false,
+    "employeeActualProducerJoinProven": false,
+    "previousHistoryPreserved": true,
+    "productionTokenSequenceUnchanged": true
   }
 }
