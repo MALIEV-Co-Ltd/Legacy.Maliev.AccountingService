@@ -7,7 +7,7 @@
     },
     {
       "repository": "Legacy.Maliev.AccountingService",
-      "commit": "c919b34975f55cb497ddf2005cbbf1e508771e8f"
+      "commit": "48ed0fc3a08e16eeae8f1d99ade2948564db2281"
     },
     {
       "repository": "Legacy.Maliev.QuotationService",
@@ -23,6 +23,22 @@
     }
   ],
   "baselineEquivalent": false,
+  "paymentReadDefaultsProducerAdvance": {
+    "previousAccounting": "c919b34975f55cb497ddf2005cbbf1e508771e8f",
+    "reviewedAccounting": "48ed0fc3a08e16eeae8f1d99ade2948564db2281",
+    "acceptedMainBaseline": "997e7e4599162d1b38b02d2cc7f2dd051708b594",
+    "inputCount": 99,
+    "changedInputs": [
+      {"path": "Legacy.Maliev.AccountingService.Api/Controllers/CrudController.cs", "previousBlob": "eea97172215abded55d049573bebb58697ba5c68", "reviewedBlob": "78fb47432c4a2c4a165e55b5f5d0559b029908d7"},
+      {"path": "Legacy.Maliev.AccountingService.Api/Controllers/PaymentRecordControllers.cs", "previousBlob": "6111aa4c083ccbb2e8deecb096f91f0ada50d83f", "reviewedBlob": "e78df9085fa87b1981d0bf2555bd488f64cbb244"}
+    ],
+    "unchangedInputCount": 97,
+    "unchangedInputSha256": "3e377088d7defff465fc50d103b67105db7d724bdd353169af74e063d0911d8c",
+    "scope": "Empty Payment lookup lists and empty or missing-parent file reads return404; populated wire shapes and authorization remain unchanged",
+    "review": "Original source slice reviewed; current accepted997 integration, strict verifier and three-way graph join await coordinator FULL actual diff review before publication",
+    "consumerGate": "Held until Intranet260 protected-main plus actual fresh focused35 and full acceptance; candidate focused35 alone is insufficient",
+    "nativeAcceptance": "Pending hosted focused24 and full783 plus all existing gates; accepted predecessor997 passed full759 and all11 gates; no local heavy runtime or standalone774 queue"
+  },
   "receiptPaymentDateProducerAdvance": {
     "previousAccounting": "e321685468c01be3ff59b398acd175ba8f64b438",
     "reviewedAccounting": "c919b34975f55cb497ddf2005cbbf1e508771e8f",
