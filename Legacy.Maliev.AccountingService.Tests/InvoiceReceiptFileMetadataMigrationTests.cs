@@ -125,11 +125,12 @@ public sealed class InvoiceReceiptFileMetadataMigrationTests(InvoiceNotification
     {
         await using var context = await PreimageAsync(invoice);
         await SeedAsync(context, invoice, "bucket", "object");
-        var table = Table(invoice);
+        var table = QuoteIdentifier(Table(invoice));
+        var check = QuoteIdentifier($"CK_{Table(invoice)}_BucketLength");
         var mutation = conflictingCheck
-            ? $"ALTER TABLE \"{table}\" ADD CONSTRAINT \"CK_{table}_BucketLength\" CHECK (true)"
-            : $"ALTER TABLE \"{table}\" ALTER COLUMN \"Bucket\" SET NOT NULL";
-        await context.Database.ExecuteSqlRawAsync(mutation);
+            ? $"ALTER TABLE {table} ADD CONSTRAINT {check} CHECK (true)"
+            : $"ALTER TABLE {table} ALTER COLUMN \"Bucket\" SET NOT NULL";
+        await ExecuteOwnedSqlAsync(context, mutation);
         var before = await SnapshotAsync(context, invoice);
         var failure = await Assert.ThrowsAsync<PostgresException>(() => MigrateAsync(context, Target));
         Assert.Equal("P0001", failure.SqlState);
@@ -150,7 +151,7 @@ public sealed class InvoiceReceiptFileMetadataMigrationTests(InvoiceNotification
         await using var transaction = await writer.BeginTransactionAsync(lifetime.Token);
         try
         {
-            await using var command = new NpgsqlCommand($"LOCK TABLE \"{Table(invoice)}\" IN ROW EXCLUSIVE MODE", writer, transaction)
+            await using var command = new NpgsqlCommand($"LOCK TABLE {QuoteIdentifier(Table(invoice))} IN ROW EXCLUSIVE MODE", writer, transaction)
             {
                 CommandTimeout = 10,
             };
@@ -195,11 +196,13 @@ public sealed class InvoiceReceiptFileMetadataMigrationTests(InvoiceNotification
         var suffix = Guid.NewGuid().ToString("N");
         var function = "meta_sleep_" + suffix;
         var trigger = "meta_delay_" + suffix;
+        var functionIdentifier = QuoteIdentifier(function);
+        var triggerIdentifier = QuoteIdentifier(trigger);
         try
         {
             // Exact disposable-database helpers induce a server deadline without a large stress dataset.
-            await context.Database.ExecuteSqlRawAsync($"CREATE FUNCTION {function}() RETURNS event_trigger LANGUAGE plpgsql AS $$ BEGIN PERFORM pg_sleep(31); END; $$");
-            await context.Database.ExecuteSqlRawAsync($"CREATE EVENT TRIGGER {trigger} ON ddl_command_start WHEN TAG IN ('ALTER TABLE') EXECUTE FUNCTION {function}()");
+            await ExecuteOwnedSqlAsync(context, $"CREATE FUNCTION {functionIdentifier}() RETURNS event_trigger LANGUAGE plpgsql AS $$ BEGIN PERFORM pg_sleep(31); END; $$");
+            await ExecuteOwnedSqlAsync(context, $"CREATE EVENT TRIGGER {triggerIdentifier} ON ddl_command_start WHEN TAG IN ('ALTER TABLE') EXECUTE FUNCTION {functionIdentifier}()");
             var clock = Stopwatch.StartNew();
             var failure = await Assert.ThrowsAsync<PostgresException>(() => MigrateAsync(context, Target));
             Assert.Equal("57014", failure.SqlState);
@@ -211,15 +214,15 @@ public sealed class InvoiceReceiptFileMetadataMigrationTests(InvoiceNotification
         {
             try
             {
-                await context.Database.ExecuteSqlRawAsync($"DROP EVENT TRIGGER IF EXISTS {trigger}");
+                await ExecuteOwnedSqlAsync(context, $"DROP EVENT TRIGGER IF EXISTS {triggerIdentifier}");
             }
             finally
             {
-                await context.Database.ExecuteSqlRawAsync($"DROP FUNCTION IF EXISTS {function}()");
+                await ExecuteOwnedSqlAsync(context, $"DROP FUNCTION IF EXISTS {functionIdentifier}()");
             }
         }
-        Assert.Equal(0, await context.Database.SqlQueryRaw<int>($"SELECT count(*)::int AS \"Value\" FROM pg_event_trigger WHERE evtname='{trigger}'").SingleAsync());
-        Assert.Equal(0, await context.Database.SqlQueryRaw<int>($"SELECT count(*)::int AS \"Value\" FROM pg_proc WHERE proname='{function}'").SingleAsync());
+        Assert.Equal(0, await context.Database.SqlQuery<int>($"SELECT count(*)::int AS \"Value\" FROM pg_event_trigger WHERE evtname={trigger}").SingleAsync());
+        Assert.Equal(0, await context.Database.SqlQuery<int>($"SELECT count(*)::int AS \"Value\" FROM pg_proc WHERE proname={function}").SingleAsync());
         await MigrateAsync(context, Target);
         Assert.Equal(before.Rows, (await SnapshotAsync(context, invoice)).Rows);
         await AssertInstalledAsync(context, invoice);
@@ -268,9 +271,9 @@ public sealed class InvoiceReceiptFileMetadataMigrationTests(InvoiceNotification
         // Bypass the new EF maximum-length mapping when arranging historical invalid rows.
         // Explicit unrestricted text parameters must preserve the original UTF-16 input.
         var parent = invoice ? "InvoiceID" : "ReceiptID";
-        await context.Database.ExecuteSqlRawAsync(
-            $"INSERT INTO \"{Table(invoice)}\" (\"ID\",\"{parent}\",\"Bucket\",\"ObjectName\",\"CreatedDate\",\"ModifiedDate\") VALUES (@id,91,@bucket,@object,@retained,@retained)",
-            new object[]
+        await ExecuteOwnedSqlAsync(context,
+            $"INSERT INTO {QuoteIdentifier(Table(invoice))} (\"ID\",{QuoteIdentifier(parent)},\"Bucket\",\"ObjectName\",\"CreatedDate\",\"ModifiedDate\") VALUES (@id,91,@bucket,@object,@retained,@retained)",
+            new NpgsqlParameter[]
             {
                 new NpgsqlParameter("id", NpgsqlDbType.Integer) { Value = id },
                 new NpgsqlParameter("bucket", NpgsqlDbType.Text) { Value = (object?)bucket ?? DBNull.Value, Size = 0 },
@@ -282,9 +285,13 @@ public sealed class InvoiceReceiptFileMetadataMigrationTests(InvoiceNotification
     private static async Task<Snapshot> SnapshotAsync(DbContext context, bool invoice)
     {
         var table = Table(invoice);
-        var rows = await context.Database.SqlQueryRaw<string>($"SELECT jsonb_agg(to_jsonb(f) ORDER BY f.\"ID\")::text AS \"Value\" FROM \"{table}\" f").SingleAsync();
-        var schema = await context.Database.SqlQueryRaw<string>($"SELECT jsonb_agg(to_jsonb(c) ORDER BY c.ordinal_position)::text AS \"Value\" FROM information_schema.columns c WHERE c.table_schema='public' AND c.table_name='{table}'").SingleAsync();
-        var constraints = await context.Database.SqlQueryRaw<string>($"SELECT COALESCE(jsonb_agg(pg_get_constraintdef(c.oid) ORDER BY c.conname)::text,'[]') AS \"Value\" FROM pg_constraint c WHERE c.conrelid='\"{table}\"'::regclass").SingleAsync();
+        var rowsSql = invoice
+            ? "SELECT jsonb_agg(to_jsonb(f) ORDER BY f.\"ID\")::text AS \"Value\" FROM \"InvoiceFile\" f"
+            : "SELECT jsonb_agg(to_jsonb(f) ORDER BY f.\"ID\")::text AS \"Value\" FROM \"ReceiptFile\" f";
+        var relation = QuoteIdentifier(table);
+        var rows = await context.Database.SqlQueryRaw<string>(rowsSql).SingleAsync();
+        var schema = await context.Database.SqlQuery<string>($"SELECT jsonb_agg(to_jsonb(c) ORDER BY c.ordinal_position)::text AS \"Value\" FROM information_schema.columns c WHERE c.table_schema='public' AND c.table_name={table}").SingleAsync();
+        var constraints = await context.Database.SqlQuery<string>($"SELECT COALESCE(jsonb_agg(pg_get_constraintdef(c.oid) ORDER BY c.conname)::text,'[]') AS \"Value\" FROM pg_constraint c WHERE c.conrelid={relation}::regclass").SingleAsync();
         var history = string.Join("\n", (await context.Database.GetAppliedMigrationsAsync()).Order(StringComparer.Ordinal));
         return new Snapshot(rows, schema, constraints, history);
     }
@@ -293,8 +300,10 @@ public sealed class InvoiceReceiptFileMetadataMigrationTests(InvoiceNotification
     {
         Assert.Contains(Target, await context.Database.GetAppliedMigrationsAsync());
         var table = Table(invoice);
-        Assert.Equal(2, await context.Database.SqlQueryRaw<int>($"SELECT count(*)::int AS \"Value\" FROM pg_attribute WHERE attrelid='\"{table}\"'::regclass AND attname IN ('Bucket','ObjectName') AND attnotnull AND atttypid='text'::regtype AND NOT attisdropped").SingleAsync());
-        Assert.Equal(1, await context.Database.SqlQueryRaw<int>($"SELECT count(*)::int AS \"Value\" FROM pg_constraint WHERE conrelid='\"{table}\"'::regclass AND conname='CK_{table}_BucketLength' AND contype='c' AND convalidated").SingleAsync());
+        var relation = QuoteIdentifier(table);
+        var check = $"CK_{table}_BucketLength";
+        Assert.Equal(2, await context.Database.SqlQuery<int>($"SELECT count(*)::int AS \"Value\" FROM pg_attribute WHERE attrelid={relation}::regclass AND attname IN ('Bucket','ObjectName') AND attnotnull AND atttypid='text'::regtype AND NOT attisdropped").SingleAsync());
+        Assert.Equal(1, await context.Database.SqlQuery<int>($"SELECT count(*)::int AS \"Value\" FROM pg_constraint WHERE conrelid={relation}::regclass AND conname={check} AND contype='c' AND convalidated").SingleAsync());
         if (invoice)
             Assert.Equal(2, await context.Database.SqlQueryRaw<int>("SELECT count(*)::int AS \"Value\" FROM pg_attribute WHERE attrelid='\"InvoiceCreationAdmission\"'::regclass AND attname IN ('FinancialOwnershipJson','EmployeeCompletionJson') AND NOT attnotnull AND atttypid='text'::regtype AND NOT attisdropped").SingleAsync());
     }
@@ -303,6 +312,29 @@ public sealed class InvoiceReceiptFileMetadataMigrationTests(InvoiceNotification
     {
         using var lifetime = new CancellationTokenSource(TimeSpan.FromSeconds(45));
         await context.GetService<IMigrator>().MigrateAsync(target, lifetime.Token);
+    }
+
+    private static async Task ExecuteOwnedSqlAsync(DbContext context, string sql, params NpgsqlParameter[] parameters)
+    {
+        using var lifetime = new CancellationTokenSource(TimeSpan.FromSeconds(45));
+        await using var connection = new NpgsqlConnection(context.Database.GetConnectionString());
+        await connection.OpenAsync(lifetime.Token);
+        await using var command = new NpgsqlCommand(sql, connection) { CommandTimeout = 40 };
+        command.Parameters.AddRange(parameters);
+        await command.ExecuteNonQueryAsync(lifetime.Token);
+    }
+
+    private static string QuoteIdentifier(string name)
+    {
+        var known = name is "InvoiceFile" or "ReceiptFile" or "InvoiceID" or "ReceiptID"
+            or "CK_InvoiceFile_BucketLength" or "CK_ReceiptFile_BucketLength";
+        var prefix = name.StartsWith("meta_sleep_", StringComparison.Ordinal) ? "meta_sleep_" : "meta_delay_";
+        var generated = name.StartsWith(prefix, StringComparison.Ordinal)
+            && Guid.TryParseExact(name[prefix.Length..], "N", out var identity)
+            && identity != Guid.Empty && name == prefix + identity.ToString("N");
+        if (!known && !generated) throw new ArgumentException("Unexpected test-owned SQL identifier.", nameof(name));
+        using var builder = new NpgsqlCommandBuilder();
+        return builder.QuoteIdentifier(name);
     }
 
     private static string Table(bool invoice) => invoice ? "InvoiceFile" : "ReceiptFile";
