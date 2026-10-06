@@ -531,6 +531,14 @@ public sealed class AccountingRepository(
         {
             payment.PaymentDate = DateTime.SpecifyKind(date, DateTimeKind.Utc);
         }
+        else if (item is Invoice { PaymentDate: { Kind: DateTimeKind.Unspecified } invoiceDate } invoice)
+        {
+            invoice.PaymentDate = DateTime.SpecifyKind(invoiceDate, DateTimeKind.Utc);
+        }
+        else if (item is Receipt { PaymentDate.Kind: DateTimeKind.Unspecified } receipt)
+        {
+            receipt.PaymentDate = DateTime.SpecifyKind(receipt.PaymentDate, DateTimeKind.Utc);
+        }
     }
 
     private static string CacheKey<T>(int id) => $"{typeof(T).Name.ToLowerInvariant()}:{id}";
