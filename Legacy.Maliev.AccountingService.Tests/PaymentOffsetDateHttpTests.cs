@@ -109,7 +109,7 @@ public sealed class PaymentOffsetDateHttpTests(AccountingBoundaryHttpFixture fix
         await fixture.AssertStatusAsync(response, HttpStatusCode.BadRequest);
         var problem = (await response.Content.ReadFromJsonAsync<JsonObject>())!;
         Assert.Equal(400, problem["status"]!.GetValue<int>());
-        Assert.True(problem["errors"]!.AsObject().Any(pair => pair.Key.Contains("PaymentDate", StringComparison.Ordinal)));
+        Assert.Contains(problem["errors"]!.AsObject(), pair => pair.Key.Contains("PaymentDate", StringComparison.Ordinal));
         Assert.Equal(before, await fixture.ReceiptSnapshotAsync());
         Assert.Empty(fixture.FailureMetadata);
     }
