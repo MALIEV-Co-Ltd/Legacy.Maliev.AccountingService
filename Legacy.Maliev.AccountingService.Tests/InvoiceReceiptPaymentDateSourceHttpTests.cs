@@ -29,6 +29,7 @@ public sealed class InvoiceReceiptPaymentDateSourceHttpTests(AccountingBoundaryH
         using var client = await fixture.ReceiptClientAsync([AccountingPermissions.Create, AccountingPermissions.Read]);
         client.DefaultRequestHeaders.Add("Idempotency-Key", Guid.NewGuid().ToString("D"));
         var before = await fixture.ReceiptSnapshotAsync();
+        var redisBefore = await fixture.ReceiptRedisSnapshotAsync();
         using var created = await client.PostAsJsonAsync(Route(invoice), Body(invoice, date));
         if (!invoice && date is null)
         {
@@ -41,6 +42,9 @@ public sealed class InvoiceReceiptPaymentDateSourceHttpTests(AccountingBoundaryH
         Assert.NotNull(created.Headers.Location);
         var wire = (await client.GetFromJsonAsync<JsonObject>(created.Headers.Location))!;
         var id = wire["Id"]!.GetValue<int>();
+        var post = (await created.Content.ReadFromJsonAsync<JsonObject>())!;
+        await SourceMutationProof.CreationPayloadsAsync(fixture, client, invoice ? "invoice" : "receipt",
+            invoice ? "invoices" : "receipts", id, wire, post);
         Assert.True(id > 0);
         Assert.Equal("THB", wire["Currency"]!.GetValue<string>());
         Assert.Equal(100m, wire["Total"]!.GetValue<decimal>());
@@ -48,7 +52,8 @@ public sealed class InvoiceReceiptPaymentDateSourceHttpTests(AccountingBoundaryH
         await AssertStoredAsync(invoice, id, date);
         var after = await fixture.ReceiptSnapshotAsync();
         Assert.Equal(before.Payment, after.Payment);
-        Assert.Equal(before.Journal, after.Journal);
+        await fixture.AssertReceiptRedisChangesAsync(redisBefore, SourceMutationProof.RedisKeys(client,
+            $"{(invoice ? "invoice" : "receipt")}:{id}", invoice ? "invoices" : "receipts"), expectedPreviouslyPresent: false);
         Assert.Equal(invoice ? before.Receipt : before.Invoice, invoice ? after.Receipt : after.Invoice);
         Assert.Contains(fixture.LiveChecks, check => check.Permission == AccountingPermissions.Create);
         Assert.Equal(0, fixture.ReceiptOutboundCalls);
@@ -73,7 +78,11 @@ public sealed class InvoiceReceiptPaymentDateSourceHttpTests(AccountingBoundaryH
         Assert.NotNull(created.Headers.Location);
         var original = (await client.GetFromJsonAsync<JsonObject>(created.Headers.Location))!;
         var id = original["Id"]!.GetValue<int>();
+        var post = (await created.Content.ReadFromJsonAsync<JsonObject>())!;
+        await SourceMutationProof.CreationPayloadsAsync(fixture, client, invoice ? "invoice" : "receipt",
+            invoice ? "invoices" : "receipts", id, original, post);
         var before = await fixture.ReceiptSnapshotAsync();
+        var redisBefore = await fixture.ReceiptRedisSnapshotAsync();
         var body = (JsonObject)original.DeepClone();
         body["PaymentDate"] = date;
         body["Id"] = 999999;
@@ -96,7 +105,9 @@ public sealed class InvoiceReceiptPaymentDateSourceHttpTests(AccountingBoundaryH
         await AssertStoredAsync(invoice, id, date);
         var after = await fixture.ReceiptSnapshotAsync();
         Assert.Equal(before.Payment, after.Payment);
-        Assert.Equal(before.Journal, after.Journal);
+        await SourceMutationProof.PayloadAsync(fixture, $"{(invoice ? "invoice" : "receipt")}:{id}", wire, invoice ? "invoice" : "receipt");
+        await fixture.AssertReceiptRedisChangesAsync(redisBefore, SourceMutationProof.RedisKeys(client,
+            $"{(invoice ? "invoice" : "receipt")}:{id}"), expectedPreviouslyPresent: true);
         Assert.Equal(invoice ? before.Receipt : before.Invoice, invoice ? after.Receipt : after.Invoice);
         Assert.Contains(fixture.LiveChecks, check => check.Permission == AccountingPermissions.Update);
         Assert.Equal(0, fixture.ReceiptOutboundCalls);

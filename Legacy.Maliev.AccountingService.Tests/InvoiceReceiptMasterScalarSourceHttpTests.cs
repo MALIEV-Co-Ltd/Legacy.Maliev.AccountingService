@@ -36,6 +36,7 @@ public sealed class InvoiceReceiptMasterScalarSourceHttpTests(AccountingBoundary
         using var client = await ClientAsync();
         var body = Body(invoice, false);
         var before = await fixture.ReceiptSnapshotAsync();
+        var redisBefore = await fixture.ReceiptRedisSnapshotAsync();
         var (id, wire) = await CreateAsync(client, invoice, body);
         Assert.True(id > 0);
         Assert.NotEqual(999999, id);
@@ -43,7 +44,8 @@ public sealed class InvoiceReceiptMasterScalarSourceHttpTests(AccountingBoundary
         AssertScalars(body, await PersistedAsync(invoice, id), invoice);
         Assert.NotEqual(body["CreatedDate"]!.GetValue<string>(), wire["CreatedDate"]!.GetValue<string>());
         Assert.NotEqual(body["ModifiedDate"]!.GetValue<string>(), wire["ModifiedDate"]!.GetValue<string>());
-        await AssertOtherBoundariesAsync(before, invoice);
+        await AssertOtherBoundariesAsync(before, invoice, redisBefore,
+            SourceMutationProof.RedisKeys(client, $"{(invoice ? "invoice" : "receipt")}:{id}", invoice ? "invoices" : "receipts"), created: true);
     }
 
     [Theory]
@@ -55,6 +57,7 @@ public sealed class InvoiceReceiptMasterScalarSourceHttpTests(AccountingBoundary
         using var client = await ClientAsync();
         var (id, original) = await CreateAsync(client, invoice, Body(invoice, false));
         var before = await fixture.ReceiptSnapshotAsync();
+        var redisBefore = await fixture.ReceiptRedisSnapshotAsync();
         var body = Body(invoice, true);
         using var updated = await client.PutAsJsonAsync($"{Route(invoice)}/{id}", body);
         await fixture.AssertStatusAsync(updated, HttpStatusCode.NoContent);
@@ -68,7 +71,9 @@ public sealed class InvoiceReceiptMasterScalarSourceHttpTests(AccountingBoundary
         Assert.Equal(original["CreatedDate"]!.GetValue<string>(), wire["CreatedDate"]!.GetValue<string>());
         AssertScalars(body, wire, invoice);
         AssertScalars(body, await PersistedAsync(invoice, id), invoice);
-        await AssertOtherBoundariesAsync(before, invoice);
+        await SourceMutationProof.PayloadAsync(fixture, $"{(invoice ? "invoice" : "receipt")}:{id}", wire, invoice ? "invoice" : "receipt");
+        await AssertOtherBoundariesAsync(before, invoice, redisBefore,
+            SourceMutationProof.RedisKeys(client, $"{(invoice ? "invoice" : "receipt")}:{id}"));
     }
 
     [Theory]
@@ -79,16 +84,24 @@ public sealed class InvoiceReceiptMasterScalarSourceHttpTests(AccountingBoundary
         await fixture.ResetAsync();
         using var client = await ClientAsync();
         var body = Body(invoice, false);
-        var (id, original) = await CreateAsync(client, invoice, body);
+        using var first = await client.PostAsJsonAsync(Route(invoice), body);
+        await fixture.AssertStatusAsync(first, HttpStatusCode.Created);
+        var original = (await first.Content.ReadFromJsonAsync<JsonObject>())!;
+        var id = original["Id"]!.GetValue<int>();
+        Assert.NotNull(first.Headers.Location);
+        var getBefore = (await client.GetFromJsonAsync<JsonObject>(first.Headers.Location))!;
+        var persistedBefore = await PersistedAsync(invoice, id);
         var before = await fixture.ReceiptSnapshotAsync();
         using var replay = await client.PostAsJsonAsync(Route(invoice), Body(invoice, true));
         await fixture.AssertStatusAsync(replay, HttpStatusCode.Created);
         var wire = (await replay.Content.ReadFromJsonAsync<JsonObject>())!;
         Assert.Equal(id, wire["Id"]!.GetValue<int>());
         AssertScalars(body, wire, invoice);
-        Assert.Equal(original["CreatedDate"]!.GetValue<string>(), wire["CreatedDate"]!.GetValue<string>());
+        Assert.True(JsonNode.DeepEquals(original, wire));
         Assert.Equal(before, await fixture.ReceiptSnapshotAsync());
         AssertScalars(body, await PersistedAsync(invoice, id), invoice);
+        Assert.True(JsonNode.DeepEquals(getBefore, await client.GetFromJsonAsync<JsonObject>(first.Headers.Location)));
+        Assert.True(JsonNode.DeepEquals(persistedBefore, await PersistedAsync(invoice, id)));
     }
 
     [Theory]
@@ -118,6 +131,7 @@ public sealed class InvoiceReceiptMasterScalarSourceHttpTests(AccountingBoundary
         using var client = await ClientAsync();
         var (id, _) = await CreateAsync(client, invoice, Body(invoice, false));
         var before = await fixture.ReceiptSnapshotAsync();
+        var redisBefore = await fixture.ReceiptRedisSnapshotAsync();
         using var deleted = await client.DeleteAsync($"{Route(invoice)}/{id}");
         await fixture.AssertStatusAsync(deleted, HttpStatusCode.NoContent);
         using var read = await client.GetAsync($"{Route(invoice)}/{id}");
@@ -134,7 +148,8 @@ public sealed class InvoiceReceiptMasterScalarSourceHttpTests(AccountingBoundary
             await using var database = fixture.ReceiptDatabase();
             Assert.False(await database.Receipts.AnyAsync(value => value.Id == id));
         }
-        await AssertOtherBoundariesAsync(before, invoice);
+        await AssertOtherBoundariesAsync(before, invoice, redisBefore,
+            SourceMutationProof.RedisKeys(client, $"{(invoice ? "invoice" : "receipt")}:{id}", rowPresent: false));
     }
 
     [Theory]
@@ -195,6 +210,9 @@ public sealed class InvoiceReceiptMasterScalarSourceHttpTests(AccountingBoundary
         await fixture.AssertStatusAsync(response, HttpStatusCode.Created);
         Assert.NotNull(response.Headers.Location);
         var wire = (await client.GetFromJsonAsync<JsonObject>(response.Headers.Location))!;
+        var post = (await response.Content.ReadFromJsonAsync<JsonObject>())!;
+        await SourceMutationProof.CreationPayloadsAsync(fixture, client, invoice ? "invoice" : "receipt",
+            invoice ? "invoices" : "receipts", wire["Id"]!.GetValue<int>(), wire, post);
         return (wire["Id"]!.GetValue<int>(), wire);
     }
 
@@ -209,11 +227,12 @@ public sealed class InvoiceReceiptMasterScalarSourceHttpTests(AccountingBoundary
         return JsonSerializer.SerializeToNode(await receipts.Receipts.AsNoTracking().SingleAsync(value => value.Id == id))!.AsObject();
     }
 
-    private async Task AssertOtherBoundariesAsync(AccountingBoundaryHttpFixture.ReceiptBoundaryState before, bool invoice)
+    private async Task AssertOtherBoundariesAsync(AccountingBoundaryHttpFixture.ReceiptBoundaryState before, bool invoice,
+        IReadOnlyDictionary<string, string> redisBefore, IReadOnlyDictionary<string, bool> expectedKeys, bool created = false)
     {
         var after = await fixture.ReceiptSnapshotAsync();
         Assert.Equal(before.Payment, after.Payment);
-        Assert.Equal(before.Journal, after.Journal);
+        await fixture.AssertReceiptRedisChangesAsync(redisBefore, expectedKeys, expectedPreviouslyPresent: !created);
         Assert.Equal(invoice ? before.Receipt : before.Invoice, invoice ? after.Receipt : after.Invoice);
         Assert.Equal(0, fixture.ReceiptOutboundCalls);
     }

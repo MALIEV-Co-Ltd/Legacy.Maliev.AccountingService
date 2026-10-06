@@ -160,6 +160,34 @@ public sealed class AccountingBoundaryHttpFixture : IAsyncLifetime
             await SnapshotRowsAsync(receipt, 3), await host.SnapshotJournalAsync());
     }
 
+    public async Task<IReadOnlyDictionary<string, string>> ReceiptRedisSnapshotAsync()
+    {
+        var host = await (receiptHost ??= ReceiptHost.StartAsync(this));
+        return await host.SnapshotRedisFieldsAsync();
+    }
+
+    public async Task AssertReceiptRedisChangesAsync(IReadOnlyDictionary<string, string> before,
+        IReadOnlyDictionary<string, bool> expectedLogicalKeys, bool expectedPreviouslyPresent)
+    {
+        var after = await ReceiptRedisSnapshotAsync();
+        var expected = expectedLogicalKeys.ToDictionary(pair => "legacy:accounting:" + pair.Key, pair => pair.Value, StringComparer.Ordinal);
+        // Only individually identified operation keys may change. Unknown prefixes, workflow
+        // journal keys and every unrelated cache/memo field remain covered by this comparison.
+        Assert.Equal(before.Where(pair => !expected.ContainsKey(pair.Key)).OrderBy(pair => pair.Key, StringComparer.Ordinal),
+            after.Where(pair => !expected.ContainsKey(pair.Key)).OrderBy(pair => pair.Key, StringComparer.Ordinal));
+        foreach (var (key, present) in expected)
+        {
+            Assert.Equal(expectedPreviouslyPresent, before.ContainsKey(key));
+            Assert.Equal(present, after.ContainsKey(key));
+        }
+    }
+
+    public async Task AssertReceiptRedisPayloadAsync(string logicalKey, byte[] expectedPayload, TimeSpan lifetime)
+    {
+        var host = await (receiptHost ??= ReceiptHost.StartAsync(this));
+        await host.AssertRedisPayloadAsync("legacy:accounting:" + logicalKey, expectedPayload, lifetime);
+    }
+
     private async Task<PhysicalState> SnapshotRowsAsync(DbContext context, int expectedTables)
     {
         var connection = (NpgsqlConnection)context.Database.GetDbConnection();
@@ -385,6 +413,34 @@ public sealed class AccountingBoundaryHttpFixture : IAsyncLifetime
                 inventory.Add(new { Key = key.ToString(), Fields = fields });
             }
             return new(1, keys.Count, Digest(inventory));
+        }
+
+        public async Task<IReadOnlyDictionary<string, string>> SnapshotRedisFieldsAsync()
+        {
+            var owned = connection ?? throw new InvalidOperationException("Receipt Redis is not initialized.");
+            var server = owned.GetServer(redis.Hostname, redis.GetMappedPublicPort(6379));
+            var database = owned.GetDatabase();
+            var inventory = new SortedDictionary<string, string>(StringComparer.Ordinal);
+            await foreach (var key in server.KeysAsync(database.Database, "*"))
+            {
+                var fields = (await database.HashGetAllAsync(key)).OrderBy(field => field.Name.ToString(), StringComparer.Ordinal)
+                    .Select(field => new { Name = field.Name.ToString(), Value = Convert.ToBase64String((byte[]?)field.Value ?? []) }).ToArray();
+                inventory.Add(key.ToString(), Digest(fields));
+            }
+            return inventory;
+        }
+
+        public async Task AssertRedisPayloadAsync(string key, byte[] expectedPayload, TimeSpan lifetime)
+        {
+            var owned = connection ?? throw new InvalidOperationException("Receipt Redis is not initialized.");
+            var fields = (await owned.GetDatabase().HashGetAllAsync(key)).ToDictionary(field => field.Name.ToString(), field => field.Value, StringComparer.Ordinal);
+            Assert.Equal(new[] { "absexp", "data", "sldexp" }, fields.Keys.OrderBy(value => value, StringComparer.Ordinal));
+            Assert.Equal(expectedPayload, (byte[]?)fields["data"]);
+            Assert.Equal(-1L, (long)fields["sldexp"]);
+            var now = DateTimeOffset.UtcNow.UtcTicks;
+            var expiry = (long)fields["absexp"];
+            Assert.True(expiry > now);
+            Assert.True(expiry <= now + lifetime.Ticks);
         }
 
         public async ValueTask DisposeAsync()

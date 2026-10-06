@@ -113,6 +113,7 @@ public sealed class PaymentCatalogHttpContractTests(AccountingBoundaryHttpFixtur
     public async Task Catalog_LiveDeniedCreateIs403AndDoesNotPersist(string resource)
     {
         await fixture.ResetAsync();
+        await SeedNegativeAccountBaselineAsync(resource);
         using var readClient = fixture.Client([AccountingPermissions.Read]);
         using var before = await readClient.GetAsync($"/payments/{resource}");
         Assert.Equal(HttpStatusCode.OK, before.StatusCode);
@@ -136,6 +137,7 @@ public sealed class PaymentCatalogHttpContractTests(AccountingBoundaryHttpFixtur
     public async Task Catalog_InvalidJsonIs400AndDoesNotPersist(string resource)
     {
         await fixture.ResetAsync();
+        await SeedNegativeAccountBaselineAsync(resource);
         using var client = fixture.Client([AccountingPermissions.Create, AccountingPermissions.Read]);
         using var before = await client.GetAsync($"/payments/{resource}");
         Assert.Equal(HttpStatusCode.OK, before.StatusCode);
@@ -148,6 +150,21 @@ public sealed class PaymentCatalogHttpContractTests(AccountingBoundaryHttpFixtur
         Assert.Equal(HttpStatusCode.OK, after.StatusCode);
         Assert.Equal(baseline, (await after.Content.ReadFromJsonAsync<JsonArray>())!.ToJsonString());
         Assert.Equal(sqlBaseline, await SqlSnapshotAsync(resource));
+    }
+
+    private async Task SeedNegativeAccountBaselineAsync(string resource)
+    {
+        if (resource != "Accounts") return;
+        await using var database = fixture.Database();
+        database.Accounts.Add(new()
+        {
+            Id = 100000,
+            Bank = "Synthetic negative baseline",
+            AccountNumber = "SYNTHETIC-ONLY",
+            Branch = "Test",
+            Swift = "TESTONLY",
+        });
+        await database.SaveChangesAsync();
     }
 
     private async Task<string> SqlSnapshotAsync(string resource)
