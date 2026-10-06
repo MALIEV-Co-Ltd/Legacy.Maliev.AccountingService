@@ -25,6 +25,9 @@ public sealed class PaymentDbContext(DbContextOptions<PaymentDbContext> options)
             .HasForeignKey(value => value.PaymentMethodId).OnDelete(DeleteBehavior.NoAction).HasConstraintName("FK_Payment_PaymentMethod");
         modelBuilder.Entity<Payment>().HasOne(value => value.PaymentType).WithMany(value => value.Payment)
             .HasForeignKey(value => value.PaymentTypeId).OnDelete(DeleteBehavior.NoAction).HasConstraintName("FK_Payment_PaymentType");
+        modelBuilder.Entity<PaymentFile>().Property(value => value.Bucket).IsRequired().HasMaxLength(50).HasColumnType("text");
+        modelBuilder.Entity<PaymentFile>().Property(value => value.ObjectName).IsRequired().HasColumnType("text");
+        modelBuilder.Entity<PaymentFile>().ToTable(table => table.HasCheckConstraint("CK_PaymentFile_BucketLength", FileMetadataConstraints.BucketLengthSql));
         modelBuilder.Entity<PaymentFile>().HasOne(value => value.Payment).WithMany(value => value.PaymentFile)
             .HasForeignKey(value => value.PaymentId).OnDelete(DeleteBehavior.NoAction).HasConstraintName("FK_PaymentFile_Payment");
     }

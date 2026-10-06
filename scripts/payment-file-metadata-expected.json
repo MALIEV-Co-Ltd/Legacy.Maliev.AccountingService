@@ -1,0 +1,19 @@
+{
+  "forecast": 23,
+  "fullForecast": 1126,
+  "priorMetadataFullForecast": 1103,
+  "sourceBase": "9f6abb70508c9c58e3a6cc6a43f69c94f503cc85",
+  "methods": {
+    "Legacy.Maliev.AccountingService.Tests.PaymentFileMetadataMigrationTests.RuntimeModelMatchesSnapshotAndExactSourceFileMetadata": 1,
+    "Legacy.Maliev.AccountingService.Tests.PaymentFileMetadataMigrationTests.UpgradeUsesUtf16BoundaryAndNeverChangesRetainedRows": 6,
+    "Legacy.Maliev.AccountingService.Tests.PaymentFileMetadataMigrationTests.HistoricalNullsBlockAtomicallyWithoutReconciliation": 3,
+    "Legacy.Maliev.AccountingService.Tests.PaymentFileMetadataMigrationTests.UnexpectedPreimageOrConflictingCheckRefusesChanges": 2,
+    "Legacy.Maliev.AccountingService.Tests.PaymentFileMetadataMigrationTests.WriterFenceTimesOutAndReleasesItsFailedMigrationTransaction": 1,
+    "Legacy.Maliev.AccountingService.Tests.PaymentFileMetadataMigrationTests.EmptyMetadataRemainsValidInStorageAndDownOnlyRelaxesNewConstraints": 1,
+    "Legacy.Maliev.AccountingService.Tests.PaymentFileMetadataMigrationTests.StatementDeadlineRollsBackOwnedDdlAndRetainsHistory": 1,
+    "Legacy.Maliev.AccountingService.Tests.PaymentFileMetadataHttpTests.Source50UnitLiteralCreateReadAndReplayKeepsOneOwnedRow": 3,
+    "Legacy.Maliev.AccountingService.Tests.PaymentFileMetadataHttpTests.OversizedCreateKeepsPinnedOpaqueProviderFailureAndCannotSeedSuccessMemo": 2,
+    "Legacy.Maliev.AccountingService.Tests.PaymentFileMetadataHttpTests.RejectedFullPutPreservesRowsParentAndPrimedFileCache": 3
+  },
+  "status": "Off-repository forecasts only; prior1103 native acceptance still pending when authored"
+}

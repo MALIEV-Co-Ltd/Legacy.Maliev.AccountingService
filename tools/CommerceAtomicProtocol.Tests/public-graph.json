@@ -7,7 +7,7 @@
     },
     {
       "repository": "Legacy.Maliev.AccountingService",
-      "commit": "2102aa6bc408636c60d2bc71ab7c89c0dd05a292"
+      "commit": "3a10e2d122504ada0d5f7e08b5acfcfc450c7d9c"
     },
     {
       "repository": "Legacy.Maliev.QuotationService",
@@ -911,6 +911,45 @@
     "digestSerialization": "UTF8 compact JSON sorted keys mapping path to full Git ls-tree metadata",
     "review": "Root full15 v5 source and causal exact HTTP response baselines cleared; private source-only witness",
     "nativeAcceptance": "Pending exact changed-head build0/focus46/full1103/raw/static; previous accepted85 actual1057 retained",
+    "peerPinsAdvanced": false,
+    "employeeActualProducerJoinProven": false,
+    "previousHistoryPreserved": true,
+    "producerGuardRelaxed": false,
+    "ddlOrDeploymentPerformed": false
+  },
+  "paymentFileMetadataOwnProducerSourceAdvance": {
+    "previousAccounting": "2102aa6bc408636c60d2bc71ab7c89c0dd05a292",
+    "reviewedAccounting": "3a10e2d122504ada0d5f7e08b5acfcfc450c7d9c",
+    "acceptedMainBaseline": "69dcb1d43296920bc18ffd923b0cb3b380377aca",
+    "previousInputCount": 113,
+    "inputCount": 115,
+    "changedInputs": [
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/AccountingDbContexts.cs",
+        "previousObject": "100644 blob dd49e84b2c3fd9a35d04b4356271aaa41e22c698",
+        "reviewedObject": "100644 blob 75d7d2e69fdd0dec13cef6b37e1f40e65c891b37"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/Migrations/Payment/20261006180000_RequirePaymentFileMetadata.Designer.cs",
+        "previousObject": null,
+        "reviewedObject": "100644 blob 4101e41972d8a974e2348e08d67bcc05a71e910d"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/Migrations/Payment/20261006180000_RequirePaymentFileMetadata.cs",
+        "previousObject": null,
+        "reviewedObject": "100644 blob c89143f6a4ffc1be752d4c5ca993685880f0921b"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/Migrations/Payment/PaymentDbContextModelSnapshot.cs",
+        "previousObject": "100644 blob c54547596b4cd950e59027704f7c7408c49369ed",
+        "reviewedObject": "100644 blob 6718ccd6465b1b1c3a27a292b2534ea15ebaf51c"
+      }
+    ],
+    "unchangedInputCount": 111,
+    "unchangedInputSha256": "ef9a9ecd477a654dcfc0294ece3974461057acebfae9fe8fdc3684104e25247d",
+    "digestSerialization": "UTF8 compact JSON sorted keys mapping path to full Git ls-tree metadata",
+    "review": "Root FULL13 v2 source and UTC PaymentDate fixture correction cleared; private source-only witness",
+    "nativeAcceptance": "Pending exact changed-head build0/focus23/full1126/raw/static; previous accepted69 actual1103 retained",
     "peerPinsAdvanced": false,
     "employeeActualProducerJoinProven": false,
     "previousHistoryPreserved": true,
