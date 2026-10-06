@@ -204,7 +204,7 @@ public sealed class ReceiptCreationRetryTests(AccountingBoundaryHttpFixture fixt
             await Assert.ThrowsAsync<DbUpdateException>(() => store.CreateReceiptAsync(input.Invoice, input.InvoiceItems, null, caller.Token));
         Assert.Equal(1, control.ReceiptInsertAttempts);
         Assert.Equal(1, control.LineInsertAttempts);
-        Assert.Empty(receipts.ChangeTracker.Entries().Where(entry => entry.State is EntityState.Added or EntityState.Modified));
+        Assert.DoesNotContain(receipts.ChangeTracker.Entries(), entry => entry.State is EntityState.Added or EntityState.Modified);
         Assert.Equal(before, await fixture.ReceiptSnapshotAsync());
         Assert.Equal(0, fixture.ReceiptOutboundCalls);
     }
