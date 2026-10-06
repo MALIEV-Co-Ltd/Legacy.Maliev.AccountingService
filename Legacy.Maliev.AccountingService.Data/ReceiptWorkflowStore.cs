@@ -3,6 +3,9 @@ using Legacy.Maliev.AccountingService.Application.Models;
 using Legacy.Maliev.AccountingService.Domain.Invoice;
 using Legacy.Maliev.AccountingService.Domain.Receipt;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
+using System.Runtime.ExceptionServices;
 
 namespace Legacy.Maliev.AccountingService.Data;
 
@@ -86,12 +89,13 @@ public sealed class ReceiptWorkflowStore(
             return existing[0];
         }
 
-        var now = Now();
+        var utcNow = timeProvider.GetUtcNow().UtcDateTime;
+        var now = DateTime.SpecifyKind(utcNow, DateTimeKind.Unspecified);
         var receipt = new Receipt
         {
             CustomerId = invoice.CustomerId,
             InvoiceNumber = invoice.Number,
-            PaymentDate = invoice.PaymentDate ?? now,
+            PaymentDate = invoice.PaymentDate ?? utcNow,
             Currency = invoice.Currency,
             Subtotal = invoice.Subtotal ?? 0m,
             WithholdingTax = invoice.WithholdingTax,
@@ -113,21 +117,74 @@ public sealed class ReceiptWorkflowStore(
             ModifiedDate = now,
         };
 
-        await using var transaction = await receipts.Database.BeginTransactionAsync(cancellationToken);
-        receipts.Receipts.Add(receipt);
-        await receipts.SaveChangesAsync(cancellationToken);
-        receipts.Items.AddRange(items.Select(item => new ReceiptOrderItem
+        var options = (DbContextOptions<ReceiptDbContext>)receipts.GetService<IDbContextOptions>();
+        Exception? failure = null;
+        await receipts.Database.CreateExecutionStrategy().ExecuteAsync(async token =>
         {
-            ReceiptId = receipt.Id,
-            Description = item.Description,
-            Quantity = item.Quantity,
-            UnitPrice = item.UnitPrice,
-            CreatedDate = item.CreatedDate ?? now,
-            ModifiedDate = item.ModifiedDate ?? now,
-        }));
-        await receipts.SaveChangesAsync(cancellationToken);
-        await transaction.CommitAsync(cancellationToken);
-        await receipts.Entry(receipt).ReloadAsync(cancellationToken);
+            ReceiptDbContext? owned = null;
+            IDbContextTransaction? transaction = null;
+            var commitSubmitted = false;
+            var cleanupUncertain = false;
+            try
+            {
+                owned = new ReceiptDbContext(options);
+                transaction = await owned.Database.BeginTransactionAsync(token);
+                owned.Receipts.Add(receipt);
+                await owned.SaveChangesAsync(token);
+                owned.Items.AddRange(items.Select(item => new ReceiptOrderItem
+                {
+                    ReceiptId = receipt.Id,
+                    Description = item.Description,
+                    Quantity = item.Quantity,
+                    UnitPrice = item.UnitPrice,
+                    CreatedDate = item.CreatedDate ?? now,
+                    ModifiedDate = item.ModifiedDate ?? now,
+                }));
+                await owned.SaveChangesAsync(token);
+                commitSubmitted = true;
+                await transaction.CommitAsync(token);
+                await owned.Entry(receipt).ReloadAsync(token);
+            }
+            catch (Exception exception)
+            {
+                failure = exception;
+                if (!commitSubmitted && transaction is not null)
+                {
+                    using var rollbackBudget = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                    try { await transaction.RollbackAsync(rollbackBudget.Token); }
+                    catch (Exception rollbackFailure)
+                    {
+                        cleanupUncertain = true;
+                        failure = new AggregateException(failure, rollbackFailure);
+                    }
+                }
+            }
+            finally
+            {
+                if (transaction is not null)
+                {
+                    try { await transaction.DisposeAsync(); }
+                    catch (Exception disposalFailure)
+                    {
+                        cleanupUncertain = true;
+                        failure = failure is null ? disposalFailure : new AggregateException(failure, disposalFailure);
+                    }
+                }
+                if (owned is not null)
+                {
+                    try { await owned.DisposeAsync(); }
+                    catch (Exception disposalFailure)
+                    {
+                        cleanupUncertain = true;
+                        failure = failure is null ? disposalFailure : new AggregateException(failure, disposalFailure);
+                    }
+                }
+            }
+            // Leave failures captured until outside the strategy: generated-ID insertion never replays.
+            if (failure is not null && (commitSubmitted || cleanupUncertain))
+                failure = new ReceiptWorkflowUnavailableException("Receipt creation outcome is unavailable.", failure);
+        }, cancellationToken);
+        if (failure is not null) ExceptionDispatchInfo.Capture(failure).Throw();
         return receipt;
     }
 
