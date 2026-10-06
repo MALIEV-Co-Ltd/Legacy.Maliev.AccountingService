@@ -16,7 +16,7 @@ public sealed class InvoiceMasterQuerySourceHttpTests(AccountingBoundaryHttpFixt
     [InlineData(" part", "1101")]
     [InlineData("part ", "1101")]
     [InlineData(" part ", "1101")]
-    [InlineData(" ", "1101")]
+    [InlineData(" ", "1101,1102,1103,1104")]
     [InlineData("%", "1101")]
     [InlineData("_", "1101")]
     [InlineData("\\", "1101")]
