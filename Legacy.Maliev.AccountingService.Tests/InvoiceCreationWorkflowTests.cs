@@ -12,6 +12,94 @@ public sealed class InvoiceCreationWorkflowTests
     private static readonly Guid OperationId = Guid.Parse("4f7870e2-d349-41bb-b4cf-567450f261e9");
     private static readonly InvoiceNotificationOrigin Origin = new("https://auth.example.invalid", "employee:42", "service:legacy-intranet");
 
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public async Task EmployeePrepareRetainsAuthorityWithoutDecisionDocumentOrNotification(bool enabled, bool sendEmail)
+    {
+        var source = new Mock<IInvoiceCreationSource>(MockBehavior.Strict);
+        source.Setup(value => value.GetAsync(84, It.IsAny<CancellationToken>())).ReturnsAsync(Snapshot());
+        var store = new Mock<IInvoiceCreationStore>(MockBehavior.Strict);
+        store.Setup(value => value.FindByNumberAsync("INV-84", It.IsAny<CancellationToken>())).ReturnsAsync((Invoice?)null);
+        store.Setup(value => value.CreateAsync(It.IsAny<Invoice>(), It.IsAny<IReadOnlyList<InvoiceOrderItem>>(),
+            It.Is<InvoiceFinancialCommitContext>(authority => authority.OperationId == OperationId && authority.QuotationId == 84 &&
+                authority.Origin == Origin && authority.OriginalQuotationVersion == Snapshot().Quotation.ModifiedDate), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Invoice invoice, IReadOnlyList<InvoiceOrderItem> _, InvoiceFinancialCommitContext _, CancellationToken _) => invoice);
+        var receipt = FinancialReceipt();
+        var reader = new Mock<IInvoiceFinancialOwnershipReader>(MockBehavior.Strict);
+        reader.SetupSequence(value => value.ReadForOriginAsync(OperationId, 84, Origin, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((InvoiceFinancialOwnership?)null).ReturnsAsync(receipt);
+        reader.Setup(value => value.ValidatePendingAsync(OperationId, 84, Origin, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        var quotations = new Mock<IInvoiceQuotationCompletionClient>(MockBehavior.Strict);
+        var documents = new Mock<IInvoiceCreationDocumentClient>(MockBehavior.Strict);
+        var notifications = new Mock<IInvoiceCreationNotificationClient>(MockBehavior.Strict);
+        var coordinator = new Mock<IInvoiceNotificationWorkflow>(MockBehavior.Strict);
+        coordinator.SetupGet(value => value.Enabled).Returns(enabled);
+        var workflow = Create(source, store, quotations, documents, notifications: notifications,
+            invoiceNotifications: coordinator.Object, financialOwnership: reader.Object);
+        Assert.Equal(receipt, await workflow.PrepareFinancialAsync(84, Request(false) with { SendEmail = sendEmail }, OperationId, Origin, CancellationToken.None));
+        store.VerifyAll();
+        reader.VerifyAll();
+        quotations.VerifyNoOtherCalls();
+        documents.VerifyNoOtherCalls();
+        notifications.VerifyNoOtherCalls();
+        coordinator.VerifyNoOtherCalls();
+    }
+
+    [Fact]
+    public async Task EmployeePrepareUnknownAcknowledgementReadsCommittedOwnershipBeforeAnyRecreation()
+    {
+        var reader = new Mock<IInvoiceFinancialOwnershipReader>(MockBehavior.Strict);
+        reader.Setup(value => value.ReadForOriginAsync(OperationId, 84, Origin, It.IsAny<CancellationToken>())).ReturnsAsync(FinancialReceipt());
+        var source = new Mock<IInvoiceCreationSource>(MockBehavior.Strict);
+        var store = new Mock<IInvoiceCreationStore>(MockBehavior.Strict);
+        Assert.Equal(FinancialReceipt(), await Create(source, store, financialOwnership: reader.Object)
+            .PrepareFinancialAsync(84, Request(false), OperationId, Origin, CancellationToken.None));
+        source.VerifyNoOtherCalls();
+        store.VerifyNoOtherCalls();
+        reader.Verify(value => value.ReadForOriginAsync(OperationId, 84, Origin, It.IsAny<CancellationToken>()), Times.Once);
+        reader.VerifyNoOtherCalls();
+    }
+
+    [Fact]
+    public async Task EmployeePrepareUnboundSameNumberRefusesDespiteMatchingCustomerAndTotal()
+    {
+        var reader = new Mock<IInvoiceFinancialOwnershipReader>();
+        reader.Setup(value => value.ReadForOriginAsync(OperationId, 84, Origin, It.IsAny<CancellationToken>())).ReturnsAsync((InvoiceFinancialOwnership?)null);
+        var source = new Mock<IInvoiceCreationSource>();
+        source.Setup(value => value.GetAsync(84, It.IsAny<CancellationToken>())).ReturnsAsync(Snapshot());
+        var store = new Mock<IInvoiceCreationStore>(MockBehavior.Strict);
+        store.Setup(value => value.FindByNumberAsync("INV-84", It.IsAny<CancellationToken>())).ReturnsAsync(new Invoice { Id = 901, CustomerId = 42, Total = 1070.27m });
+        await Assert.ThrowsAsync<InvoiceCreationConflictException>(() => Create(source, store, financialOwnership: reader.Object)
+            .PrepareFinancialAsync(84, Request(false), OperationId, Origin, CancellationToken.None));
+        store.Verify(value => value.FindByNumberAsync("INV-84", It.IsAny<CancellationToken>()), Times.Once);
+        store.VerifyNoOtherCalls();
+    }
+
+    private static InvoiceFinancialOwnership FinancialReceipt() => new(1, OperationId, 84, 901, Origin.Issuer,
+        Origin.EmployeeSubject, Origin.ServiceSubject, "2030-07-18T00:00:00.0000000Z", new string('A', 64));
+
+    [Fact]
+    public async Task LegacyCustomerByNumberCannotBypassRetainedEmployeeFinancialFence()
+    {
+        var source = new Mock<IInvoiceCreationSource>(MockBehavior.Strict);
+        source.Setup(value => value.GetAsync(84, It.IsAny<CancellationToken>())).ReturnsAsync(Snapshot());
+        var store = new Mock<IInvoiceCreationStore>(MockBehavior.Strict);
+        store.Setup(value => value.FindByNumberAsync("INV-84", It.IsAny<CancellationToken>())).ReturnsAsync(new Invoice { Id = 901, Number = "INV-84", CustomerId = 42, Total = 1070.27m });
+        var reader = new Mock<IInvoiceFinancialOwnershipReader>(MockBehavior.Strict);
+        reader.Setup(value => value.HasFenceAsync(901, It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        var quotations = new Mock<IInvoiceQuotationCompletionClient>(MockBehavior.Strict);
+        var documents = new Mock<IInvoiceCreationDocumentClient>(MockBehavior.Strict);
+        var notifications = new Mock<IInvoiceCreationNotificationClient>(MockBehavior.Strict);
+        await Assert.ThrowsAsync<InvoiceCreationConflictException>(() => Create(source, store, quotations, documents,
+            notifications: notifications, financialOwnership: reader.Object).CreateAsync(84, Request(false), OperationId, CancellationToken.None));
+        quotations.VerifyNoOtherCalls(); documents.VerifyNoOtherCalls(); notifications.VerifyNoOtherCalls();
+        store.Verify(value => value.FindByNumberAsync("INV-84", It.IsAny<CancellationToken>()), Times.Once);
+        store.VerifyNoOtherCalls();
+    }
+
     [Fact]
     public async Task EnabledEmail_MissingOriginRefusesBeforeJournalOrFinancialEffects()
     {
@@ -225,7 +313,8 @@ public sealed class InvoiceCreationWorkflowTests
         Mock<IInvoiceCreationFileClient>? files = null,
         Mock<IInvoiceCreationNotificationClient>? notifications = null,
         IInvoiceCreationJournal? journal = null,
-        IInvoiceNotificationWorkflow? invoiceNotifications = null) => new(
+        IInvoiceNotificationWorkflow? invoiceNotifications = null,
+        IInvoiceFinancialOwnershipReader? financialOwnership = null) => new(
             (source ?? new()).Object,
             (store ?? new()).Object,
             (quotation ?? new()).Object,
@@ -234,7 +323,7 @@ public sealed class InvoiceCreationWorkflowTests
             (notifications ?? new()).Object,
             journal ?? Journal().Object,
             new NoopLock(),
-            new FakeTimeProvider(new DateTimeOffset(2030, 7, 18, 12, 0, 0, TimeSpan.Zero)), invoiceNotifications);
+            new FakeTimeProvider(new DateTimeOffset(2030, 7, 18, 12, 0, 0, TimeSpan.Zero)), invoiceNotifications, financialOwnership);
 
     private static Mock<IInvoiceCreationDocumentClient> Document()
     {

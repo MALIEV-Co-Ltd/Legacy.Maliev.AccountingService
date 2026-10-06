@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text.Json;
+using Legacy.Maliev.AccountingService.Api.Controllers.Invoice;
 using Legacy.Maliev.AccountingService.Data;
 using Legacy.Maliev.AccountingService.Application.Models;
 using Legacy.Maliev.AccountingService.Domain.Invoice;
@@ -24,9 +25,20 @@ public sealed class AccountingContractTests
             .Where(method => method.GetCustomAttributes<HttpMethodAttribute>().Any())
             .ToArray();
 
-        Assert.Equal(15, controllers.Length);
-        Assert.Equal(72, actions.Length);
-        Assert.Equal(73, actions.Sum(method => method.GetCustomAttributes<HttpMethodAttribute>().Count()));
+        Assert.Equal(16, controllers.Length);
+        Assert.Equal(75, actions.Length);
+        Assert.Equal(76, actions.Sum(method => method.GetCustomAttributes<HttpMethodAttribute>().Count()));
+        var employeeActions = actions.Where(method => method.DeclaringType == typeof(InvoiceFinancialOwnershipController) ||
+            method.DeclaringType == typeof(InvoiceCreationController) && (method.Name is nameof(InvoiceCreationController.PrepareAsync) or nameof(InvoiceCreationController.CompleteEmployeeAsync))).ToArray();
+        Assert.Equal(3, employeeActions.Length);
+        Assert.Single(employeeActions, method => method.DeclaringType == typeof(InvoiceFinancialOwnershipController));
+        Assert.Equal(15, controllers.Count(type => type != typeof(InvoiceFinancialOwnershipController)));
+        var legacyActions = actions.Except(employeeActions).ToArray();
+        Assert.Equal(72, legacyActions.Length);
+        Assert.Equal(73, legacyActions.Sum(method => method.GetCustomAttributes<HttpMethodAttribute>().Count()));
+        Assert.Equal("{quotationId:int}/prepare", typeof(InvoiceCreationController).GetMethod(nameof(InvoiceCreationController.PrepareAsync))!.GetCustomAttribute<HttpPostAttribute>()!.Template);
+        Assert.Equal("{quotationId:int}/complete", typeof(InvoiceCreationController).GetMethod(nameof(InvoiceCreationController.CompleteEmployeeAsync))!.GetCustomAttribute<HttpPostAttribute>()!.Template);
+        Assert.Equal("{operationId:guid}/financial-ownership", typeof(InvoiceFinancialOwnershipController).GetMethod(nameof(InvoiceFinancialOwnershipController.ReadAsync))!.GetCustomAttribute<HttpGetAttribute>()!.Template);
         Assert.All(controllers, type => Assert.NotNull(type.GetCustomAttribute<AuthorizeAttribute>()));
     }
 

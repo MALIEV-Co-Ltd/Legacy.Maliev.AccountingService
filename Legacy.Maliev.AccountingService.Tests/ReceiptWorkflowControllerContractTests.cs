@@ -61,7 +61,13 @@ public sealed class ReceiptWorkflowControllerContractTests
     {
         var program = File.ReadAllText(FindRepositoryFile("Legacy.Maliev.AccountingService.Api", "Program.cs"));
         Assert.Contains("AddLegacyAuthServiceTokenExchange", program, StringComparison.Ordinal);
-        Assert.Equal(10, Count(program, ".AddLegacyServiceAuthentication()"));
+        Assert.Equal(11, Count(program, ".AddLegacyServiceAuthentication()"));
+        var employeeStart = program.IndexOf("builder.Services.AddHttpClient<IInvoiceEmployeeQuotationCompletionClient", StringComparison.Ordinal);
+        Assert.True(employeeStart >= 0);
+        var employeeEnd = program.IndexOf("AddInvoiceSourceClient(InvoiceCreationSourceClient.CustomerClient", employeeStart, StringComparison.Ordinal);
+        Assert.True(employeeEnd > employeeStart);
+        Assert.Equal(1, Count(program[employeeStart..employeeEnd], ".AddLegacyServiceAuthentication()"));
+        Assert.Equal(10, Count(program.Remove(employeeStart, employeeEnd - employeeStart), ".AddLegacyServiceAuthentication()"));
         Assert.DoesNotContain("Authorization =", program, StringComparison.Ordinal);
     }
 

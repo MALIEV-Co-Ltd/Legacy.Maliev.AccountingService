@@ -18,6 +18,8 @@ public sealed class InvoiceCreationAdmission
     public string? ResultJson { get; set; }
     public string? OriginIssuer { get; set; }
     public string? FinancialResultJson { get; set; }
+    public string? FinancialOwnershipJson { get; set; }
+    public string? EmployeeCompletionJson { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }
@@ -26,6 +28,15 @@ public sealed class InvoiceCreationAdmission
 public sealed class InvoiceCreationAdmissionStore(InvoiceDbContext database)
 {
     private static readonly UTF8Encoding StrictUtf8 = new(false, true);
+
+    /// <summary>Completion cannot create an admission or change the original editable intent.</summary>
+    public async Task ValidateEmployeeIntentAsync(Guid operationId, int quotationId, InvoiceNotificationOrigin origin,
+        CreateInvoiceFromQuotationRequest request, CancellationToken cancellationToken)
+    {
+        var row = await OriginRowAsync(operationId, quotationId, origin, cancellationToken);
+        if (row.FinancialOwnershipJson is null || row.IntentFingerprint != Fingerprint(request) ||
+            row.State is not ("Pending" or "NeedsReconciliation" or "Completed")) throw Conflict();
+    }
 
     /// <summary>Retained V2 origin fences keep strict actor validation even after feature deactivation.</summary>
     public Task<bool> RequiresOriginValidationAsync(Guid operationId, CancellationToken cancellationToken) =>

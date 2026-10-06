@@ -50,7 +50,11 @@ builder.Services.AddScoped<IInvoiceCreationLock, PostgresInvoiceCreationLock>();
 builder.Services.AddScoped<IInvoiceCreationSource, InvoiceCreationSourceClient>();
 builder.Services.AddScoped<IInvoiceCreationWorkflow, InvoiceCreationWorkflowService>();
 builder.Services.AddScoped<InvoiceCreationAdmissionStore>();
+builder.Services.AddScoped<InvoiceFinancialOwnershipStore>();
+builder.Services.AddScoped<IInvoiceFinancialOwnershipReader>(provider => provider.GetRequiredService<InvoiceFinancialOwnershipStore>());
+builder.Services.AddScoped<IInvoiceEmployeeCompletionStore, InvoiceEmployeeCompletionStore>();
 builder.Services.AddSingleton<InvoiceCreationDelegationVerifier>();
+builder.Services.AddSingleton<InvoiceCompletionCapabilityVerifier>();
 builder.Services.AddHttpClient<IReceiptDocumentClient, ReceiptDocumentClient>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["Services:Document"]
@@ -105,6 +109,17 @@ builder.Services.AddHttpClient<IInvoiceQuotationCompletionClient, InvoiceQuotati
     client.Timeout = TimeSpan.FromSeconds(30);
 }).AddServiceDiscovery().AddLegacyServiceAuthentication();
 AddInvoiceSourceClient(InvoiceCreationSourceClient.QuotationClient, "Services:Quotation", "https+http://legacy-maliev-quotation-service");
+#pragma warning disable EXTEXP0001 // Explicitly isolate this single-use employee decision client from inherited retries.
+builder.Services.AddHttpClient<IInvoiceEmployeeQuotationCompletionClient, InvoiceEmployeeQuotationCompletionClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["Services:Quotation"] ?? "https+http://legacy-maliev-quotation-service");
+    client.Timeout = TimeSpan.FromSeconds(30);
+    client.MaxResponseContentBufferSize = 16384;
+}).RemoveAllResilienceHandlers()
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false })
+    .RedactLoggedHeaders(["Authorization", InvoiceEmployeeQuotationCompletionClient.CapabilityHeader])
+    .AddServiceDiscovery().AddLegacyServiceAuthentication();
+#pragma warning restore EXTEXP0001
 AddInvoiceSourceClient(InvoiceCreationSourceClient.CustomerClient, "Services:Customer", "https+http://legacy-maliev-customer-service");
 AddInvoiceSourceClient(InvoiceCreationSourceClient.EmployeeClient, "Services:Employee", "https+http://legacy-maliev-employee-service");
 AddInvoiceSourceClient(InvoiceCreationSourceClient.CatalogClient, "Services:Catalog", "https+http://legacy-maliev-catalog-service");

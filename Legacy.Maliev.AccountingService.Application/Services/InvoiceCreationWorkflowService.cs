@@ -2,6 +2,7 @@ using System.Globalization;
 using Legacy.Maliev.AccountingService.Application.Interfaces;
 using Legacy.Maliev.AccountingService.Application.Models;
 using Legacy.Maliev.AccountingService.Domain.Invoice;
+using System.Security.Cryptography;
 
 namespace Legacy.Maliev.AccountingService.Application.Services;
 
@@ -16,9 +17,187 @@ public sealed class InvoiceCreationWorkflowService(
     IInvoiceCreationJournal journal,
     IInvoiceCreationLock operationLock,
     TimeProvider timeProvider,
-    IInvoiceNotificationWorkflow? invoiceNotifications = null) : IInvoiceCreationWorkflow
+    IInvoiceNotificationWorkflow? invoiceNotifications = null,
+    IInvoiceFinancialOwnershipReader? financialOwnership = null,
+    IInvoiceEmployeeQuotationCompletionClient? employeeQuotations = null,
+    IInvoiceEmployeeCompletionStore? employeeCompletion = null) : IInvoiceCreationWorkflow
 {
     private const string Bucket = "maliev.com";
+
+    /// <summary>Completes only retained financial ownership, with single-use document/send phases and exact decision readback.</summary>
+    public async Task<InvoiceCreationResult> CompleteEmployeeAsync(int quotationId, Guid operationId, InvoiceNotificationOrigin origin,
+        CreateInvoiceFromQuotationRequest request, string freshCapability, CancellationToken cancellationToken)
+    {
+        ValidateQuotation(quotationId);
+        ArgumentNullException.ThrowIfNull(request);
+        if (operationId == Guid.Empty || string.IsNullOrWhiteSpace(freshCapability)) throw new InvoiceCreationConflictException("Fresh employee completion authority is required.");
+        if (financialOwnership is null || employeeQuotations is null || employeeCompletion is null)
+            throw new InvoiceCreationUnavailableException("Employee invoice completion is unavailable.");
+        using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        deadline.CancelAfter(TimeSpan.FromMinutes(3));
+        cancellationToken = deadline.Token;
+        await using var lease = await operationLock.AcquireAsync(quotationId, cancellationToken);
+        var ownership = await financialOwnership.ReadForOriginAsync(operationId, quotationId, origin, cancellationToken)
+            ?? throw new InvoiceCreationConflictException("Retained financial ownership is required.");
+        var financial = await financialOwnership.ReadCommittedAsync(operationId, cancellationToken);
+        if (financial.Ownership != ownership) throw new InvoiceCreationConflictException("Financial ownership changed during completion.");
+        try
+        {
+            var decision = await employeeQuotations.CompleteAsync(ownership, freshCapability, cancellationToken);
+            if (decision.State != "Completed") throw new InvoiceCreationConflictException("Quotation and frozen Orders require same-operation reconciliation.");
+            var phase = await employeeCompletion.ReadAsync(ownership, cancellationToken);
+            if (phase is not null && (phase.DecisionOrderVersion != decision.DecisionOrderVersion || phase.TotalOrders != decision.TotalOrders))
+                throw new InvoiceCreationConflictException("Retained decision version or membership differs.");
+            if (phase?.Result is not null)
+            {
+                if (phase.Result.EmailState == InvoiceCreationEmailState.ProviderAccepted)
+                {
+                    if (invoiceNotifications is null) throw new InvoiceCreationUnavailableException("Retained notification verification is unavailable.");
+                    await invoiceNotifications.ValidateReplayAsync(quotationId, operationId, origin, phase.Result, cancellationToken);
+                }
+                await employeeCompletion.RetainCompletedAsync(ownership, phase.Result, cancellationToken);
+                return phase.Result;
+            }
+            byte[]? pdf = null;
+            if (phase is null)
+            {
+                if (!await employeeCompletion.BeginDocumentAsync(ownership, decision, cancellationToken))
+                    throw new InvoiceCreationUnavailableException("Document attempt acknowledgment requires reconciliation.");
+                var path = $"invoices/{financial.Invoice.Id}";
+                var fileName = $"invoice_{SafeFilePart(financial.Invoice.Number)}.pdf";
+                var objectName = $"{path}/{fileName}".ToLowerInvariant();
+                // A filename alone cannot adopt an existing object into this new operation.
+                if (await files.ExistsAsync(Bucket, objectName, cancellationToken))
+                    throw new InvoiceCreationConflictException("An unbound invoice document already exists.");
+                pdf = await documents.RenderAsync(financial.Invoice, financial.Items, cancellationToken);
+                if (pdf.Length is <= 0 or > 10 * 1024 * 1024) throw new InvoiceCreationDependencyException("Invoice document size is invalid.");
+                var stored = await files.UploadAsync(Bucket, path, fileName, pdf, operationId, cancellationToken);
+                if (stored.Bucket != Bucket || stored.ObjectName != objectName) throw new InvoiceCreationDependencyException("FileService returned an unexpected invoice object identity.");
+                await store.LinkFileAsync(financial.Invoice.Id, stored.Bucket, stored.ObjectName, cancellationToken);
+                phase = await employeeCompletion.RetainDocumentAsync(ownership, Convert.ToHexString(SHA256.HashData(pdf)), stored, cancellationToken);
+            }
+            if (phase.State == "DocumentExecuting" || phase.StoredFile is null)
+                throw new InvoiceCreationUnavailableException("Unacknowledged document work cannot be repeated.");
+            var result = new InvoiceCreationResult(ownership.InvoiceId, InvoiceCreationState.Completed, InvoiceCreationEmailState.NotRequested, null, phase.StoredFile);
+            if (!request.SendEmail)
+            {
+                await employeeCompletion.RetainCompletedAsync(ownership, result, cancellationToken);
+                return result;
+            }
+            var notificationFence = invoiceNotifications is not null && await invoiceNotifications.HasFenceAsync(ownership.InvoiceId, cancellationToken);
+            if (phase.State == "NotificationExecuting" || notificationFence)
+            {
+                if (invoiceNotifications is { Enabled: true } && notificationFence)
+                    result = await invoiceNotifications.ReconcileAsync(quotationId, operationId, origin, cancellationToken);
+                else result = result with { EmailState = InvoiceCreationEmailState.ExplicitRetryRequired };
+            }
+            else if (await employeeCompletion.BeginNotificationAsync(ownership, cancellationToken))
+            {
+                var recipient = await source.GetAsync(quotationId, cancellationToken);
+                if (recipient.Customer.Id != financial.Invoice.CustomerId)
+                    throw new InvoiceCreationConflictException("Invoice notification customer identity differs.");
+                pdf ??= await files.DownloadAsync(phase.StoredFile.Bucket, phase.StoredFile.ObjectName, 10 * 1024 * 1024, cancellationToken);
+                if (Convert.ToHexString(SHA256.HashData(pdf)) != phase.PdfSha256)
+                    throw new InvoiceCreationConflictException("Retained invoice document content differs.");
+                if (invoiceNotifications is { Enabled: true })
+                {
+                    var delivery = await invoiceNotifications.SendAsync(quotationId, operationId, origin, recipient.Customer.Email,
+                        recipient.Customer.FullName, financial.Invoice, pdf, cancellationToken);
+                    result = result with
+                    {
+                        EmailState = delivery.ProviderAccepted ? InvoiceCreationEmailState.ProviderAccepted : InvoiceCreationEmailState.ExplicitRetryRequired,
+                        ProviderMessageId = delivery.ProviderMessageId
+                    };
+                }
+                else
+                {
+                    var message = await notifications.SendAsync(recipient.Customer.Email, recipient.Customer.FullName, financial.Invoice, pdf, operationId, cancellationToken);
+                    result = result with { EmailState = InvoiceCreationEmailState.Delivered, ProviderMessageId = message };
+                }
+            }
+            else result = result with { EmailState = InvoiceCreationEmailState.ExplicitRetryRequired };
+            if (result.EmailState == InvoiceCreationEmailState.ExplicitRetryRequired) await MarkUncertainAsync();
+            else await employeeCompletion.RetainCompletedAsync(ownership, result, cancellationToken);
+            return result;
+        }
+        catch
+        {
+            await MarkUncertainAsync();
+            throw;
+        }
+
+        async Task MarkUncertainAsync()
+        {
+            using var cleanup = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            await financialOwnership.MarkDecisionUncertainAsync(operationId, quotationId, origin, cleanup.Token);
+        }
+    }
+
+    /// <summary>Resumes only the retained employee decision; an owning Order receipt never substitutes for document/notification completion.</summary>
+    public async Task<InvoiceQuotationOperationReceipt> ResumeEmployeeDecisionAsync(int quotationId, Guid operationId,
+        InvoiceNotificationOrigin origin, string freshCapability, CancellationToken cancellationToken)
+    {
+        ValidateQuotation(quotationId);
+        if (operationId == Guid.Empty || string.IsNullOrWhiteSpace(freshCapability)) throw new InvoiceCreationConflictException("Fresh employee decision authority is required.");
+        if (financialOwnership is null || employeeQuotations is null) throw new InvoiceCreationUnavailableException("Employee decision resume is unavailable.");
+        // Cancellation while waiting for this lease owns no phase and must not poison its owner.
+        await using var lease = await operationLock.AcquireAsync(quotationId, cancellationToken);
+        var receipt = await financialOwnership.ReadForOriginAsync(operationId, quotationId, origin, cancellationToken)
+            ?? throw new InvoiceCreationConflictException("Retained financial ownership is required.");
+        var financial = await financialOwnership.ReadCommittedAsync(operationId, cancellationToken);
+        if (financial.Ownership != receipt) throw new InvoiceCreationConflictException("Financial ownership changed during resume.");
+        try
+        {
+            var decision = await employeeQuotations.CompleteAsync(receipt, freshCapability, cancellationToken);
+            if (decision.State != "Completed") await MarkUncertainAsync();
+            // Completed proves only Quotation and its recorded Order convergence, not this whole workflow.
+            return decision;
+        }
+        catch
+        {
+            await MarkUncertainAsync();
+            throw;
+        }
+
+        async Task MarkUncertainAsync()
+        {
+            using var cleanup = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            await financialOwnership.MarkDecisionUncertainAsync(operationId, quotationId, origin, cleanup.Token);
+        }
+    }
+
+    /// <summary>Duplicate preparation is read-only and cannot poison or recreate a first writer's admission.</summary>
+    public async Task<InvoiceFinancialOwnership> ReadPreparedFinancialAsync(int quotationId, Guid operationId,
+        InvoiceNotificationOrigin origin, CancellationToken cancellationToken)
+    {
+        if (financialOwnership is null) throw new InvoiceCreationUnavailableException("Employee financial readback is unavailable.");
+        return await financialOwnership.ReadForOriginAsync(operationId, quotationId, origin, cancellationToken)
+            ?? throw new InvoiceCreationConflictException("Financial preparation is pending or requires reconciliation.");
+    }
+
+    /// <summary>First phase commits only verified financial ownership; completion requires a later fresh capability.</summary>
+    public async Task<InvoiceFinancialOwnership> PrepareFinancialAsync(int quotationId, CreateInvoiceFromQuotationRequest request,
+        Guid operationId, InvoiceNotificationOrigin origin, CancellationToken cancellationToken)
+    {
+        ValidateQuotation(quotationId);
+        ArgumentNullException.ThrowIfNull(request);
+        if (operationId == Guid.Empty || string.IsNullOrWhiteSpace(request.InvoiceNumber)) throw new ArgumentException("Stable operation and invoice number are required.");
+        if (financialOwnership is null) throw new InvoiceCreationUnavailableException("Employee financial preparation is unavailable.");
+        await using var lease = await operationLock.AcquireAsync(quotationId, cancellationToken);
+        var retained = await financialOwnership.ReadForOriginAsync(operationId, quotationId, origin, cancellationToken);
+        if (retained is not null) return retained;
+        await financialOwnership.ValidatePendingAsync(operationId, quotationId, origin, cancellationToken);
+        var snapshot = await source.GetAsync(quotationId, cancellationToken);
+        if (snapshot.Quotation.ModifiedDate is null || snapshot.Quotation.ModifiedDate.Value.Kind == DateTimeKind.Local)
+            throw new InvoiceCreationConflictException("Quotation has no valid authoritative version.");
+        if (await store.FindByNumberAsync(request.InvoiceNumber.Trim(), cancellationToken) is not null)
+            throw new InvoiceCreationConflictException("An existing unbound invoice cannot authorize this operation.");
+        var invoice = MapInvoice(Preview(snapshot, timeProvider.GetUtcNow()), request, Now());
+        var items = MapItems(snapshot.OrderItems, null, invoice.CreatedDate!.Value);
+        _ = await store.CreateAsync(invoice, items, new(operationId, quotationId, origin, snapshot.Quotation.ModifiedDate.Value), cancellationToken);
+        return await financialOwnership.ReadForOriginAsync(operationId, quotationId, origin, cancellationToken)
+            ?? throw new InvoiceCreationUnavailableException("Committed financial ownership readback is unavailable.");
+    }
 
     public async Task<InvoiceCreationPreview> PreviewAsync(int quotationId, CancellationToken cancellationToken)
     {
@@ -75,6 +254,8 @@ public sealed class InvoiceCreationWorkflowService(
         var preview = Preview(snapshot, timeProvider.GetUtcNow());
         var invoiceNumber = request.InvoiceNumber.Trim();
         var existing = await store.FindByNumberAsync(invoiceNumber, cancellationToken);
+        if (existing is not null && financialOwnership is not null && await financialOwnership.HasFenceAsync(existing.Id, cancellationToken))
+            throw new InvoiceCreationConflictException("Retained employee financial ownership requires bound same-operation completion.");
         if (existing is not null && invoiceNotifications is not null && await invoiceNotifications.HasFenceAsync(existing.Id, cancellationToken))
         {
             if (!useV2 || origin is null) throw new InvoiceCreationConflictException("Retained invoice notification requires authenticated reconciliation.");
