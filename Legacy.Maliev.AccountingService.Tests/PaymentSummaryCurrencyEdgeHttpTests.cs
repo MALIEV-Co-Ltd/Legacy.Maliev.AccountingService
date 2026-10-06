@@ -217,9 +217,19 @@ public sealed class PaymentSummaryCurrencyEdgeHttpTests(AccountingBoundaryHttpFi
         await using var database = fixture.Database();
         var payments = await database.Payments.AsNoTracking().OrderBy(row => row.Id).Select(row => new
         {
-            row.Id, row.EmployeeId, row.PaymentDirectionId, row.PaymentTypeId, row.PaymentMethodId,
-            row.PaymentDate, row.Amount, row.CurrencyId, row.CreatedDate, row.ModifiedDate,
-            row.Description, row.Recipient, row.TransactionNumber
+            row.Id,
+            row.EmployeeId,
+            row.PaymentDirectionId,
+            row.PaymentTypeId,
+            row.PaymentMethodId,
+            row.PaymentDate,
+            row.Amount,
+            row.CurrencyId,
+            row.CreatedDate,
+            row.ModifiedDate,
+            row.Description,
+            row.Recipient,
+            row.TransactionNumber
         }).ToArrayAsync();
         var directions = await database.Directions.AsNoTracking().OrderBy(row => row.Id)
             .Select(row => new { row.Id, row.Name, row.Description, row.CreatedDate, row.ModifiedDate }).ToArrayAsync();
