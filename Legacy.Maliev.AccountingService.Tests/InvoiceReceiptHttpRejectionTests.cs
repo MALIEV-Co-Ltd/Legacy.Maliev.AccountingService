@@ -70,13 +70,15 @@ public sealed class InvoiceReceiptHttpRejectionTests(AccountingBoundaryHttpFixtu
             _ => throw new ArgumentOutOfRangeException(nameof(operation)),
         };
         using var client = await fixture.ReceiptClientAsync(anonymous ? null : [permission], allowLive);
+        // The shared host retains earlier tests' denied outbound attempts; this request must add none.
+        var outbound = fixture.ReceiptOutboundCalls;
         var before = await fixture.ReceiptSnapshotAsync();
         Assert.Equal(6, before.Payment.Tables);
         Assert.Equal(5, before.Invoice.Tables);
         Assert.Equal(3, before.Receipt.Tables);
         Assert.Equal(0, before.Journal.Rows);
         Assert.Empty(fixture.LiveChecks);
-        Assert.Equal(0, fixture.ReceiptOutboundCalls);
+        Assert.Equal(outbound, fixture.ReceiptOutboundCalls);
 
         using var request = new HttpRequestMessage(operation == "delete" ? HttpMethod.Delete : HttpMethod.Post,
             $"/invoices/{int.MaxValue}/receipt" + (operation == "email" ? "/email" : ""));
@@ -104,6 +106,6 @@ public sealed class InvoiceReceiptHttpRejectionTests(AccountingBoundaryHttpFixtu
         Assert.True(before.Invoice == after.Invoice, "Receipt rejection changed complete Invoice context row state.");
         Assert.True(before.Receipt == after.Receipt, "Receipt rejection changed complete Receipt context row state.");
         Assert.True(before.Journal == after.Journal, "Receipt rejection changed Redis journal key or value state.");
-        Assert.Equal(0, fixture.ReceiptOutboundCalls);
+        Assert.Equal(outbound, fixture.ReceiptOutboundCalls);
     }
 }
