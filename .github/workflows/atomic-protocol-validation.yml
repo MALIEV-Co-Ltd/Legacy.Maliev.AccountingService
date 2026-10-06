@@ -65,7 +65,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: MALIEV-Co-Ltd/Legacy.Maliev.AccountingService
-          ref: 48ed0fc3a08e16eeae8f1d99ade2948564db2281
+          ref: d0d2fe46926a7043f115147563b4af52e309a0ab
           path: .joined-public/Legacy.Maliev.AccountingService
           persist-credentials: false
       - name: Check out Legacy.Maliev.QuotationService
