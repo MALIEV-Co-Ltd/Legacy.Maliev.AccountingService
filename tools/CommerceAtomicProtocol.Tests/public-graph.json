@@ -7,7 +7,7 @@
     },
     {
       "repository": "Legacy.Maliev.AccountingService",
-      "commit": "f99e8154816289a8ecf63ece5b90e12aab344cf8"
+      "commit": "3ad97fcdcd013ab22def779a77564cbd9621b028"
     },
     {
       "repository": "Legacy.Maliev.QuotationService",
@@ -23,6 +23,22 @@
     }
   ],
   "baselineEquivalent": false,
+  "invoiceQueryNumberProducerAdvance": {
+    "previousAccounting": "f99e8154816289a8ecf63ece5b90e12aab344cf8",
+    "reviewedAccounting": "3ad97fcdcd013ab22def779a77564cbd9621b028",
+    "acceptedMainBaseline": "41e610352998352cdcba087b11018d635b2155c9",
+    "inputCount": 99,
+    "changedInputs": [
+      {"path": "Legacy.Maliev.AccountingService.Api/Controllers/InvoiceControllers.cs", "previousBlob": "4b4a447855a9886968c24ee9b237f00d61e29477", "reviewedBlob": "43cd305ffffe316dfe318fea70e2bcf3650402a0"},
+      {"path": "Legacy.Maliev.AccountingService.Application/Interfaces/IAccountingBoundaries.cs", "previousBlob": "54b39db3e6fee0085c8403740a47cc0631b08100", "reviewedBlob": "3f5a65c93d5389444c94605259061aea2fa43b11"},
+      {"path": "Legacy.Maliev.AccountingService.Data/AccountingRepository.cs", "previousBlob": "8560692d5deb7c663385f373641649a7fb8aa0c4", "reviewedBlob": "22cc8da06dce5aa27764d2cff8e3fab0a64f9924"}
+    ],
+    "unchangedInputCount": 96,
+    "unchangedInputSha256": "8aedbcdf99ab94587296ddcd8488361698b41d39f24c1b53b2269fa354c40727",
+    "scope": "Invoice literal search, nullable date ordering and selected-empty-page404 plus direct unique literal Number lookup; numeric ID precedence and existing cache behavior preserved",
+    "independentReview": "Coordinator FULL query21 and number18 packets approved; combined three-input mapping and current workflow expected pin reconciled together; seven mutation controls unchanged",
+    "nativeAcceptance": "Pending actual full750 and query/number39 plus all existing focused gates; counts are authored inventory expectations, not native proof"
+  },
   "previousPaymentProducerAdvance": {
     "previousAccounting": "c1abf131d1b50b2329b21db2daf32eb1b8b4d8e6",
     "reviewedAccounting": "fa190f391ba91f0c67ae20032153a1bd30d59f1b",

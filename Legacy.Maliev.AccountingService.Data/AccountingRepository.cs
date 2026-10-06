@@ -112,6 +112,13 @@ public sealed class AccountingRepository(
         }
     }
 
+    public Task<Invoice?> GetInvoiceByNumberAsync(string number, CancellationToken cancellationToken)
+    {
+        var literal = EscapeLikePattern(number);
+        return invoices.Invoices.AsNoTracking()
+            .SingleOrDefaultAsync(invoice => EF.Functions.ILike(invoice.Number, literal, "\\"), cancellationToken);
+    }
+
     public async Task<PaginatedResponse<Invoice>?> GetInvoicesAsync(
         int? customerId,
         InvoiceSortType? sort,
@@ -127,11 +134,10 @@ public sealed class AccountingRepository(
             query = query.Where(invoice => invoice.CustomerId == customerId);
         }
 
-        if (!string.IsNullOrWhiteSpace(search))
+        if (!string.IsNullOrEmpty(search))
         {
-            var normalizedSearch = search.Trim();
-            var isNumeric = int.TryParse(normalizedSearch, out var searchAsInteger);
-            var pattern = $"%{EscapeLikePattern(normalizedSearch)}%";
+            var isNumeric = int.TryParse(search, out var searchAsInteger);
+            var pattern = $"%{EscapeLikePattern(search)}%";
             query = query.Where(invoice =>
                 (isNumeric && (invoice.Id == searchAsInteger || invoice.ReceiptId == searchAsInteger))
                 || EF.Functions.ILike(invoice.Number, pattern, "\\")
@@ -148,19 +154,26 @@ public sealed class AccountingRepository(
         {
             InvoiceSortType.InvoiceId_Ascending => query.OrderBy(invoice => invoice.Id),
             InvoiceSortType.InvoiceId_Descending => query.OrderByDescending(invoice => invoice.Id),
-            InvoiceSortType.InvoiceCreatedDate_Ascending => query.OrderBy(invoice => invoice.CreatedDate).ThenBy(invoice => invoice.Id),
+            InvoiceSortType.InvoiceCreatedDate_Ascending => query
+                .OrderBy(invoice => invoice.CreatedDate != null)
+                .ThenBy(invoice => invoice.CreatedDate)
+                .ThenBy(invoice => invoice.Id),
             InvoiceSortType.InvoiceCreatedDate_Descending => query
                 .OrderBy(invoice => invoice.CreatedDate == null)
                 .ThenByDescending(invoice => invoice.CreatedDate)
                 .ThenByDescending(invoice => invoice.Id),
-            InvoiceSortType.InvoicePaymentDate_Ascending => query.OrderBy(invoice => invoice.PaymentDate).ThenBy(invoice => invoice.Id),
+            InvoiceSortType.InvoicePaymentDate_Ascending => query
+                .OrderBy(invoice => invoice.PaymentDate != null)
+                .ThenBy(invoice => invoice.PaymentDate)
+                .ThenBy(invoice => invoice.Id),
             InvoiceSortType.InvoicePaymentDate_Descending => query
                 .OrderBy(invoice => invoice.PaymentDate == null)
                 .ThenByDescending(invoice => invoice.PaymentDate)
                 .ThenByDescending(invoice => invoice.Id),
             _ => query.OrderBy(invoice => invoice.Id),
         };
-        return await PageAsync(query, page, size, cancellationToken);
+        var result = await PageAsync(query, page, size, cancellationToken);
+        return result is { Items.Count: > 0 } ? result : null;
     }
 
     public async Task<IReadOnlyList<InvoiceOrderItem>> GetInvoiceItemsAsync(int invoiceId, CancellationToken cancellationToken) =>

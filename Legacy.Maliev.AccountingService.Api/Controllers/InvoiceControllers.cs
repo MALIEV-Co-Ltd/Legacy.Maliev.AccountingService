@@ -23,8 +23,7 @@ public sealed class InvoicesController(IAccountingService service, IIdempotencyS
             return await Get(id, cancellationToken);
         }
 
-        var page = await Service.GetInvoicesAsync(null, null, invoice, null, 1, 2, cancellationToken);
-        var match = page?.Items.SingleOrDefault(value => string.Equals(value.Number, invoice, StringComparison.OrdinalIgnoreCase));
+        var match = await Service.GetInvoiceByNumberAsync(invoice, cancellationToken);
         return match is null ? NotFound() : match;
     }
     [HttpGet, HttpGet("customers/{customerId:int}"), RequirePermission(AccountingPermissions.Read, RequireLiveCheck = true)]
