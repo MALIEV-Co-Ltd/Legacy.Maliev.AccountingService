@@ -7,7 +7,7 @@
     },
     {
       "repository": "Legacy.Maliev.AccountingService",
-      "commit": "fa49506a3d97b817f89a92ee9ff7db8747224342"
+      "commit": "794ab16d29646bf74b598686fcfa96998be66b43"
     },
     {
       "repository": "Legacy.Maliev.QuotationService",
@@ -832,6 +832,32 @@
     "digestSerialization": "UTF8 compact JSON sorted keys mapping path to full Git ls-tree metadata",
     "review": "Root reviewed collective two-file whitespace correction and causal exact structural inventories; source-only immutable witness",
     "nativeAcceptance": "Pending changed-head native gates; previous bc102 employee168 passed but formatting failed, full1053 passed and four structural inventory cases failed",
+    "peerPinsAdvanced": false,
+    "employeeActualProducerJoinProven": false,
+    "previousHistoryPreserved": true,
+    "productionTokenSequenceUnchanged": true
+  },
+  "employeeCompletionProductionFormatterOwnProducerSourceAdvance": {
+    "previousAccounting": "fa49506a3d97b817f89a92ee9ff7db8747224342",
+    "reviewedAccounting": "794ab16d29646bf74b598686fcfa96998be66b43",
+    "inputCount": 109,
+    "changedInputs": [
+      {
+        "path": "Legacy.Maliev.AccountingService.Application/Services/InvoiceCreationWorkflowService.cs",
+        "previousObject": "100644 blob eaefe6132a9de60880a3d9f926f7c27ff20127c1",
+        "reviewedObject": "100644 blob 012109740c07ef312d052d8a783206b9cf1b97bb"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/InvoiceEmployeeCompletionStore.cs",
+        "previousObject": "100644 blob 8da79034d11e591d69ba45ff6d41fc6c91f2d6dd",
+        "reviewedObject": "100644 blob e3f2dc4f44d91e961655c107b7dcc7f066097405"
+      }
+    ],
+    "unchangedInputCount": 107,
+    "unchangedInputSha256": "4e5bed0d43b6e7f634efa69055a3565f25c67f60eb1d6554f509f3312ebd30e2",
+    "digestSerialization": "UTF8 compact JSON sorted keys mapping path to full Git ls-tree metadata",
+    "review": "Root reviewed five production formatting positions in two files; source-only immutable witness",
+    "nativeAcceptance": "Pending changed-head gates; previous5f0801 actual1057 full cases and employee168 passed, four coverage floors passed; full formatter failed and audit skipped",
     "peerPinsAdvanced": false,
     "employeeActualProducerJoinProven": false,
     "previousHistoryPreserved": true,
