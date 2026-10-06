@@ -6,6 +6,7 @@ namespace Legacy.Maliev.AccountingService.Application.Interfaces;
 
 public interface IAccountingService
 {
+    Task<Invoice?> GetInvoiceByNumberAsync(string number, CancellationToken cancellationToken);
     Task<T> CreateAsync<T>(T item, CancellationToken c) where T : class; Task<bool> DeleteAsync<T>(int id, CancellationToken c) where T : class; Task<T?> GetAsync<T>(int id, CancellationToken c) where T : class; Task<IReadOnlyList<T>> ListAsync<T>(CancellationToken c) where T : class; Task<UpdateResult> UpdateAsync<T>(int id, T item, DateTimeOffset? expected, CancellationToken c) where T : class;
     Task<PaginatedResponse<Invoice>?> GetInvoicesAsync(int? customerId, InvoiceSortType? sort, string? search, bool? paid, int page, int size, CancellationToken c); Task<IReadOnlyList<InvoiceOrderItem>> GetInvoiceItemsAsync(int invoiceId, CancellationToken c); Task<IReadOnlyList<InvoiceFile>> GetInvoiceFilesAsync(int invoiceId, CancellationToken c);
     Task<PaidInvoiceOutcomeReadback> GetPaidInvoiceOutcomeReadbackAsync(DateTime fromUtc, DateTime toUtc, CancellationToken c);

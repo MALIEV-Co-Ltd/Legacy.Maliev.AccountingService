@@ -112,6 +112,13 @@ public sealed class AccountingRepository(
         }
     }
 
+    public Task<Invoice?> GetInvoiceByNumberAsync(string number, CancellationToken cancellationToken)
+    {
+        var literal = EscapeLikePattern(number);
+        return invoices.Invoices.AsNoTracking()
+            .SingleOrDefaultAsync(invoice => EF.Functions.ILike(invoice.Number, literal, "\\"), cancellationToken);
+    }
+
     public async Task<PaginatedResponse<Invoice>?> GetInvoicesAsync(
         int? customerId,
         InvoiceSortType? sort,
