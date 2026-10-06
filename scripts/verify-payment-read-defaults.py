@@ -20,20 +20,57 @@ if len(reports) != 1:
 ns = {"t": "http://microsoft.com/schemas/VisualStudio/TeamTest/2010"}
 trx = ET.parse(reports[0])
 actual = collections.Counter()
-for result in trx.findall("./t:Results/t:UnitTestResult", ns):
-    matches = [method for method in expected if
-               f"PaymentReadDefaultsSourceHttpTests.{method}" in result.get("testName", "")]
-    if len(matches) != 1 or result.get("outcome") != "Passed":
-        raise SystemExit("Unexpected or non-passing Payment read case")
-    actual[matches[0]] += 1
-if dict(actual) != expected:
-    raise SystemExit(f"Read case cardinality mismatch: {dict(actual)}")
+prefix = "Legacy.Maliev.AccountingService.Tests.PaymentReadDefaultsSourceHttpTests."
+definitions = {}
+definition_rows = trx.findall("./t:TestDefinitions/t:UnitTest", ns)
+definition_container = trx.find("./t:TestDefinitions", ns)
+if definition_container is None or len(definition_container) != len(definition_rows):
+    raise SystemExit("Require actual UnitTest definitions only")
+for definition in definition_rows:
+    test_id = definition.get("id", "").strip()
+    methods = definition.findall("./t:TestMethod", ns)
+    if not test_id or len(methods) != 1:
+        raise SystemExit("Missing test identity or unique TestMethod definition")
+    method = methods[0]
+    identity = method.get("className", "") + "." + method.get("name", "")
+    name = definition.get("name", "")
+    if not identity.startswith(prefix) or identity.removeprefix(prefix) not in expected or not (
+            name == identity or name.startswith(identity + "(")):
+        raise SystemExit("Unexpected class/method definition: " + identity)
+    if test_id in definitions and definitions[test_id] != identity:
+        raise SystemExit("Contradictory definitions for reused theory test ID")
+    definitions[test_id] = identity
+executions = set()
+names = set()
+used_definitions = set()
+result_rows = trx.findall("./t:Results/t:UnitTestResult", ns)
+result_container = trx.find("./t:Results", ns)
+if result_container is None or len(result_container) != len(result_rows):
+    raise SystemExit("Require actual UnitTestResult rows only")
+for result in result_rows:
+    name = result.get("testName", "")
+    execution = result.get("executionId", "").strip()
+    test_id = result.get("testId", "").strip()
+    identity = definitions.get(test_id)
+    if not execution or execution in executions or identity is None or result.get("outcome") != "Passed" or name in names:
+        raise SystemExit("Unexpected, duplicate, or non-passing Payment read result: " + name)
+    if not (name == identity or name.startswith(identity + "(")):
+        raise SystemExit("Result name contradicts its class/method definition")
+    executions.add(execution)
+    names.add(name)
+    used_definitions.add(test_id)
+    actual[identity.removeprefix(prefix)] += 1
+if used_definitions != set(definitions) or dict(actual) != expected:
+    raise SystemExit(f"Receipt creation cardinality mismatch: {dict(actual)}")
 counters = trx.find("./t:ResultSummary/t:Counters", ns)
-if counters is None or any(int(counters.get(key, "-1")) != 24 for key in ("total", "executed", "passed")):
-    raise SystemExit("Require exactly 24 executed/passed cases")
-if any(int(counters.get(key, "0")) != 0 for key in
-       ("failed", "error", "timeout", "aborted", "inconclusive", "notExecuted")):
-    raise SystemExit("Failed or skipped Payment read case")
+required_counters = {key: 24 for key in ("total", "executed", "passed")}
+required_counters.update({key: 0 for key in (
+    "failed", "error", "timeout", "aborted", "inconclusive", "passedButRunAborted",
+    "notRunnable", "notExecuted", "disconnected", "warning", "completed", "inProgress", "pending",
+)})
+if counters is None or any(key not in counters.attrib or int(counters.get(key)) != value
+                           for key, value in required_counters.items()):
+    raise SystemExit("Require all 16 standard counters: 24 total/executed/passed and zero in every other state")
 raw = list(root.rglob("coverage.cobertura.xml"))
 digests = {hashlib.sha256(path.read_bytes()).hexdigest() for path in raw}
 if len(digests) != 1:
