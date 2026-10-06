@@ -7,7 +7,7 @@
     },
     {
       "repository": "Legacy.Maliev.AccountingService",
-      "commit": "3a10e2d122504ada0d5f7e08b5acfcfc450c7d9c"
+      "commit": "caf7dad3f17787615d4f468a6a8ed06896bba043"
     },
     {
       "repository": "Legacy.Maliev.QuotationService",
@@ -955,5 +955,27 @@
     "previousHistoryPreserved": true,
     "producerGuardRelaxed": false,
     "ddlOrDeploymentPerformed": false
+  },
+  "paymentDateOffsetSourceAdvance": {
+    "previousAccounting": "3a10e2d122504ada0d5f7e08b5acfcfc450c7d9c",
+    "reviewedAccounting": "caf7dad3f17787615d4f468a6a8ed06896bba043",
+    "acceptedMainBaseline": "ad45c78d7546674b5bb7eacff62759460df6ca02",
+    "inputCount": 115,
+    "changedInputs": {
+      "Legacy.Maliev.AccountingService.Data/AccountingRepository.cs": {
+        "previousMetadata": "100644 blob 2216b6bf1b6fffea9e15ebc17dc278df81f1b4aa",
+        "reviewedMetadata": "100644 blob 5621dadcdb8114c1edf5cba228175c5ecd80490f"
+      }
+    },
+    "unchangedInputCount": 114,
+    "unchangedInputSha256": "f77ea1841ed59a8cbe11253265e2f789bcb0f3d6432e67b1d75bb090c2a2685d",
+    "sourcePacketSha256": "fcb47476ffe7a1ba5cbe94780d6d215b71551a619e3d78557f49ecfdfc72fa62",
+    "sourceReviewReceiptSha256": "3baaa09faa7e52caa4aaf736ba3b885a80b923f9c2cc8d907fca7348bc31c900",
+    "scope": "One owned Payment Local-date instant conversion only; existing UTC, Unspecified tick representation and Invoice/Receipt branches unchanged; all peer pins unchanged.",
+    "nativeAcceptance": false,
+    "fullCaseForecast": 1178,
+    "sourceOnlyWitness": true,
+    "originalSqlServerExecuted": false,
+    "productionDataSchemaOrDeploy": false
   }
 }

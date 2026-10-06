@@ -98,7 +98,7 @@ public sealed class WorkflowContractTests
         Assert.Contains("python3 scripts/verify-atomic-protocol-results.py atomic-results", source, StringComparison.Ordinal);
         Assert.True(source.IndexOf("Require current Accounting production", StringComparison.Ordinal)
                     < source.IndexOf("Validate prospective protocol graph", StringComparison.Ordinal));
-        Assert.Contains("ref: 3a10e2d122504ada0d5f7e08b5acfcfc450c7d9c", source, StringComparison.Ordinal);
+        Assert.Contains("ref: caf7dad3f17787615d4f468a6a8ed06896bba043", source, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -341,28 +341,28 @@ internal static partial class WorkflowContractValidator
         {
             throw new InvalidOperationException("Employee gate must contain only name and run.");
         }
-        RequireScalarValue(employeeGate, "name", "Verify full 1132 executions and employee inventory");
+        RequireScalarValue(employeeGate, "name", "Verify full 1178 executions and employee inventory");
         RequireScalarValue(employeeGate, "run", "python3 -B scripts/verify-employee-completion.py runner-results --full");
         var fileGate = RequireMapping(steps.Children[6], "file metadata execution gate");
         if (fileGate.Children.Count != 2)
         {
             throw new InvalidOperationException("File metadata gate must contain only name and run.");
         }
-        RequireScalarValue(fileGate, "name", "Verify full 1132 executions and file metadata inventory");
+        RequireScalarValue(fileGate, "name", "Verify full 1178 executions and file metadata inventory");
         RequireScalarValue(fileGate, "run", "python3 -B scripts/verify-file-metadata.py runner-results --full");
         var paymentFileGate = RequireMapping(steps.Children[7], "Payment file metadata execution gate");
         if (paymentFileGate.Children.Count != 2)
         {
             throw new InvalidDataException("Payment file metadata execution gate has unexpected fields.");
         }
-        RequireScalarValue(paymentFileGate, "name", "Verify full 1132 executions and Payment file metadata inventory");
+        RequireScalarValue(paymentFileGate, "name", "Verify full 1178 executions and Payment file metadata inventory");
         RequireScalarValue(paymentFileGate, "run", "python3 -B scripts/verify-payment-file-metadata.py runner-results --full");
         var wireGate = RequireMapping(steps.Children[8], "PaidInvoice actual wire execution/provenance gate");
         if (wireGate.Children.Count != 2)
         {
             throw new InvalidDataException("PaidInvoice wire gate has unexpected fields.");
         }
-        RequireScalarValue(wireGate, "name", "Verify full 1132 executions and actual PaidInvoice wire provenance");
+        RequireScalarValue(wireGate, "name", "Verify full 1178 executions and actual PaidInvoice wire provenance");
         RequireScalarValue(wireGate, "run", "python3 -B scripts/verify-paid-invoice-wire.py runner-results --full --wire");
         var evidence = RequireMapping(steps.Children[9], "evidence upload");
         if (evidence.Children.Count != 4)

@@ -1,21 +1,34 @@
-name: Build and test
+name: Payment date and currency edge acceptance
 
 on:
-  workflow_call:
+  pull_request:
+    branches: [main, develop, staging]
+  push:
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
   validate:
-    name: validate
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - timezone: UTC
+            artifact: utc
+          - timezone: Asia/Bangkok
+            artifact: bangkok
     env:
+      TZ: ${{ matrix.timezone }}
       MalievWorkspaceRoot: ${{ github.workspace }}/.dependencies
       VSTestCollect: XPlat Code Coverage
       VSTestLogger: trx
-      VSTestResultsDirectory: ${{ github.workspace }}/runner-results
-      PAID_INVOICE_WIRE_OUTPUT_DIRECTORY: ${{ github.workspace }}/runner-results/paid-invoice-wire
+      VSTestResultsDirectory: ${{ github.workspace }}/boundary-results
+      VSTestTestCaseFilter: FullyQualifiedName~PaymentOffsetDateHttpTests|FullyQualifiedName~PaymentSummaryCurrencyEdgeHttpTests|FullyQualifiedName~PaymentProducerDateHttpTests|FullyQualifiedName~PaymentSummarySourceWindowHttpTests
     steps:
       - name: Check out AccountingService
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -38,23 +51,15 @@ jobs:
       - name: Validate .NET solution
         uses: MALIEV-Co-Ltd/Legacy.Maliev.Workflows/actions/dotnet-validate@e3a6093324a24968876782153286f52db8b29fd8
         with:
-          solution: Legacy.Maliev.AccountingService.slnx
+          solution: Legacy.Maliev.AccountingService.Tests/Legacy.Maliev.AccountingService.Tests.csproj
           use-local-maliev-dependencies: 'true'
-      - name: Gate owned production coverage
-        run: python3 scripts/verify-runner-coverage.py runner-results
-      - name: Verify full 1178 executions and employee inventory
-        run: python3 -B scripts/verify-employee-completion.py runner-results --full
-      - name: Verify full 1178 executions and file metadata inventory
-        run: python3 -B scripts/verify-file-metadata.py runner-results --full
-      - name: Verify full 1178 executions and Payment file metadata inventory
-        run: python3 -B scripts/verify-payment-file-metadata.py runner-results --full
-      - name: Verify full 1178 executions and actual PaidInvoice wire provenance
-        run: python3 -B scripts/verify-paid-invoice-wire.py runner-results --full --wire
-      - name: Preserve validation evidence
+      - name: Verify all 56 date and currency cases and raw evidence
+        run: python3 -B scripts/verify-payment-date-currency.py boundary-results
+      - name: Preserve date and currency evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: accounting-validation-${{ github.sha }}
-          path: runner-results
+          name: payment-date-currency-${{ matrix.artifact }}-${{ github.sha }}
+          path: boundary-results
           if-no-files-found: warn
           retention-days: 7
