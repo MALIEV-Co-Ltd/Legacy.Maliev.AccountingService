@@ -43,7 +43,11 @@ public sealed class FilesController(IAccountingService service, IIdempotencyStor
     [HttpGet("{paymentFileId:int}", Name = "GetPaymentFile"), RequirePermission(AccountingPermissions.FilesRead, RequireLiveCheck = true)]
     public Task<ActionResult<PaymentFile>> GetPaymentFileAsync(int paymentFileId, CancellationToken cancellationToken) => Get(paymentFileId, cancellationToken);
     [HttpGet("/payments/{paymentId:int}/files"), RequirePermission(AccountingPermissions.FilesRead, RequireLiveCheck = true)]
-    public async Task<ActionResult<IReadOnlyList<PaymentFile>>> GetPaymentFilesAsync(int paymentId, CancellationToken cancellationToken) => Ok(await Service.GetPaymentFilesAsync(paymentId, cancellationToken));
+    public async Task<ActionResult<IReadOnlyList<PaymentFile>>> GetPaymentFilesAsync(int paymentId, CancellationToken cancellationToken)
+    {
+        var files = await Service.GetPaymentFilesAsync(paymentId, cancellationToken);
+        return files.Count == 0 ? NotFound() : Ok(files);
+    }
     [HttpPut("{paymentFileId:int}"), RequirePermission(AccountingPermissions.FilesWrite, RequireLiveCheck = true)]
     public Task<IActionResult> UpdatePaymentFileAsync(int paymentFileId, PaymentFile item, [FromHeader(Name = "If-Unmodified-Since")] DateTimeOffset? expected, CancellationToken cancellationToken) => Update(paymentFileId, item, expected, cancellationToken);
 }

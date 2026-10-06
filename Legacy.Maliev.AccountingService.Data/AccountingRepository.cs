@@ -63,6 +63,9 @@ public sealed class AccountingRepository(
         return item;
     }
 
+    public Task<bool> ExistsAsync<T>(int id, CancellationToken cancellationToken) where T : class =>
+        ContextFor<T>().Set<T>().AsNoTracking().AnyAsync(item => EF.Property<int>(item, "Id") == id, cancellationToken);
+
     public async Task<IReadOnlyList<T>> ListAsync<T>(CancellationToken cancellationToken) where T : class =>
         await ContextFor<T>().Set<T>().AsNoTracking()
             .OrderBy(item => EF.Property<int>(item, "Id"))
@@ -530,6 +533,14 @@ public sealed class AccountingRepository(
         if (item is Payment { PaymentDate: { Kind: DateTimeKind.Unspecified } date } payment)
         {
             payment.PaymentDate = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+        }
+        else if (item is Invoice { PaymentDate: { Kind: DateTimeKind.Unspecified } invoiceDate } invoice)
+        {
+            invoice.PaymentDate = DateTime.SpecifyKind(invoiceDate, DateTimeKind.Utc);
+        }
+        else if (item is Receipt { PaymentDate.Kind: DateTimeKind.Unspecified } receipt)
+        {
+            receipt.PaymentDate = DateTime.SpecifyKind(receipt.PaymentDate, DateTimeKind.Utc);
         }
     }
 

@@ -7,7 +7,7 @@
     },
     {
       "repository": "Legacy.Maliev.AccountingService",
-      "commit": "c919b34975f55cb497ddf2005cbbf1e508771e8f"
+      "commit": "9d3c1b9b3e8f4ddf8ae5c6bb6387b036f7116dad"
     },
     {
       "repository": "Legacy.Maliev.QuotationService",
@@ -23,6 +23,154 @@
     }
   ],
   "baselineEquivalent": false,
+  "coherentCommerceProducerAdvance": {
+    "previousAccounting": "5d70d0036d885729371b1e867aa0cfb32c17dfac",
+    "reviewedAccounting": "9d3c1b9b3e8f4ddf8ae5c6bb6387b036f7116dad",
+    "acceptedMainBaseline": "997e7e4599162d1b38b02d2cc7f2dd051708b594",
+    "inputCount": 99,
+    "changedInputs": [
+      {
+        "path": "Legacy.Maliev.AccountingService.Api/Controllers/CrudController.cs",
+        "previousBlob": "eea97172215abded55d049573bebb58697ba5c68",
+        "reviewedBlob": "78fb47432c4a2c4a165e55b5f5d0559b029908d7"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Api/Controllers/InvoiceControllers.cs",
+        "previousBlob": "43cd305ffffe316dfe318fea70e2bcf3650402a0",
+        "reviewedBlob": "57c6774757de1713f10f51d1b17f87d24f02daa6"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Api/Controllers/PaymentRecordControllers.cs",
+        "previousBlob": "6111aa4c083ccbb2e8deecb096f91f0ada50d83f",
+        "reviewedBlob": "e78df9085fa87b1981d0bf2555bd488f64cbb244"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Api/Controllers/ReceiptControllers.cs",
+        "previousBlob": "2338fce42f3b3f095df683c96b9afeb59f7c9b4d",
+        "reviewedBlob": "b7b7a21e4a2601d31ffbdbf452d85562b4139a9e"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Application/Interfaces/IAccountingBoundaries.cs",
+        "previousBlob": "3f5a65c93d5389444c94605259061aea2fa43b11",
+        "reviewedBlob": "afcbb60cf369da24905b28b58cf13f5b1aad0efb"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/AccountingRepository.cs",
+        "previousBlob": "22cc8da06dce5aa27764d2cff8e3fab0a64f9924",
+        "reviewedBlob": "2216b6bf1b6fffea9e15ebc17dc278df81f1b4aa"
+      }
+    ],
+    "unchangedInputCount": 93,
+    "unchangedInputSha256": "0c2b398b47f54945ec695c27019b5c3df1bf4ef69a168467daf5c17e88310408",
+    "digestSerialization": "UTF-8 compact JSON sorted keys, mapping path to full git ls-tree metadata",
+    "scope": "One private Payment read24, master-date24, master-scalar24, file-parent24 and test-only order-item34 union; same reviewed9d3 runtime inputs, six changed and93 identical to accepted997",
+    "review": "Original complete855 BBEB/C1B and correctedorder-item870E/03BA FULL source-cleared; final complete889 current diff requires fresh Root FULL review before publication",
+    "publicationHold": "Actual Intranet260 protected-main and fresh focused35/full acceptance; one normal protected PR/native queue from accepted997, no intermediate855 queue",
+    "nativeAcceptance": "Pending hosted full889 forecast759+96+34, four distinct focused24 proofs, order-item34 and all pre-existing gates; source review/offline controls are not acceptance",
+    "testOnlyAugmentation": {
+      "privateReviewedPredecessor": "1d99b1c019465cd691af892719edcbdd9d8ee7aa",
+      "acceptedMainAssumed": false,
+      "reviewedOrderItemPacketSha256": "870e1dc3add64831992ee96d947e7300d0a1111fde5d225bbcf6893a4023a6cf",
+      "authoredCases": 34,
+      "changedProductionInputs": 0,
+      "runtimePinAdvanced": false
+    }
+  },
+  "coherent855PrivateProducerAdvance": {
+    "previousAccounting": "5d70d0036d885729371b1e867aa0cfb32c17dfac",
+    "reviewedAccounting": "9d3c1b9b3e8f4ddf8ae5c6bb6387b036f7116dad",
+    "acceptedMainBaseline": "997e7e4599162d1b38b02d2cc7f2dd051708b594",
+    "inputCount": 99,
+    "changedInputs": [
+      {
+        "path": "Legacy.Maliev.AccountingService.Api/Controllers/CrudController.cs",
+        "previousBlob": "eea97172215abded55d049573bebb58697ba5c68",
+        "reviewedBlob": "78fb47432c4a2c4a165e55b5f5d0559b029908d7"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Api/Controllers/InvoiceControllers.cs",
+        "previousBlob": "43cd305ffffe316dfe318fea70e2bcf3650402a0",
+        "reviewedBlob": "57c6774757de1713f10f51d1b17f87d24f02daa6"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Api/Controllers/PaymentRecordControllers.cs",
+        "previousBlob": "6111aa4c083ccbb2e8deecb096f91f0ada50d83f",
+        "reviewedBlob": "e78df9085fa87b1981d0bf2555bd488f64cbb244"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Api/Controllers/ReceiptControllers.cs",
+        "previousBlob": "2338fce42f3b3f095df683c96b9afeb59f7c9b4d",
+        "reviewedBlob": "b7b7a21e4a2601d31ffbdbf452d85562b4139a9e"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Application/Interfaces/IAccountingBoundaries.cs",
+        "previousBlob": "3f5a65c93d5389444c94605259061aea2fa43b11",
+        "reviewedBlob": "afcbb60cf369da24905b28b58cf13f5b1aad0efb"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/AccountingRepository.cs",
+        "previousBlob": "22cc8da06dce5aa27764d2cff8e3fab0a64f9924",
+        "reviewedBlob": "2216b6bf1b6fffea9e15ebc17dc278df81f1b4aa"
+      }
+    ],
+    "unchangedInputCount": 93,
+    "unchangedInputSha256": "0c2b398b47f54945ec695c27019b5c3df1bf4ef69a168467daf5c17e88310408",
+    "digestSerialization": "UTF-8 compact JSON sorted keys, mapping path to full git ls-tree metadata",
+    "scope": "One private Payment read24, master-date24, master-scalar24 and file-parent24 union; six production/build inputs differ from accepted997 and93 are identical",
+    "review": "Original full831 packetA54 and standalone file-parent packet54EAF source-cleared; final complete855 current diff requires fresh Root FULL review before publication",
+    "publicationHold": "Actual Intranet260 protected-main and fresh focused35/full acceptance; one normal protected PR/native queue from accepted997, no intermediate831 queue",
+    "nativeAcceptance": "Pending hosted full855 forecast759+96, four distinct focused24 proofs and all pre-existing gates; source review/offline controls are not acceptance"
+  },
+  "coherent831PrivateProducerAdvance": {
+    "previousAccounting": "d0d2fe46926a7043f115147563b4af52e309a0ab",
+    "reviewedAccounting": "5d70d0036d885729371b1e867aa0cfb32c17dfac",
+    "acceptedMainBaseline": "997e7e4599162d1b38b02d2cc7f2dd051708b594",
+    "inputCount": 99,
+    "changedInputs": [
+      {"path": "Legacy.Maliev.AccountingService.Api/Controllers/CrudController.cs", "previousBlob": "eea97172215abded55d049573bebb58697ba5c68", "reviewedBlob": "78fb47432c4a2c4a165e55b5f5d0559b029908d7"},
+      {"path": "Legacy.Maliev.AccountingService.Api/Controllers/PaymentRecordControllers.cs", "previousBlob": "6111aa4c083ccbb2e8deecb096f91f0ada50d83f", "reviewedBlob": "e78df9085fa87b1981d0bf2555bd488f64cbb244"},
+      {"path": "Legacy.Maliev.AccountingService.Data/AccountingRepository.cs", "previousBlob": "22cc8da06dce5aa27764d2cff8e3fab0a64f9924", "reviewedBlob": "05c21c5106cb8be2fd3a853bc91e2166f9ff86e0"}
+    ],
+    "unchangedInputCount": 96,
+    "unchangedInputSha256": "42cff798f398e66972c70c3cddb21d9a299e331cd52c6c3061233ae4e0a2ad9a",
+    "scope": "One source-cleared Payment read24, master-date24 and master-scalar24 union; reviewed source bytes retained, only three production/build inputs differ from accepted997",
+    "review": "All three original source/fixture slices and private61099 causal graph delta cleared; final complete-union current diff requires coordinator FULL review before publication",
+    "publicationHold": "Actual Intranet260 protected-main plus fresh focused35/full acceptance; then one normal protected PR/native queue from accepted997, no intermediate783/807 gate required",
+    "nativeAcceptance": "Pending actual hosted full831 forecast759+72, three distinct focused24 proofs and every pre-existing gate; counts and offline controls are not native acceptance"
+  },
+  "invoiceReceiptMasterDatePrivateUnion": {
+    "previousAccounting": "48ed0fc3a08e16eeae8f1d99ade2948564db2281",
+    "reviewedAccounting": "d0d2fe46926a7043f115147563b4af52e309a0ab",
+    "privateReviewedPredecessor": "6ef8502c01e097adc91f8fbe1a92730cb72b1b26",
+    "acceptedMainBaseline": null,
+    "lastAcceptedAccountingMain": "997e7e4599162d1b38b02d2cc7f2dd051708b594",
+    "inputCount": 99,
+    "changedInput": "Legacy.Maliev.AccountingService.Data/AccountingRepository.cs",
+    "previousBlob": "22cc8da06dce5aa27764d2cff8e3fab0a64f9924",
+    "reviewedBlob": "05c21c5106cb8be2fd3a853bc91e2166f9ff86e0",
+    "unchangedInputCount": 98,
+    "unchangedInputSha256": "33a6245ce0b2a3cd971a77fd9124845971afa8c16d042399913c19867a8042c3",
+    "scope": "Private reviewed Payment/date union preserves both Payment API inputs and all historical peer/protocol pins; only supplied offset-free Invoice/Receipt PaymentDate representation changes relative to private Payment predecessor",
+    "review": "Original date source8d842 and private997 graph1c3/10b coordinator FULL clear; this combined private graph is preparation only and not publication approval",
+    "publicationHold": "Historical private preparation only, superseded by coherentCommerceProducerAdvance; private6ef is not accepted main, and actual Intranet260 protected/fresh admission remains required",
+    "nativeAcceptance": "No native execution or807 acceptance; nullable Invoice and required Receipt semantics, UTC values and server wall-clock dates preserved; explicit nonzero offsets excluded"
+  },
+  "paymentReadDefaultsProducerAdvance": {
+    "previousAccounting": "c919b34975f55cb497ddf2005cbbf1e508771e8f",
+    "reviewedAccounting": "48ed0fc3a08e16eeae8f1d99ade2948564db2281",
+    "acceptedMainBaseline": "997e7e4599162d1b38b02d2cc7f2dd051708b594",
+    "inputCount": 99,
+    "changedInputs": [
+      {"path": "Legacy.Maliev.AccountingService.Api/Controllers/CrudController.cs", "previousBlob": "eea97172215abded55d049573bebb58697ba5c68", "reviewedBlob": "78fb47432c4a2c4a165e55b5f5d0559b029908d7"},
+      {"path": "Legacy.Maliev.AccountingService.Api/Controllers/PaymentRecordControllers.cs", "previousBlob": "6111aa4c083ccbb2e8deecb096f91f0ada50d83f", "reviewedBlob": "e78df9085fa87b1981d0bf2555bd488f64cbb244"}
+    ],
+    "unchangedInputCount": 97,
+    "unchangedInputSha256": "3e377088d7defff465fc50d103b67105db7d724bdd353169af74e063d0911d8c",
+    "scope": "Empty Payment lookup lists and empty or missing-parent file reads return404; populated wire shapes and authorization remain unchanged",
+    "review": "Original source slice reviewed; current accepted997 integration, strict verifier and three-way graph join await coordinator FULL actual diff review before publication",
+    "consumerGate": "Held until Intranet260 protected-main plus actual fresh focused35 and full acceptance; candidate focused35 alone is insufficient",
+    "nativeAcceptance": "Historical standalone783 forecast superseded by coherent full831 forecast from accepted997; distinct focused24 still required, no local heavy runtime or extra standalone774/783/807 queue"
+  },
   "receiptPaymentDateProducerAdvance": {
     "previousAccounting": "e321685468c01be3ff59b398acd175ba8f64b438",
     "reviewedAccounting": "c919b34975f55cb497ddf2005cbbf1e508771e8f",

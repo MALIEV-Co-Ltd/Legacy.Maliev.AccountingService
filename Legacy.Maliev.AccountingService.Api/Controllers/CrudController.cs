@@ -28,8 +28,11 @@ public abstract class CrudController<T>(IAccountingService service, IIdempotency
         return value is null ? NotFound() : value;
     }
 
-    protected async Task<ActionResult<IReadOnlyList<T>>> List(CancellationToken cancellationToken) =>
-        Ok(await Service.ListAsync<T>(cancellationToken));
+    protected async Task<ActionResult<IReadOnlyList<T>>> List(CancellationToken cancellationToken)
+    {
+        var items = await Service.ListAsync<T>(cancellationToken);
+        return items.Count == 0 ? NotFound() : Ok(items);
+    }
 
     protected async Task<IActionResult> Update(int id, T item, DateTimeOffset? expected, CancellationToken cancellationToken) =>
         await Service.UpdateAsync(id, item, expected, cancellationToken) switch
