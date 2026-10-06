@@ -7,7 +7,7 @@ import sys
 import xml.etree.ElementTree as ET
 
 expected = {
-    "FreshCreation_NormalRetryStrategyPersistsOneReceiptAndComputedLines": 1,
+    "FreshCreation_NormalRetryStrategyPersistsOneReceiptAndComputedLines": 2,
     "ExistingReceipt_ReconciliationDoesNotInsertOrChangeAnyOwnedState": 1,
     "PreCancellation_DoesNotInsertReceiptOrChangeOwnedCacheAndTables": 1,
     "LineInsertionFailure_RollsBackReceiptAndLeavesCallerContextClean": 1,
@@ -65,14 +65,14 @@ for result in result_rows:
 if used_definitions != set(definitions) or dict(actual) != expected:
     raise SystemExit(f"Receipt creation cardinality mismatch: {dict(actual)}")
 counters = trx.find("./t:ResultSummary/t:Counters", ns)
-required_counters = {key: 8 for key in ("total", "executed", "passed")}
+required_counters = {key: 9 for key in ("total", "executed", "passed")}
 required_counters.update({key: 0 for key in (
     "failed", "error", "timeout", "aborted", "inconclusive", "passedButRunAborted",
     "notRunnable", "notExecuted", "disconnected", "warning", "completed", "inProgress", "pending",
 )})
 if counters is None or any(key not in counters.attrib or int(counters.get(key)) != value
                            for key, value in required_counters.items()):
-    raise SystemExit("Require all 16 standard counters: 8 total/executed/passed and zero in every other state")
+    raise SystemExit("Require all 16 standard counters: 9 total/executed/passed and zero in every other state")
 raw = list(root.rglob("coverage.cobertura.xml"))
 digests = {hashlib.sha256(path.read_bytes()).hexdigest() for path in raw}
 if len(digests) != 1:
@@ -83,7 +83,7 @@ for assembly in ("Api", "Application", "Data", "Domain"):
     if not selected or not any(p.findall(".//line") for p in selected):
         raise SystemExit(f"Missing owned executable inventory: {assembly}")
 proof = {
-    "passed": 8, "failed": 0, "skipped": 0, "methods": dict(actual),
+    "passed": 9, "failed": 0, "skipped": 0, "methods": dict(actual),
     "trxSha256": hashlib.sha256(reports[0].read_bytes()).hexdigest(),
     "rawSha256": next(iter(digests)), "rawCopies": len(raw),
     "fullServiceCoverageAcceptance": False, "actualAuthProducerAcceptance": False,

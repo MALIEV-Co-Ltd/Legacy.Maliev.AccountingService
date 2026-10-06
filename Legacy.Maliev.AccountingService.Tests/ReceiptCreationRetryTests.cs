@@ -21,15 +21,20 @@ namespace Legacy.Maliev.AccountingService.Tests;
 public sealed class ReceiptCreationRetryTests(AccountingBoundaryHttpFixture fixture)
     : IClassFixture<AccountingBoundaryHttpFixture>
 {
-    [Fact]
-    public async Task FreshCreation_NormalRetryStrategyPersistsOneReceiptAndComputedLines()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task FreshCreation_NormalRetryStrategyPersistsOneReceiptAndComputedLines(bool hasPaymentDate)
     {
-        await SeedAsync(false);
+        DateTime? paymentDate = hasPaymentDate ? new DateTime(2026, 10, 5, 9, 0, 0, DateTimeKind.Utc) : null;
+        await SeedAsync(false, paymentDate);
         await PrimeInvoiceAsync();
         var before = await fixture.ReceiptSnapshotAsync();
         await using var scope = await ScopeAsync();
         var store = scope.ServiceProvider.GetRequiredService<IReceiptWorkflowStore>();
         var input = await store.GetAsync(42, CancellationToken.None);
+        Assert.Equal(paymentDate, input.Invoice.PaymentDate);
+        var startedAtUtc = DateTime.UtcNow;
         var created = await store.CreateReceiptAsync(input.Invoice, input.InvoiceItems, "Synthetic creation", CancellationToken.None);
         Assert.True(created.Id > 0);
         Assert.Equal("SYNTHETIC-CREATE-42", created.InvoiceNumber);
@@ -44,6 +49,13 @@ public sealed class ReceiptCreationRetryTests(AccountingBoundaryHttpFixture fixt
         Assert.Equal("Synthetic creation", created.Comment);
         Assert.NotNull(created.CreatedDate);
         Assert.NotNull(created.ModifiedDate);
+        Assert.Equal(DateTimeKind.Unspecified, created.CreatedDate.GetValueOrDefault().Kind);
+        Assert.Equal(DateTimeKind.Unspecified, created.ModifiedDate.GetValueOrDefault().Kind);
+        Assert.Equal(DateTimeKind.Utc, created.PaymentDate.Kind);
+        if (paymentDate is { } supplied)
+            Assert.Equal(supplied, created.PaymentDate);
+        else
+            Assert.InRange(created.PaymentDate, startedAtUtc, DateTime.UtcNow);
         await using var receipts = fixture.ReceiptDatabase();
         Assert.Equal(created.Id, Assert.Single(await receipts.Receipts.AsNoTracking().ToArrayAsync()).Id);
         var item = Assert.Single(await receipts.Items.AsNoTracking().ToArrayAsync());
@@ -235,7 +247,7 @@ public sealed class ReceiptCreationRetryTests(AccountingBoundaryHttpFixture fixt
         Assert.NotNull(await cache.GetAsync<Invoice>("invoice:42", CancellationToken.None));
     }
 
-    private async Task SeedAsync(bool existing)
+    private async Task SeedAsync(bool existing, DateTime? paymentDate = null)
     {
         await fixture.ResetAsync();
         await using var invoices = fixture.InvoiceDatabase();
@@ -244,9 +256,17 @@ public sealed class ReceiptCreationRetryTests(AccountingBoundaryHttpFixture fixt
         await invoices.Invoices.ExecuteDeleteAsync();
         invoices.Invoices.Add(new Invoice
         {
-            Id = 42, Number = "SYNTHETIC-CREATE-42", CustomerId = 7, Currency = "THB",
-            Subtotal = 200m, Vat = 14m, Total = 214m, WithholdingTax = 2m,
-            BillingAddressCity = "Synthetic Bangkok", TaxIdentification = "SYNTHETIC-TAX",
+            Id = 42,
+            Number = "SYNTHETIC-CREATE-42",
+            CustomerId = 7,
+            Currency = "THB",
+            Subtotal = 200m,
+            Vat = 14m,
+            Total = 214m,
+            WithholdingTax = 2m,
+            BillingAddressCity = "Synthetic Bangkok",
+            TaxIdentification = "SYNTHETIC-TAX",
+            PaymentDate = paymentDate,
         });
         invoices.Items.Add(new InvoiceOrderItem { Id = 421, InvoiceId = 42, Description = "Synthetic line", Quantity = 2, UnitPrice = 100m });
         await invoices.SaveChangesAsync();

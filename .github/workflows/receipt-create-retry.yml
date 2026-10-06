@@ -43,7 +43,7 @@ jobs:
         with:
           solution: Legacy.Maliev.AccountingService.Tests/Legacy.Maliev.AccountingService.Tests.csproj
           use-local-maliev-dependencies: 'true'
-      - name: Verify all eight creation cases and raw evidence
+      - name: Verify all nine creation cases and raw evidence
         run: python3 -B scripts/verify-receipt-create-retry.py create-results
       - name: Preserve receipt creation evidence
         if: always()

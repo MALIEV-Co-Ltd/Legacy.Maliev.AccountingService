@@ -89,12 +89,13 @@ public sealed class ReceiptWorkflowStore(
             return existing[0];
         }
 
-        var now = Now();
+        var utcNow = timeProvider.GetUtcNow().UtcDateTime;
+        var now = DateTime.SpecifyKind(utcNow, DateTimeKind.Unspecified);
         var receipt = new Receipt
         {
             CustomerId = invoice.CustomerId,
             InvoiceNumber = invoice.Number,
-            PaymentDate = invoice.PaymentDate ?? now,
+            PaymentDate = invoice.PaymentDate ?? utcNow,
             Currency = invoice.Currency,
             Subtotal = invoice.Subtotal ?? 0m,
             WithholdingTax = invoice.WithholdingTax,
