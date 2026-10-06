@@ -357,8 +357,8 @@ public sealed class AccountingRepository(
                 Date = payment.PaymentDate!.Value,
                 payment.Amount,
                 payment.CurrencyId,
-                Direction = payment.PaymentDirection.Name,
-                Type = payment.PaymentType.Name,
+                payment.PaymentDirectionId,
+                payment.PaymentTypeId,
             })
             .ToListAsync(cancellationToken);
         var current = rows.Where(row => row.Date >= currentStart && row.Date <= currentEnd).ToList();
@@ -367,15 +367,24 @@ public sealed class AccountingRepository(
             return null;
         }
 
+        // Resolve authoritative catalog IDs only after the source's empty-current check.
+        // Ambiguous names must fail rather than combine payments from distinct IDs.
+        var expenseId = jobIncomeOnly ? (int?)null : await payments.Directions.AsNoTracking()
+            .Where(direction => direction.Name == "Expense").Select(direction => direction.Id).SingleAsync(cancellationToken);
+        var incomeId = await payments.Directions.AsNoTracking()
+            .Where(direction => direction.Name == "Income").Select(direction => direction.Id).SingleAsync(cancellationToken);
+        var jobId = jobIncomeOnly ? await payments.Types.AsNoTracking()
+            .Where(type => type.Name == "Job").Select(type => type.Id).SingleAsync(cancellationToken) : (int?)null;
+
         var previous = rows.Where(row => row.Date >= previousStart && row.Date <= previousEnd).ToList();
         var result = new FinancialSummary();
         foreach (var currency in current.GroupBy(row => row.CurrencyId))
         {
             decimal Value(IEnumerable<dynamic> source) => jobIncomeOnly
-                ? source.Where(row => string.Equals(row.Direction, "Income", StringComparison.OrdinalIgnoreCase)
-                    && string.Equals(row.Type, "Job", StringComparison.OrdinalIgnoreCase)).Sum(row => (decimal)row.Amount)
-                : source.Where(row => string.Equals(row.Direction, "Income", StringComparison.OrdinalIgnoreCase)).Sum(row => (decimal)row.Amount)
-                    - source.Where(row => string.Equals(row.Direction, "Expense", StringComparison.OrdinalIgnoreCase)).Sum(row => (decimal)row.Amount);
+                ? source.Where(row => row.PaymentDirectionId == incomeId
+                    && row.PaymentTypeId == jobId).Sum(row => (decimal)row.Amount)
+                : source.Where(row => row.PaymentDirectionId == incomeId).Sum(row => (decimal)row.Amount)
+                    - source.Where(row => row.PaymentDirectionId == expenseId).Sum(row => (decimal)row.Amount);
             var currentAmount = Value(currency);
             var previousAmount = Value(previous.Where(row => row.CurrencyId == currency.Key));
             if (jobIncomeOnly && previousAmount == 0m)
@@ -402,10 +411,14 @@ public sealed class AccountingRepository(
         var selectedYear = year ?? clock.GetUtcNow().Year;
         var start = new DateTime(selectedYear, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         var end = start.AddYears(1).AddDays(-1);
+        // Source yearly detail resolves the direction before querying the selected window.
+        var directionId = await payments.Directions.AsNoTracking()
+            .Where(direction => direction.Name == (income ? "Income" : "Expense"))
+            .Select(direction => (int?)direction.Id).SingleOrDefaultAsync(cancellationToken);
         var rows = await payments.Payments.AsNoTracking()
             .Where(payment => payment.PaymentDate >= start && payment.PaymentDate <= end
                 && (!currencyId.HasValue || payment.CurrencyId == currencyId))
-            .Where(payment => income ? payment.PaymentDirection.Name == "Income" : payment.PaymentDirection.Name == "Expense")
+            .Where(payment => payment.PaymentDirectionId == directionId)
             .Select(payment => new { Date = payment.PaymentDate!.Value.Date, payment.Amount })
             .ToListAsync(cancellationToken);
         return rows.Count == 0

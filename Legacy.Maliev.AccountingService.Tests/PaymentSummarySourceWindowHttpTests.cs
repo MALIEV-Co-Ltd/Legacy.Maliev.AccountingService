@@ -24,6 +24,7 @@ public sealed class PaymentSummarySourceWindowHttpTests(AccountingBoundaryHttpFi
         {
             (await database.Directions.SingleAsync(row => row.Id == 100000)).Name = "Income";
             (await database.Types.SingleAsync(row => row.Id == 100000)).Name = "Job";
+            database.Directions.Add(new PaymentDirection { Id = 100001, Name = "Expense" });
             database.Payments.AddRange(
                 Payment(interior, 12, 100m),
                 Payment(lastDay, 0, 10m),
