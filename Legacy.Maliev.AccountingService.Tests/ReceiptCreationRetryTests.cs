@@ -57,7 +57,10 @@ public sealed class ReceiptCreationRetryTests(AccountingBoundaryHttpFixture fixt
         else
             Assert.InRange(created.PaymentDate, startedAtUtc, DateTime.UtcNow);
         await using var receipts = fixture.ReceiptDatabase();
-        Assert.Equal(created.Id, Assert.Single(await receipts.Receipts.AsNoTracking().ToArrayAsync()).Id);
+        var persisted = Assert.Single(await receipts.Receipts.AsNoTracking().ToArrayAsync());
+        Assert.Equal(created.Id, persisted.Id);
+        Assert.Equal(DateTimeKind.Utc, persisted.PaymentDate.Kind);
+        Assert.Equal(created.PaymentDate, persisted.PaymentDate);
         var item = Assert.Single(await receipts.Items.AsNoTracking().ToArrayAsync());
         Assert.Equal(created.Id, item.ReceiptId);
         Assert.Equal(200m, item.Subtotal);

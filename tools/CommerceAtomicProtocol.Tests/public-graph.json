@@ -7,7 +7,7 @@
     },
     {
       "repository": "Legacy.Maliev.AccountingService",
-      "commit": "e321685468c01be3ff59b398acd175ba8f64b438"
+      "commit": "c919b34975f55cb497ddf2005cbbf1e508771e8f"
     },
     {
       "repository": "Legacy.Maliev.QuotationService",
@@ -23,6 +23,20 @@
     }
   ],
   "baselineEquivalent": false,
+  "receiptPaymentDateProducerAdvance": {
+    "previousAccounting": "e321685468c01be3ff59b398acd175ba8f64b438",
+    "reviewedAccounting": "c919b34975f55cb497ddf2005cbbf1e508771e8f",
+    "acceptedMainBaseline": "168defab3ee50cd178cc0b20a975ba94ad5e1a3d",
+    "inputCount": 99,
+    "changedInput": "Legacy.Maliev.AccountingService.Data/ReceiptWorkflowStore.cs",
+    "previousBlob": "8785613951ff71d0884b78c2eeb8bcd3d9cdcfb3",
+    "reviewedBlob": "d03c3ddd7d7fae0c7f17add8b3acd070375f5be6",
+    "unchangedInputCount": 98,
+    "unchangedInputSha256": "bb5c018a45b2ff76e3802e4d15f35feac67fdad4fb0f7b02aa5d153f422e2a7c",
+    "scope": "Absent PaymentDate uses the captured UTC instant; CreatedDate/ModifiedDate retain the same instant with Kind stripped for existing wall-clock columns; supplied persisted UTC PaymentDate unchanged",
+    "review": "Coordinator FULL causal runtime/test/verifier/workflow/design and current graph join reviewed and approved before publication; seven selected-input guard controls unchanged",
+    "nativeAcceptance": "Pending actual full759 and receipt creation9 plus all existing focused gates; old build and 752/758 failures remain historical, not acceptance"
+  },
   "receiptCreationRetryProducerAdvance": {
     "previousAccounting": "3ad97fcdcd013ab22def779a77564cbd9621b028",
     "reviewedAccounting": "e321685468c01be3ff59b398acd175ba8f64b438",
@@ -35,7 +49,7 @@
     "unchangedInputSha256": "bb5c018a45b2ff76e3802e4d15f35feac67fdad4fb0f7b02aa5d153f422e2a7c",
     "scope": "One-attempt generated-ID receipt creation transaction under configured PostgreSQL retries, owned context and fail-closed uncertain commit; existing provider/cache/journal ordering preserved",
     "independentReview": "Coordinator FULL original coherent draft and strict verifier correction approved; production/test blobs unchanged after integration on accepted168; graph/workflow/current expected pin reconciled together; seven mutation controls unchanged",
-    "nativeAcceptance": "Pending actual full758, receipt creation8 and all existing focused gates; no live provider or new HTTP creation-authorization witness claimed"
+    "nativeAcceptance": "Historical initial4d8 build failed xUnit2029 without tests; corrected32cb built0W/E then full752/758 and focused2/8 failed on Unspecified PaymentDate fallback; not accepted. No live provider or new HTTP creation-authorization witness claimed"
   },
   "invoiceQueryNumberProducerAdvance": {
     "previousAccounting": "f99e8154816289a8ecf63ece5b90e12aab344cf8",
