@@ -1,6 +1,6 @@
 {
   "forecast": 23,
-  "fullForecast": 1126,
+  "fullForecast": 1132,
   "priorMetadataFullForecast": 1103,
   "sourceBase": "9f6abb70508c9c58e3a6cc6a43f69c94f503cc85",
   "methods": {
@@ -15,5 +15,11 @@
     "Legacy.Maliev.AccountingService.Tests.PaymentFileMetadataHttpTests.OversizedCreateKeepsPinnedOpaqueProviderFailureAndCannotSeedSuccessMemo": 2,
     "Legacy.Maliev.AccountingService.Tests.PaymentFileMetadataHttpTests.RejectedFullPutPreservesRowsParentAndPrimedFileCache": 3
   },
-  "status": "Off-repository forecasts only; prior1103 native acceptance still pending when authored"
+  "status": "Off-repository forecasts only; prior1103 native acceptance still pending when authored",
+  "paidInvoiceWireForecast": {
+    "previousFullForecast": 1126,
+    "additionalCases": 6,
+    "sourceBase": "e36217751d620aaf98c0179c4c73885278c48c92",
+    "nativeAcceptance": "Pending reviewed whole source and actual6/1132 receipt/exports"
+  }
 }

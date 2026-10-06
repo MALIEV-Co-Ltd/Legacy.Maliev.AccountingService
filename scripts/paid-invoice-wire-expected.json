@@ -1,0 +1,11 @@
+{
+  "forecast": 6,
+  "fullForecast": 1132,
+  "priorPaymentFullForecast": 1126,
+  "sourceBase": "e36217751d620aaf98c0179c4c73885278c48c92",
+  "methods": {
+    "Legacy.Maliev.AccountingService.Tests.PaidInvoiceOutcomeWireTests.ActualControllerDtoAndProgramMvcSerializerRetainSyntheticWire": 5,
+    "Legacy.Maliev.AccountingService.Tests.PaidInvoiceOutcomeWireTests.NormalHttpRepositoryAndMvcProduceUtcPrivacySafeAggregatesAndNormalizeNullCurrency": 1
+  },
+  "status": "Source-only forecast; Payment69 full acceptance pending; actual source/receipt required"
+}

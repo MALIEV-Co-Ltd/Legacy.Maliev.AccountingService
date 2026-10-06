@@ -20,6 +20,8 @@ public sealed class WorkflowContractTests
         AssertMutationRejected("python3 -B scripts/verify-employee-completion.py runner-results --full", "echo omitted native employee gate");
         AssertMutationRejected("python3 -B scripts/verify-file-metadata.py runner-results --full", "echo omitted native file metadata gate");
         AssertMutationRejected("python3 -B scripts/verify-payment-file-metadata.py runner-results --full", "echo omitted native Payment file metadata gate");
+        AssertMutationRejected("python3 -B scripts/verify-paid-invoice-wire.py runner-results --full --wire", "echo omitted actual wire provenance gate");
+        AssertMutationRejected("PAID_INVOICE_WIRE_OUTPUT_DIRECTORY: ${{ github.workspace }}/runner-results/paid-invoice-wire", "PAID_INVOICE_WIRE_OUTPUT_DIRECTORY: missing-witness");
     }
 
     [Fact]
@@ -309,13 +311,13 @@ internal static partial class WorkflowContractValidator
         RejectDuplicatedValidationActionsAndCommands(jobs);
 
         var steps = RequireSequence(validateJob, "steps");
-        if (steps.Children.Count != 9)
+        if (steps.Children.Count != 10)
         {
-            throw new InvalidOperationException("Validate job must contain four validation and five exact evidence steps.");
+            throw new InvalidOperationException("Validate job must contain four validation and six exact evidence steps.");
         }
 
         var environment = RequireMapping(validateJob, "env");
-        if (environment.Children.Count != 4)
+        if (environment.Children.Count != 5)
         {
             throw new InvalidOperationException("Validate environment must contain only dependency root and evidence properties.");
         }
@@ -324,6 +326,7 @@ internal static partial class WorkflowContractValidator
         RequireScalarValue(environment, "VSTestCollect", "XPlat Code Coverage");
         RequireScalarValue(environment, "VSTestLogger", "trx");
         RequireScalarValue(environment, "VSTestResultsDirectory", "${{ github.workspace }}/runner-results");
+        RequireScalarValue(environment, "PAID_INVOICE_WIRE_OUTPUT_DIRECTORY", "${{ github.workspace }}/runner-results/paid-invoice-wire");
 
         var gate = RequireMapping(steps.Children[4], "coverage gate");
         if (gate.Children.Count != 2)
@@ -338,23 +341,30 @@ internal static partial class WorkflowContractValidator
         {
             throw new InvalidOperationException("Employee gate must contain only name and run.");
         }
-        RequireScalarValue(employeeGate, "name", "Verify full 1126 executions and employee inventory");
+        RequireScalarValue(employeeGate, "name", "Verify full 1132 executions and employee inventory");
         RequireScalarValue(employeeGate, "run", "python3 -B scripts/verify-employee-completion.py runner-results --full");
         var fileGate = RequireMapping(steps.Children[6], "file metadata execution gate");
         if (fileGate.Children.Count != 2)
         {
             throw new InvalidOperationException("File metadata gate must contain only name and run.");
         }
-        RequireScalarValue(fileGate, "name", "Verify full 1126 executions and file metadata inventory");
+        RequireScalarValue(fileGate, "name", "Verify full 1132 executions and file metadata inventory");
         RequireScalarValue(fileGate, "run", "python3 -B scripts/verify-file-metadata.py runner-results --full");
         var paymentFileGate = RequireMapping(steps.Children[7], "Payment file metadata execution gate");
         if (paymentFileGate.Children.Count != 2)
         {
             throw new InvalidDataException("Payment file metadata execution gate has unexpected fields.");
         }
-        RequireScalarValue(paymentFileGate, "name", "Verify full 1126 executions and Payment file metadata inventory");
+        RequireScalarValue(paymentFileGate, "name", "Verify full 1132 executions and Payment file metadata inventory");
         RequireScalarValue(paymentFileGate, "run", "python3 -B scripts/verify-payment-file-metadata.py runner-results --full");
-        var evidence = RequireMapping(steps.Children[8], "evidence upload");
+        var wireGate = RequireMapping(steps.Children[8], "PaidInvoice actual wire execution/provenance gate");
+        if (wireGate.Children.Count != 2)
+        {
+            throw new InvalidDataException("PaidInvoice wire gate has unexpected fields.");
+        }
+        RequireScalarValue(wireGate, "name", "Verify full 1132 executions and actual PaidInvoice wire provenance");
+        RequireScalarValue(wireGate, "run", "python3 -B scripts/verify-paid-invoice-wire.py runner-results --full --wire");
+        var evidence = RequireMapping(steps.Children[9], "evidence upload");
         if (evidence.Children.Count != 4)
         {
             throw new InvalidOperationException("Evidence upload must contain exactly name, if, uses and with.");
