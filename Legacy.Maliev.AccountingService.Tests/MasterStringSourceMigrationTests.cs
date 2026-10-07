@@ -430,15 +430,26 @@ public sealed class MasterStringSourceMigrationTests(InvoiceNotificationPhaseFen
             new NpgsqlParameter("value", NpgsqlDbType.Text) { Value = (object?)value ?? DBNull.Value, Size = 0 });
 
     private static Task<string> ReadAsync(DbContext context, string entity, string field) =>
-        context.Database.SqlQueryRaw<string>($"SELECT {Quote(field)} AS \"Value\" FROM {Quote(entity)} WHERE \"ID\"=1").SingleAsync();
+        ScalarAsync<string>(context, $"SELECT {Quote(field)} AS \"Value\" FROM {Quote(entity)} WHERE \"ID\"=1");
 
     private static Task<int> CountAsync(DbContext context, string entity) =>
-        context.Database.SqlQueryRaw<int>($"SELECT count(*)::int AS \"Value\" FROM {Quote(entity)}").SingleAsync();
+        ScalarAsync<int>(context, $"SELECT count(*)::int AS \"Value\" FROM {Quote(entity)}");
 
     private static async Task MigrateAsync(DbContext context, string target)
     {
         using var lifetime = new CancellationTokenSource(TimeSpan.FromSeconds(45));
         await context.GetService<IMigrator>().MigrateAsync(target, lifetime.Token);
+    }
+
+    private static async Task<T> ScalarAsync<T>(DbContext context, string sql, CancellationToken cancellationToken = default)
+    {
+        using var lifetime = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        lifetime.CancelAfter(TimeSpan.FromSeconds(45));
+        await using var connection = new NpgsqlConnection(context.Database.GetConnectionString());
+        await connection.OpenAsync(lifetime.Token);
+        await using var command = new NpgsqlCommand(sql, connection) { CommandTimeout = 40 };
+        return (T)(await command.ExecuteScalarAsync(lifetime.Token)
+            ?? throw new InvalidOperationException("The owned scalar query returned no value."));
     }
 
     private static async Task ExecuteAsync(DbContext context, string sql, params NpgsqlParameter[] parameters)
@@ -458,7 +469,7 @@ public sealed class MasterStringSourceMigrationTests(InvoiceNotificationPhaseFen
         var rows = new List<string>();
         foreach (var table in tables)
         {
-            var json = await context.Database.SqlQueryRaw<string>($"SELECT COALESCE(jsonb_agg(to_jsonb(r) ORDER BY to_jsonb(r)::text)::text,'[]') AS \"Value\" FROM {Quote(table)} r").SingleAsync(lifetime.Token);
+            var json = await ScalarAsync<string>(context, $"SELECT COALESCE(jsonb_agg(to_jsonb(r) ORDER BY to_jsonb(r)::text)::text,'[]') AS \"Value\" FROM {Quote(table)} r", lifetime.Token);
             rows.Add(table + ":" + json);
         }
         var schema = await context.Database.SqlQueryRaw<string>("SELECT COALESCE(jsonb_agg(to_jsonb(c) ORDER BY c.table_name,c.ordinal_position)::text,'[]') AS \"Value\" FROM information_schema.columns c WHERE c.table_schema='public'").SingleAsync(lifetime.Token);
