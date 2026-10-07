@@ -7,7 +7,7 @@
     },
     {
       "repository": "Legacy.Maliev.AccountingService",
-      "commit": "caf7dad3f17787615d4f468a6a8ed06896bba043"
+      "commit": "3d128b6d95d915ccd38323ccd66af4575800f32e"
     },
     {
       "repository": "Legacy.Maliev.QuotationService",
@@ -977,5 +977,94 @@
     "sourceOnlyWitness": true,
     "originalSqlServerExecuted": false,
     "productionDataSchemaOrDeploy": false
+  },
+  "masterSourceStringsOwnProducerSourceAdvance": {
+    "previousAccounting": "caf7dad3f17787615d4f468a6a8ed06896bba043",
+    "reviewedAccounting": "3d128b6d95d915ccd38323ccd66af4575800f32e",
+    "acceptedMainBaseline": "a9ab7faa40b62cf527b7f3f559ea2779037e4e16",
+    "previousInputCount": 115,
+    "inputCount": 122,
+    "changedInputs": [
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/AccountingDbContexts.cs",
+        "previousObject": "100644 blob 75d7d2e69fdd0dec13cef6b37e1f40e65c891b37",
+        "reviewedObject": "100644 blob 665036558aba09b6ed08a368f5d3bbbc03191c08"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/AccountingRepository.cs",
+        "previousObject": "100644 blob 5621dadcdb8114c1edf5cba228175c5ecd80490f",
+        "reviewedObject": "100644 blob 423475b881697c6ecf36dce07ab72e2c81947f4c"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/InvoiceCreationStore.cs",
+        "previousObject": "100644 blob 295ac5f5b36f5bfa7fd79f5a3b9d2589bd8bdcbb",
+        "reviewedObject": "100644 blob 2be331334901b80e648c0391e378fe9e31b6f21d"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/MasterStringConstraints.cs",
+        "previousObject": null,
+        "reviewedObject": "100644 blob 56aae0846b8e4b43dab4aeb3b7d42014d235729d"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/20261007100000_RequireInvoiceMasterSourceStrings.Designer.cs",
+        "previousObject": null,
+        "reviewedObject": "100644 blob ef2eff765409c2e5cf49379e638a7c67ce83f00e"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/20261007100000_RequireInvoiceMasterSourceStrings.cs",
+        "previousObject": null,
+        "reviewedObject": "100644 blob 5e9d2f38122d3f9dcffdeb00537c340b3dfe4c1b"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/InvoiceDbContextModelSnapshot.cs",
+        "previousObject": "100644 blob c45762111bcdc0c9eacd1c2087dbedf12cbe8382",
+        "reviewedObject": "100644 blob 213df9120a8f3537a16579cc17ef45f4afc32d22"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/Migrations/Payment/20261007100000_RequirePaymentMasterSourceStrings.Designer.cs",
+        "previousObject": null,
+        "reviewedObject": "100644 blob 5d3944316cf5f567e153fa4ffbc8128d845d8144"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/Migrations/Payment/20261007100000_RequirePaymentMasterSourceStrings.cs",
+        "previousObject": null,
+        "reviewedObject": "100644 blob 18f48595a175c9e95362e386fa3f7774df4c58e6"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/Migrations/Payment/PaymentDbContextModelSnapshot.cs",
+        "previousObject": "100644 blob 6718ccd6465b1b1c3a27a292b2534ea15ebaf51c",
+        "reviewedObject": "100644 blob e001f80914e1a1995db393e6fb80f2adeaa7a64a"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/Migrations/Receipt/20261007100000_RequireReceiptMasterSourceStrings.Designer.cs",
+        "previousObject": null,
+        "reviewedObject": "100644 blob f87aee2945d8788c346c5cec245f9fb20f90a7b8"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/Migrations/Receipt/20261007100000_RequireReceiptMasterSourceStrings.cs",
+        "previousObject": null,
+        "reviewedObject": "100644 blob 6f787a9553effc7cfe9140af6b810e8d4a5efd84"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/Migrations/Receipt/ReceiptDbContextModelSnapshot.cs",
+        "previousObject": "100644 blob 976cc64be9b5474d05efb48a4fdd69c95e8f9b7b",
+        "reviewedObject": "100644 blob fefe0c54ef5519a449a7a9e424eb4e46bb1841da"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/ReceiptWorkflowStore.cs",
+        "previousObject": "100644 blob d03c3ddd7d7fae0c7f17add8b3acd070375f5be6",
+        "reviewedObject": "100644 blob 514376de0ad192b60db2dcab82740f510bf53209"
+      }
+    ],
+    "unchangedInputCount": 108,
+    "unchangedInputSha256": "6f55a15ae10df188d1eab3e3db1163dfcc2b5f31ba3643923f04a02112a4159e",
+    "digestSerialization": "UTF8 compact JSON sorted keys mapping path to full Git ls-tree metadata",
+    "review": "Root complete34 source review and narrow r3 resource cleanup correction cleared; private source-only witness",
+    "nativeAcceptance": "Pending exact changed-head build0/focus474/full1652/raw/static; accepted71 actual1178 retained",
+    "peerPinsAdvanced": false,
+    "employeeActualProducerJoinProven": false,
+    "previousHistoryPreserved": true,
+    "producerGuardRelaxed": false,
+    "ddlOrDeploymentPerformed": false
   }
 }
