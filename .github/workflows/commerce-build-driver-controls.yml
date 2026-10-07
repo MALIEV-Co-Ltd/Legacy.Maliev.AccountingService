@@ -1,0 +1,39 @@
+name: Commerce BUILD command lifecycle controls
+on:
+  pull_request:
+    paths: ['eng/commerce-build-driver/**', '.github/workflows/commerce-build-driver-controls.yml']
+  push:
+    branches: [main]
+    paths: ['eng/commerce-build-driver/**', '.github/workflows/commerce-build-driver-controls.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: commerce-build-driver-controls-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  linux-command-lifecycle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.14'
+      - name: Compile source-only controls
+        run: python -B -c "from pathlib import Path; [compile(p.read_bytes(), str(p), 'exec') for p in Path('eng/commerce-build-driver').glob('*.py')]"
+      - name: Verify child expiry precedes blocking writes
+        working-directory: eng/commerce-build-driver
+        run: python -B -m unittest prove_linux_command_lifecycle_v1.FixtureLeaseControls -v
+      - name: Prove four actual owned Linux child and pipe lifecycles
+        run: python -B eng/commerce-build-driver/prove_linux_command_lifecycle_v1.py --results "$RUNNER_TEMP/commerce-build-driver-proof-$GITHUB_RUN_ID"
+      - name: Retain actual lifecycle evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: commerce-build-driver-proof-${{ github.sha }}
+          path: ${{ runner.temp }}/commerce-build-driver-proof-${{ github.run_id }}
+          if-no-files-found: error
+          retention-days: 7
