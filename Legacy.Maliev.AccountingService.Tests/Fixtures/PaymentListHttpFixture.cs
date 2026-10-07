@@ -199,7 +199,9 @@ public sealed class PaymentListHttpFixture : IAsyncLifetime
     private async Task ChangeHistoricalNameSchemaAsync(string table, bool restore)
     {
         var authority = new NpgsqlConnectionStringBuilder(connections["PaymentDbContext"]);
-        if (string.IsNullOrWhiteSpace(postgres.Id) || !ownedDatabases.Contains(authority.Database)
+        var databaseName = authority.Database;
+        if (string.IsNullOrWhiteSpace(databaseName)
+            || string.IsNullOrWhiteSpace(postgres.Id) || !ownedDatabases.Contains(databaseName)
             || authority.Host is not ("127.0.0.1" or "localhost")
             || authority.Port != postgres.GetMappedPublicPort(5432)
             || table is not ("PaymentDirection" or "PaymentMethod" or "PaymentType"))
