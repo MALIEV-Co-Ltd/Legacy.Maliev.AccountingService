@@ -155,8 +155,8 @@ public sealed class PaymentSummaryCurrencyEdgeHttpTests(AccountingBoundaryHttpFi
         await using var database = fixture.Database();
         (await database.Directions.SingleAsync(row => row.Id == 100000)).Name = "Income";
         (await database.Types.SingleAsync(row => row.Id == 100000)).Name = "Job";
-        database.Directions.Add(new PaymentDirection { Id = 100001, Name = "Expense" });
-        database.Types.Add(new PaymentType { Id = 100001, Name = "Other" });
+        database.Directions.Add(new PaymentDirection { Id = 100001, Name = "Expense", Description = "Synthetic source-compatible seed" });
+        database.Types.Add(new PaymentType { Id = 100001, Name = "Other", Description = "Synthetic source-compatible seed" });
         await database.SaveChangesAsync();
     }
 

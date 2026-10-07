@@ -85,9 +85,9 @@ public sealed class PaymentSummaryLookupIdentityHttpTests(AccountingBoundaryHttp
         await using var database = fixture.Database();
         (await database.Directions.SingleAsync(row => row.Id == 100000)).Name = "Income";
         (await database.Types.SingleAsync(row => row.Id == 100000)).Name = "Job";
-        database.Directions.Add(new PaymentDirection { Id = 100001, Name = "Expense" });
-        if (duplicate == "Job") database.Types.Add(new PaymentType { Id = 100002, Name = duplicate });
-        else if (duplicate is not null) database.Directions.Add(new PaymentDirection { Id = 100002, Name = duplicate });
+        database.Directions.Add(new PaymentDirection { Id = 100001, Name = "Expense", Description = "Synthetic source-compatible seed" });
+        if (duplicate == "Job") database.Types.Add(new PaymentType { Id = 100002, Name = duplicate, Description = "Synthetic source-compatible seed" });
+        else if (duplicate is not null) database.Directions.Add(new PaymentDirection { Id = 100002, Name = duplicate, Description = "Synthetic source-compatible seed" });
         if (populated)
         {
             database.Payments.AddRange(Row(100000, 100000, 10, 6, 100m), Row(100001, 100000, 10, 6, 10m),

@@ -17,6 +17,7 @@ public sealed class PaymentDbContext(DbContextOptions<PaymentDbContext> options)
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ModelRules.Apply(modelBuilder);
+        MasterStringConstraints.Apply(modelBuilder);
         modelBuilder.Entity<Payment>().Property(value => value.Amount).HasPrecision(18, 2);
         modelBuilder.Entity<Payment>().Property(value => value.ModifiedDate).IsConcurrencyToken();
         modelBuilder.Entity<Payment>().HasOne(value => value.PaymentDirection).WithMany(value => value.Payment)
@@ -44,6 +45,7 @@ public sealed class InvoiceDbContext(DbContextOptions<InvoiceDbContext> options)
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ModelRules.Apply(modelBuilder);
+        MasterStringConstraints.Apply(modelBuilder);
         modelBuilder.Entity<InvoiceCreationAdmission>(entity =>
         {
             entity.HasKey(value => value.OperationId);
@@ -167,6 +169,7 @@ public sealed class ReceiptDbContext(DbContextOptions<ReceiptDbContext> options)
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ModelRules.Apply(modelBuilder);
+        MasterStringConstraints.Apply(modelBuilder);
         modelBuilder.Entity<ReceiptOrderItem>().ToTable("OrderItem");
         modelBuilder.Entity<ReceiptOrderItem>().Property(value => value.UnitPrice).HasPrecision(18, 2);
         modelBuilder.Entity<ReceiptOrderItem>().Property(value => value.Subtotal).HasPrecision(18, 2)
