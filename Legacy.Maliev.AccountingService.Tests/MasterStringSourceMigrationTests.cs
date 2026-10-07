@@ -195,6 +195,7 @@ public sealed class MasterStringSourceMigrationTests(InvoiceNotificationPhaseFen
         await using var owned = await PreimageAsync(database);
         var context = owned.Context;
         await SeedAsync(context, database);
+        if (!collision) await SetAsync(context, entity, field, "Synthetic schema preimage");
         await ExecuteAsync(context, collision
             ? $"ALTER TABLE {Quote(entity)} ADD CONSTRAINT {Quote(CheckName(entity, field))} CHECK (true)"
             : $"ALTER TABLE {Quote(entity)} ALTER COLUMN {Quote(field)} SET NOT NULL");

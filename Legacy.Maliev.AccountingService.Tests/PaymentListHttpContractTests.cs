@@ -179,7 +179,13 @@ public sealed class PaymentListHttpContractTests(PaymentListHttpFixture fixture)
         await fixture.SeedAsync(withoutName, alpha, charlie);
         if (!sort.StartsWith("Recipient_", StringComparison.Ordinal))
         {
-            await fixture.SetNullableLookupNamesAsync(sort);
+            await fixture.WithHistoricalNullableLookupAsync(sort, async () =>
+            {
+                await fixture.SetNullableLookupNamesAsync(sort);
+                using var historicalClient = fixture.Client();
+                Assert.Equal(new[] { first, second, third }, Ids(await Page(historicalClient, $"/payments?sort={sort}")));
+            });
+            return;
         }
 
         using var client = fixture.Client();

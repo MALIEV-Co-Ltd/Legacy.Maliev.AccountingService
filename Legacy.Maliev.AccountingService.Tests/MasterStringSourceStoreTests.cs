@@ -74,7 +74,11 @@ public sealed class MasterStringSourceStoreTests(InvoiceNotificationPhaseFencePo
             return await controller.CreateAsync(84, request, operation.ToString("D"), CancellationToken.None);
         }
         var failure = Assert.IsType<BadRequestObjectResult>((await Call()).Result);
-        Assert.Equal("The request is invalid. (Parameter 'item')", Assert.IsType<ProblemDetails>(failure.Value).Title);
+        var problem = Assert.IsType<ObjectResult>(failure.Value);
+        Assert.Equal(StatusCodes.Status400BadRequest, problem.StatusCode);
+        var details = Assert.IsType<ProblemDetails>(problem.Value);
+        Assert.Equal(StatusCodes.Status400BadRequest, details.Status);
+        Assert.Equal("The request is invalid. (Parameter 'item')", details.Title);
         var retained = await database.InvoiceCreationAdmissions.AsNoTracking().SingleAsync();
         Assert.Equal(operation, retained.OperationId);
         Assert.Equal("NeedsReconciliation", retained.State);
