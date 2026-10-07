@@ -1,0 +1,6192 @@
+{
+  "schemaVersion": 1,
+  "repository": "MALIEV-Co-Ltd/Legacy.Maliev.AccountingService",
+  "acceptedBase": "668f2cb63c64b911db776329b983dd91944b3b8c",
+  "candidateFileCount": 49,
+  "owner": "01a1009c-aa47-72d2-9914-3a0784a67c0e",
+  "coordinator": "019fc21e-50f0-7112-834f-9fb3b35b9dfe",
+  "executionMode": "source-intake-only",
+  "sdkAuthorized": false,
+  "dependencyPins": {
+    "Legacy.Maliev.ServiceDefaults": "7b3099bf67d0f17e56cfdb3dcf36541304abaac2",
+    "Legacy.Maliev.CompatibilityContracts": "78e48ffc4ee000df0510cba5e7c7a3c4c4d539d7"
+  },
+  "candidateManifestSha256": "cc314f03b3cee337ddd2ea40609a7c40d664a8e8177eae82b6a87b353590d0a2",
+  "dependencyManifestSha256": "46d25b1c76eaf2d7077af087e432de3e691426d7da1d1a6c5299a679b6e11b53",
+  "baseFiles": [
+    {
+      "path": ".dockerignore",
+      "bytes": 85,
+      "sha256": "5984866d3f136fd22a64d3147c942eac8423638bf2f5703232c2d11cc1ed0db5"
+    },
+    {
+      "path": ".gitattributes",
+      "bytes": 39,
+      "sha256": "91c171a7f4e295966f6e40aba83b0a11a56b4c99b59b9c55fcf54f15df207bc0"
+    },
+    {
+      "path": ".github/dependabot.yml",
+      "bytes": 1341,
+      "sha256": "95fdef4d9a700a714b8efaaa62e66f0e99e23092f9fc08cd1b6b19b24942f547"
+    },
+    {
+      "path": ".github/workflows/_build-and-test.yml",
+      "bytes": 2686,
+      "sha256": "06c122888d474098ac3512602a051af5f658e85779aed28c56487a775f0f079c"
+    },
+    {
+      "path": ".github/workflows/accounting-child-list-source.yml",
+      "bytes": 2257,
+      "sha256": "bfb759c183a2e0054177efe92531080eda7512c63bfb5ade64c140ebd99aad97"
+    },
+    {
+      "path": ".github/workflows/atomic-focused-validation.yml",
+      "bytes": 2341,
+      "sha256": "31ba234e1b3f92171a51073c9c706002bd36e7f680e28882e5705f6be3cc604e"
+    },
+    {
+      "path": ".github/workflows/atomic-protocol-validation.yml",
+      "bytes": 6650,
+      "sha256": "ccce1d1f55ee3c74265180121f6fda645af09e09bdcd4d691f41105c610f04c0"
+    },
+    {
+      "path": ".github/workflows/ci-develop.yml",
+      "bytes": 247,
+      "sha256": "55438892e1be3a3f5ff3e3e96aa69d74fc50884f1f465ce0ef1bc7e733ff825f"
+    },
+    {
+      "path": ".github/workflows/ci-main.yml",
+      "bytes": 262,
+      "sha256": "9222ef62a720838756b03fac73ac6c35b206a5e86fce28e8dfb447fe415e6937"
+    },
+    {
+      "path": ".github/workflows/ci-staging.yml",
+      "bytes": 246,
+      "sha256": "5436292ba9523f34ca9f3801fdd674ed6e7d18b4e4d6e0b72bdb9c2d2fa1c1cd"
+    },
+    {
+      "path": ".github/workflows/employee-completion.yml",
+      "bytes": 3564,
+      "sha256": "12ea1bee269af6e9d25907f779d589d4ed406f11dec10e327186bd23c2dcfb60"
+    },
+    {
+      "path": ".github/workflows/invoice-master-query-source.yml",
+      "bytes": 2352,
+      "sha256": "f03e6d7acf91e0d0b20177af1ffd31ae792560b4196ada608ac484fa405e9c30"
+    },
+    {
+      "path": ".github/workflows/invoice-notification-focused.yml",
+      "bytes": 2452,
+      "sha256": "daabedab9ed11722b7c3e30a743d40a3c99a5c533d0814f3099c6c38056ce902"
+    },
+    {
+      "path": ".github/workflows/invoice-receipt-file-metadata-source.yml",
+      "bytes": 2319,
+      "sha256": "3f9b414e28d3968ccc3c9cb91ac19c3f529ca0e0a27e2c68d331285a2b700bb1"
+    },
+    {
+      "path": ".github/workflows/invoice-receipt-file-parent-source.yml",
+      "bytes": 2268,
+      "sha256": "d353a3d3344c29324bfb5ceaac0b96418513fd34a911ad1a689a4090f1b6993c"
+    },
+    {
+      "path": ".github/workflows/invoice-receipt-master-date-source.yml",
+      "bytes": 2269,
+      "sha256": "e43848d93a6285062401cb588c0aadfc3bd846f16c7aec049a92d7ec608ead99"
+    },
+    {
+      "path": ".github/workflows/invoice-receipt-master-scalar-source.yml",
+      "bytes": 2286,
+      "sha256": "d9ea5963cb221c7e9e134f631e7dde27e6e5a8386b7e8454893c5e64163aea2b"
+    },
+    {
+      "path": ".github/workflows/invoice-receipt-order-item-source.yml",
+      "bytes": 2283,
+      "sha256": "89bacfb93b34b715d85a4e130e3331576dc4bb7f4020f67d2b2142343c735628"
+    },
+    {
+      "path": ".github/workflows/joined-public-validation.yml",
+      "bytes": 3480,
+      "sha256": "26a440c628b5af075dc094d1edebb4dbd648a05480b5daf4506a0448b938e675"
+    },
+    {
+      "path": ".github/workflows/master-source-strings.yml",
+      "bytes": 2559,
+      "sha256": "99c564b0e4242250cee0b3af0da12facf7c323832fdeaaacd13d57c875fedda1"
+    },
+    {
+      "path": ".github/workflows/paid-invoice-wire.yml",
+      "bytes": 2396,
+      "sha256": "3f4aa9a64724ee2d621838bf600dbf9d27a15ef821d84fc54f67e9124eaa8f2f"
+    },
+    {
+      "path": ".github/workflows/payment-date-currency.yml",
+      "bytes": 2641,
+      "sha256": "06246e08c4a1d8399bdc4d4e555e9107c38654297c913055c0b3be38cb26fa94"
+    },
+    {
+      "path": ".github/workflows/payment-file-metadata-source.yml",
+      "bytes": 2341,
+      "sha256": "d0ab21a8246c86f45876b31d9f199385da67bc41b9c9650c594ab00674441756"
+    },
+    {
+      "path": ".github/workflows/payment-master-query-source.yml",
+      "bytes": 2289,
+      "sha256": "112529001ff931a99cf4269c0d7cd686d37024005c65304fa14dc5d724662d02"
+    },
+    {
+      "path": ".github/workflows/payment-read-defaults-source.yml",
+      "bytes": 2202,
+      "sha256": "b308f5c59f0f7388c4bfaa195d3ace41d66ce60f018f52f165e19873cc3c758a"
+    },
+    {
+      "path": ".github/workflows/payment-summary-identity.yml",
+      "bytes": 2344,
+      "sha256": "7ad070f779a1d6fa61aa3d0fcf8b3ef65edd001f8ec2b5888f40e8d47b26b8ad"
+    },
+    {
+      "path": ".github/workflows/pr-validation.yml",
+      "bytes": 345,
+      "sha256": "ae35a914831b085fe4197d7899d0612e4bddf2ea02ec9d349f4f1a196645b2fe"
+    },
+    {
+      "path": ".github/workflows/publish-image.yml",
+      "bytes": 1104,
+      "sha256": "3fe09176e6aaa903599e153f3a6f81fafb670cd9e95cf217a9d7b9bf9c2f29f2"
+    },
+    {
+      "path": ".github/workflows/receipt-create-retry.yml",
+      "bytes": 2205,
+      "sha256": "525cb29d91cc9359468f0fd6fc8ce3e845529704afc394afd35c779213e3b03a"
+    },
+    {
+      "path": ".github/workflows/receipt-invoice-cache.yml",
+      "bytes": 2197,
+      "sha256": "58029ec88121af13eef0057983298141765d27ef228c6be3c31985846fbd2611"
+    },
+    {
+      "path": ".github/workflows/receipt-master-query-source.yml",
+      "bytes": 2344,
+      "sha256": "9c34691e92806e4c4aa8df0b03478b760e87ceeff3a813184104290c47b989a7"
+    },
+    {
+      "path": ".gitignore",
+      "bytes": 118,
+      "sha256": "60e518e0a9167f1fb3769cabc8437a82120c75f6541c4c5ca30dbb528e8e99cc"
+    },
+    {
+      "path": "AGENTS.md",
+      "bytes": 1465,
+      "sha256": "42d63e34b575f0121e1e4aed1be218f82f9a1f3626f4c622dcb5b59c82a3160a"
+    },
+    {
+      "path": "Directory.Build.props",
+      "bytes": 553,
+      "sha256": "acf13da5d1eed107a7244be2e7ebf3deed7f31d6fc67796e21c5e88709bd3131"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Api/Authorization/AccountingIamComposition.cs",
+      "bytes": 2531,
+      "sha256": "8dc80d90497c012ce17f9e36c95d2f7a0f9d2a5eacf4c7b503f48491831bfaae"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Api/Authorization/AccountingPermissions.cs",
+      "bytes": 558,
+      "sha256": "c667c2217473bc2bead490e9a14d4dcc54b40d684f287b0b170f7aec23c04e0b"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Api/Authorization/InvoiceCompletionCapabilityVerifier.cs",
+      "bytes": 5881,
+      "sha256": "60f71c04e5964566b5136a66bdfb4e8e1b782f9ba0794a253ea55796ffe69c37"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Api/Authorization/InvoiceCreationDelegationVerifier.cs",
+      "bytes": 4952,
+      "sha256": "46d02750707c51e3a09cbc9417f4be0a9f58d31fd0fdc85bc555b3304268ed3b"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Api/Controllers/CrudController.cs",
+      "bytes": 2031,
+      "sha256": "a19bc759ee9d744d9a275b454ebd468f899479c46ab16fd27557d1f88de16286"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Api/Controllers/InvoiceControllers.cs",
+      "bytes": 7637,
+      "sha256": "ee6b05cdbc43d73f13be3c4b3592b41fc0a84f1c589f8be45928d0bea2104e92"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Api/Controllers/InvoiceCreationController.cs",
+      "bytes": 12506,
+      "sha256": "67ecec2c260bfc255b0761253437b9e0965a9d427a239d20972dad44663f420c"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Api/Controllers/InvoiceFinancialOwnershipController.cs",
+      "bytes": 2393,
+      "sha256": "c546d7983b08222be6fc391e3e5f6460fad4070b24fa865ade5a2209731f2510"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Api/Controllers/InvoiceReceiptWorkflowController.cs",
+      "bytes": 6105,
+      "sha256": "d77e77e130aaf8e28fe374eb1a7deb1d363871343d75d509e985e400a4202c36"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Api/Controllers/PaymentCatalogControllers.cs",
+      "bytes": 7382,
+      "sha256": "ad5aa3c90701878c58ea81a4a95545a15c8a773259d971af3763831e130ba98d"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Api/Controllers/PaymentRecordControllers.cs",
+      "bytes": 6783,
+      "sha256": "78b9ff2490db8f8c07c56e62546debd9015b0e65e39fd9c78528fcca823f440b"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Api/Controllers/ReceiptControllers.cs",
+      "bytes": 6672,
+      "sha256": "fba875a10a2bcf9420c7a5ebabec92cc605a801552cc43634680c7b0ccf4042a"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Api/Dockerfile",
+      "bytes": 1313,
+      "sha256": "2150a1d560902ed683a3e0c9aa39c8572a66c3dd48fb1e8b404451feab860fcc"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Api/IdempotentCreates.cs",
+      "bytes": 793,
+      "sha256": "6aa8d5add55672fec4447456b958e91556878faae104c59fead6b29e764ee5c9"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Api/InvoiceNotificationRegistration.cs",
+      "bytes": 3688,
+      "sha256": "1591b8f1a150c4c25c274f1a207fa5033266de679bb73aa0dab4fe1c98be0436"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Api/Legacy.Maliev.AccountingService.Api.csproj",
+      "bytes": 1289,
+      "sha256": "7ebcb86d45d90b77e8b70ca746cf3f0071176771e67173cbe262cbe332b6dceb"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Api/Program.cs",
+      "bytes": 8797,
+      "sha256": "2d0cb22886a4b3d6afc65105e1c9d360a71930fa078139fea09ae9d90a20b6f1"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Api/Properties/launchSettings.json",
+      "bytes": 618,
+      "sha256": "3d5744d3d6ffce5b0a1a1b30d81543bda5ddc6146fd7ee9d1592c3b769210a40"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Api/appsettings.Development.json",
+      "bytes": 119,
+      "sha256": "817db0bf2ecca78364c41dbaf7949bf2504cf47a1c3d0d54f3be8178fefc030b"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Api/appsettings.json",
+      "bytes": 859,
+      "sha256": "36edf47938ee26c3ae9cf6f666c413d614c4cdf8690647559702c79c887e78af"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Application/Interfaces/IAccountingBoundaries.cs",
+      "bytes": 2733,
+      "sha256": "cfe775a3cf1107fc12ef5bb32dfd5c63881b64c6e1c1913b77fe77a5cfa6d139"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Application/Interfaces/IInvoiceCreationBoundaries.cs",
+      "bytes": 6881,
+      "sha256": "c438aa6b1d4b2bd73c317cc9281931236c2cd101451be3745037e770572c662e"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Application/Interfaces/IInvoiceNotificationCorrelationStore.cs",
+      "bytes": 787,
+      "sha256": "9c9d2e16aa1efec5609a1b54f802213370530170180d081a3db638b8e674373f"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Application/Interfaces/IInvoiceNotificationPhaseStore.cs",
+      "bytes": 1589,
+      "sha256": "26837042333df5434363734024f439eb250c5036908620b96b696c371f294713"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Application/Interfaces/IInvoiceNotificationWorkflow.cs",
+      "bytes": 1536,
+      "sha256": "48caa3b7399412beea7852716f602afe374e9fb4f3d3028b2ad4722d4db12abb"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Application/Interfaces/IReceiptWorkflowBoundaries.cs",
+      "bytes": 5490,
+      "sha256": "34e81978e7f4d9ab00fc4ced2587b6f3d14a0002008e2375c6716bcf383ecdf9"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Application/Legacy.Maliev.AccountingService.Application.csproj",
+      "bytes": 480,
+      "sha256": "750202f7f5e1ff9d7d80a0ce433f856785c046d829875570549737a4763593b3"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Application/Models/AccountingModels.cs",
+      "bytes": 1739,
+      "sha256": "070838352226e56faee0344f24bc739c7c4a1468e4ed2053c4362150c3472b15"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Application/Models/InvoiceCreationModels.cs",
+      "bytes": 3847,
+      "sha256": "e44091c6d696d364b8503482c6882e811d0ad9b917a47c79e0cb94103ff4dd96"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Application/Models/InvoiceEmployeeCompletionPhase.cs",
+      "bytes": 497,
+      "sha256": "ea6c3fda60f2a1a9eff824ecd7f7139b1eec24a202ff627931166fe9e1d50a17"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Application/Models/InvoiceFinancialOwnership.cs",
+      "bytes": 1024,
+      "sha256": "f10c1b34dd7870b5b1e51e8bbd52ec13a02b1e85bc9f6cf86878b4fe7cfb45d4"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Application/Models/InvoiceNotificationCorrelationModels.cs",
+      "bytes": 2591,
+      "sha256": "3aad4646a6b1a5dce11e355850fca14f26fbab68c6094756a93a4ef47db73e9f"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Application/Models/InvoiceNotificationPayloadSnapshot.cs",
+      "bytes": 5913,
+      "sha256": "b790be6d875f11cc2826774e89ca879f511e9c952c80137407fa99f6fade878e"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Application/Models/InvoiceNotificationPhaseModels.cs",
+      "bytes": 1878,
+      "sha256": "5ad9f8b046e9a5f514adc284b68a68427055d26b52c003852b87918464319898"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Application/Models/InvoiceNotificationReceiptModels.cs",
+      "bytes": 1398,
+      "sha256": "821e00c2ba362b80c1a1fd0c2496b6084a033b3560f0e1aed1b3fa479b20d6ca"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Application/Models/InvoiceQuotationOperationReceipt.cs",
+      "bytes": 601,
+      "sha256": "e9ef76ac8209e7d96c749169b41a65c45c00d20088cac277995f242ad7584f1e"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Application/Models/PaidInvoiceOutcomeReadback.cs",
+      "bytes": 845,
+      "sha256": "7204e70222fbcbf7022a64085a87bddf4702b8c079c19f77afa43d29caeeab9c"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Application/Models/ReceiptWorkflowModels.cs",
+      "bytes": 2902,
+      "sha256": "0e7296404c8b3f68edf02cb05e4868392228b7ce2105ab3734dd785875359d63"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Application/Services/InvoiceCreationWorkflowService.cs",
+      "bytes": 28506,
+      "sha256": "70a6026ffb01f006fd449b44f8b932bb12b3749b20ca28210bb5bedd83609b15"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Application/Services/InvoiceNotificationCorrelationBinding.cs",
+      "bytes": 4565,
+      "sha256": "cc55ac7478537b8b7e55db3865c4e7cf76dce09ff8232544713fec567f8b9a1d"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Application/Services/InvoiceNotificationReceiptBinding.cs",
+      "bytes": 7236,
+      "sha256": "d56b1c42caac38c1cbddbd487b626d54b2a90aff60bf19a0b5b5c735e4b48acd"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Application/Services/ReceiptWorkflowService.cs",
+      "bytes": 10478,
+      "sha256": "628c19e36dcdbe64350c3f2257c90783804baf56f41af37960243e288597beb5"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/AccountingDbContextFactories.cs",
+      "bytes": 1489,
+      "sha256": "a3602c5dd13b56cf94bac91c416e7a7a2fb687f34a7bc4512602a4ecd5d2335b"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/AccountingDbContexts.cs",
+      "bytes": 15897,
+      "sha256": "eb20ceb82860c179eb4fcfbc1fc2c5f6003cb8bdebca97b16766e5625dc00072"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/AccountingRepository.cs",
+      "bytes": 28239,
+      "sha256": "85c1d80f38c518ecb2f0c451e54004ea25bbbe5c356a819c88782c21ab855fb8"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/DistributedAccountingCache.cs",
+      "bytes": 2803,
+      "sha256": "b28d63ba2bda2baf4beec2e614a5b5cf15cb6d1e081aa2a8acfc5c2b8b729261"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/InvoiceCreationAdmission.cs",
+      "bytes": 14405,
+      "sha256": "8ff543232f791e30fd4124b18cf39f16ae71e02682c407f8a479bc1f97b5bd50"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/InvoiceCreationDownstreamClients.cs",
+      "bytes": 11860,
+      "sha256": "0bebe054a674eef0c9184643867202094c8782dc4d7daf868948d218c2b42825"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/InvoiceCreationJournal.cs",
+      "bytes": 1641,
+      "sha256": "2b7af31192a285a633a4d55b3a5521d67392ccb1b17f3dc214e31c17193d6fb8"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/InvoiceCreationStore.cs",
+      "bytes": 5897,
+      "sha256": "a361e857c55cdd5e56f21966801ba047acee6ab883a9004e17f284a29b468ed8"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/InvoiceEmployeeCompletionStore.cs",
+      "bytes": 14080,
+      "sha256": "247dd354f724be9d419fcf6359fcf85f38405b736f233247789cb588590238f3"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/InvoiceEmployeeQuotationCompletionClient.cs",
+      "bytes": 8412,
+      "sha256": "79a328af15aeee14edfb64deeaa012219ec0252bc2eaee5ab9ad6def94e784a1"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/InvoiceFinancialOwnershipStore.cs",
+      "bytes": 10469,
+      "sha256": "d263e52be34a6f1787bae251b43e57ae0a8fecadf38d42fb81c26e0a072bfde7"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/InvoiceNotificationCorrelationReadiness.cs",
+      "bytes": 8502,
+      "sha256": "4d4c199830ba574405edf04cc90888807c1e7fcba3286ba0a10a0ede1f7db4ff"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/InvoiceNotificationCorrelationRow.cs",
+      "bytes": 1517,
+      "sha256": "32052cb85277d1dffcb39c5c11f3dd20a8ef5c4f2f15066121c81e3dc6eab044"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/InvoiceNotificationCorrelationStore.cs",
+      "bytes": 22931,
+      "sha256": "b27742aae6f1ff5bd3eef042503d794757157f5c5b17becb4cd24a4f9a4902ab"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/InvoiceNotificationIntentClient.cs",
+      "bytes": 9036,
+      "sha256": "0224c2b1d046e12492d581bcf58ff7e2e495f06acada168549f1e35e327c1c56"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/InvoiceNotificationWorkflow.cs",
+      "bytes": 9079,
+      "sha256": "8e767d2f31d58937ce4dd388238373e7617f5b3bf0fdc0cce08d8117cd728747"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Legacy.Maliev.AccountingService.Data.csproj",
+      "bytes": 1257,
+      "sha256": "77e35ec20d9cd8a56741efaccf44ae4a87551976025c46f6825f76ab8d8b64d8"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/MasterStringConstraints.cs",
+      "bytes": 6277,
+      "sha256": "f71e56d22362c0d1a0975c191223c250ad2ecb2dd734c2e4800e07b0f8e41aad"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/20260715055541_InitialPostgres.Designer.cs",
+      "bytes": 11403,
+      "sha256": "b41d216153d18eb8d9fd65ee470194a63cdc4aa74161246b01ce97d490f9b993"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/20260715055541_InitialPostgres.cs",
+      "bytes": 8598,
+      "sha256": "ec7ed48165612a450e2969cc1d5c0ebfd5b6513984f10455a0a4e95e93e3669d"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/20260721024204_FixTimestampAndInvoiceColumnCasing.Designer.cs",
+      "bytes": 11481,
+      "sha256": "2ab1bc6eb1a34f53f653dc5d0b1609109f02bc848264115f425db90e7cf9a4bb"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/20260721024204_FixTimestampAndInvoiceColumnCasing.cs",
+      "bytes": 2328,
+      "sha256": "0a0ced78c898fa8010e6b83cc476778eec9deed6d549e84d80c306054a0f3d5b"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/20260905113336_AddInvoiceMarketingAttribution.Designer.cs",
+      "bytes": 12048,
+      "sha256": "597357180eabd66028f26381b4f801fdc1694d0b0aa14305536183a46aec592e"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/20260905113336_AddInvoiceMarketingAttribution.cs",
+      "bytes": 1821,
+      "sha256": "f0f413bb9c52da8690dbc03e6ce74e49362b5970e983ba8fc9df106c122d9306"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/20260928094829_AddInvoiceCreationAdmission.Designer.cs",
+      "bytes": 13978,
+      "sha256": "34a85f81a3a342284bad48fbf4999ff027b5814ac6f95389ed21ac4d90ad286a"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/20260928094829_AddInvoiceCreationAdmission.cs",
+      "bytes": 1979,
+      "sha256": "4e4fdc8b5206a7b4f11b10e841d596bf63b6b372252a20996a84d04135f04838"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/20261001105037_AddInvoiceNotificationCorrelation.Designer.cs",
+      "bytes": 20355,
+      "sha256": "39995d8138404d470010d99520c88e1e22d50a49935e9e888956ceef2c3b21bf"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/20261001105037_AddInvoiceNotificationCorrelation.cs",
+      "bytes": 5688,
+      "sha256": "3e6f308d0a1269b11e82607bce281035b80433b009f1a4efb128afce6a5c93a0"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/20261001133820_RetainInvoiceNotificationReceipt.Designer.cs",
+      "bytes": 22201,
+      "sha256": "84db983e9dd55c6e5ade998fe3e01c6d7a6a17032d7efdd8e3ac9489571c3f19"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/20261001133820_RetainInvoiceNotificationReceipt.cs",
+      "bytes": 3294,
+      "sha256": "5f90fb37fdb3f1a33c6f6325e1a1de8db5292f62fb2efca126f1aee21628f726"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/20261005210000_RetainInvoiceCreationOriginAndFinancialResult.Designer.cs",
+      "bytes": 22476,
+      "sha256": "631b151732e0a4a86bc109094059ad217e450ffdd377aab9f932a5453e6ce154"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/20261005210000_RetainInvoiceCreationOriginAndFinancialResult.cs",
+      "bytes": 993,
+      "sha256": "8efe21c03737c0e5e3c981b2e7bfad5103a832047e4824c0865701305ce6977e"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/20261006140000_RetainInvoiceFinancialOwnership.Designer.cs",
+      "bytes": 22673,
+      "sha256": "cd9cf36e00ff52074a54657cd392f995a0b04c7c2b6308cf80c5be3bad7dc5f2"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/20261006140000_RetainInvoiceFinancialOwnership.cs",
+      "bytes": 897,
+      "sha256": "840d7d6e5420d5f9866870998d45c2b46c6c37a970b68b23c7cee76956dd72bd"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/20261006160000_RequireFileMetadata.Designer.cs",
+      "bytes": 23055,
+      "sha256": "af57f4c996a48bd2dddd8abfeebf05c9e1e088c15307cbb8d9520f6d79166373"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/20261006160000_RequireFileMetadata.cs",
+      "bytes": 2290,
+      "sha256": "8cad8894e8f21ca71a5b2e1f3ac1ba3ebc566207cc8a9d226e423b25905f1214"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/20261007100000_RequireInvoiceMasterSourceStrings.Designer.cs",
+      "bytes": 31372,
+      "sha256": "014519d4c964fc1c34722dd06c95a3584fde62c97bd4fa153a6babb58da3c6c6"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/20261007100000_RequireInvoiceMasterSourceStrings.cs",
+      "bytes": 72610,
+      "sha256": "c8dc24e02f7040c9b9a77862b7b376bd53492a82442fe0258131a5adf95a3706"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Invoice/InvoiceDbContextModelSnapshot.cs",
+      "bytes": 31262,
+      "sha256": "c9c998f6f55bed7d1d6083a736e4ef307bb042231c183bf2930b7d4e2b53ff9c"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Payment/20260715055536_InitialPostgres.Designer.cs",
+      "bytes": 12599,
+      "sha256": "12669a257786aeb75d744057e783d83403979524545c58c89391bf53c865aa92"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Payment/20260715055536_InitialPostgres.cs",
+      "bytes": 9473,
+      "sha256": "5a847cc9dc36515e76992e81301dac5ca21bd82a48fec0b0b04ffe22139853bd"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Payment/20260721024322_FixTimestampColumnType.Designer.cs",
+      "bytes": 12877,
+      "sha256": "f735be08901b772f3194ef79f36daabda4d739264436b0a2873c97b449c282d0"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Payment/20260721024322_FixTimestampColumnType.cs",
+      "bytes": 2055,
+      "sha256": "7c066b4620e8940d4234746c85e003687bd1d92713c6d5ef850ef9b4e6cc32b4"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Payment/20261006180000_RequirePaymentFileMetadata.Designer.cs",
+      "bytes": 13308,
+      "sha256": "62db3522a3159bae7c7e77ea02c14d432b7befe3eeeb69224cce01a9dbfc29c5"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Payment/20261006180000_RequirePaymentFileMetadata.cs",
+      "bytes": 2297,
+      "sha256": "4c6c9f1f37e7a042245487005e02819cbcf742de030672288b177095f6422256"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Payment/20261007100000_RequirePaymentMasterSourceStrings.Designer.cs",
+      "bytes": 15522,
+      "sha256": "95b846313d40712e5cde59c1ea6ffe6cb285424945df359f1b69d5f07a0c0532"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Payment/20261007100000_RequirePaymentMasterSourceStrings.cs",
+      "bytes": 24740,
+      "sha256": "43d157d7afc931d6cc7ece3f3c74452d7776b5baeb0560adff0a9e741458472a"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Payment/PaymentDbContextModelSnapshot.cs",
+      "bytes": 15412,
+      "sha256": "a28cc2b485c32145d39d8f6fbb6ad7b0ba33594270538380f7ea229ff1c330df"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Receipt/20260715055545_InitialPostgres.Designer.cs",
+      "bytes": 9406,
+      "sha256": "e229700723db62a0f63811c075bbb7dfbb6be65acc60e245570c687b665c4412"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Receipt/20260715055545_InitialPostgres.cs",
+      "bytes": 6958,
+      "sha256": "33e5e02c95534fe1d8da0eae389de24397fb7c49779a5b874e5bd386148a72ca"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Receipt/20260721024327_FixTimestampColumnType.Designer.cs",
+      "bytes": 9552,
+      "sha256": "9517dd94e56d8def2a994a580f5fefd988ce35b0b529f1223a56716bbd02085b"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Receipt/20260721024327_FixTimestampColumnType.cs",
+      "bytes": 1802,
+      "sha256": "f782b1cc0f31e096231ba9b1ebbb009a2abf33bc4b4f25389d5590ee0ad66861"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Receipt/20260927184934_PreserveNullableAmountPaid.Designer.cs",
+      "bytes": 9548,
+      "sha256": "3481f2adc7274b89bb9afa5130b58b98add37f336baf0b31fdf3ea45f48658d0"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Receipt/20260927184934_PreserveNullableAmountPaid.cs",
+      "bytes": 2472,
+      "sha256": "96c157b3689b443fd9924602f3f66b3d1deb508b5db1e92a0c51d93c3bca951c"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Receipt/20261006160000_RequireFileMetadata.Designer.cs",
+      "bytes": 9910,
+      "sha256": "f7ca85d3d6b8b20d8de562d6b9209b3ab6d87b128a359a3cd6951904c1364bbe"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Receipt/20261006160000_RequireFileMetadata.cs",
+      "bytes": 2290,
+      "sha256": "9eaf5a26d3308d07e01ef2b1336f06ac44f7291dee741f5612c374f22d904203"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Receipt/20261007100000_RequireReceiptMasterSourceStrings.Designer.cs",
+      "bytes": 13147,
+      "sha256": "1a01b6bb88810316a012206709925b5ce754fc1c5159b30a443c9420caff9097"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Receipt/20261007100000_RequireReceiptMasterSourceStrings.cs",
+      "bytes": 29065,
+      "sha256": "afc614a7115c65ce1b9ffd422da329d87d8e81c3780feb99e3d962fc40e7d7cd"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/Migrations/Receipt/ReceiptDbContextModelSnapshot.cs",
+      "bytes": 13037,
+      "sha256": "e5d3bb0183788dbbe140c1eb2d520db9fd3b363ff4bf676908c32017b02b588c"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/PostgresInvoiceCreationLock.cs",
+      "bytes": 1347,
+      "sha256": "f0f8e6be1577db6ee2804c3530b53ac6be7323d1a3aefc69723c31e62eef7a1d"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/PostgresReceiptOperationLock.cs",
+      "bytes": 3049,
+      "sha256": "63a17cd96e5fb9225b311f34d35a28217e0a27d0fa0e964f76fd6119aefba9fc"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/ReceiptDownstreamClients.cs",
+      "bytes": 19111,
+      "sha256": "9da8437fac05538705450e8c8fd820fac1759e4999c5b02abee4684a8765f534"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/ReceiptOperationJournal.cs",
+      "bytes": 2526,
+      "sha256": "e56d674ada38ea258d39a560a3b1f05081087862c0d164738c953ecd1b91b514"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Data/ReceiptWorkflowStore.cs",
+      "bytes": 12169,
+      "sha256": "52f756ac3b76a3e290a139747d976498b03973ce3dbef4ab9782c8b2545a794f"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Domain/Invoice/Invoice.cs",
+      "bytes": 11018,
+      "sha256": "97889c48ccc21e4de0aedc29cfecd6d54a478958fbb4da950439623c4858db49"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Domain/Invoice/InvoiceFile.cs",
+      "bytes": 1717,
+      "sha256": "428b0095b80c952ab18df3aa82059e1a3ddb51142e305143347bd73f05091d08"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Domain/Invoice/InvoiceOrderItem.cs",
+      "bytes": 2115,
+      "sha256": "2fc907599541a615379f5806c7cdf6a8fa4eeb7171be3f359ba23f8a1c8d7768"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Domain/Legacy.Maliev.AccountingService.Domain.csproj",
+      "bytes": 452,
+      "sha256": "ad14c8a7043ca91e19e40635ba892594069f3432525248ed510f28cdc144e679"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Domain/Payment/Account.cs",
+      "bytes": 1614,
+      "sha256": "e5b1e47da0f38c213929e2579a3d972fb444bee0b438afd938127283ac2f97ec"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Domain/Payment/Payment.cs",
+      "bytes": 4388,
+      "sha256": "89355965b02ae4df761e2618e3ffec8cef2d4d9a88ca825f50e373d65e21e939"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Domain/Payment/PaymentDirection.cs",
+      "bytes": 1738,
+      "sha256": "4690259753a23dfc67621ea3a4b3ac4189099f944678583038a139cc56aec115"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Domain/Payment/PaymentFile.cs",
+      "bytes": 1714,
+      "sha256": "252a4c807dbff36b8b1fd7f383b04b7fe1858d76d68af97f314f2c71763da850"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Domain/Payment/PaymentMethod.cs",
+      "bytes": 1726,
+      "sha256": "cb6331cdd1638d92e13e317bb3e4addc95e66f8ff927045507c7c6e2469d841b"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Domain/Payment/PaymentType.cs",
+      "bytes": 1718,
+      "sha256": "9ec624d1537f64a6e09b87687078963181e3b935bff09f5231655590606a3c5b"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Domain/Receipt/Receipt.cs",
+      "bytes": 6357,
+      "sha256": "a3a1598bad2e08b72da841274590826936587b93e006e17b305ce15c3dfd45f6"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Domain/Receipt/ReceiptFile.cs",
+      "bytes": 1722,
+      "sha256": "a3f134d39502014be9707576e861defd276458caa9eee40e4f3de9d288bb0b64"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Domain/Receipt/ReceiptOrderItem.cs",
+      "bytes": 1754,
+      "sha256": "dc7ceb76e1c510ade60f095207881b094cec47903d5e54530883280bc9cfb8af"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/AcceptedAuthProducerChainTests.cs",
+      "bytes": 6377,
+      "sha256": "c4dcfaee6c195d319bb0e90e83933c7abdb455250b3769549557e78c704c7636"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/AccountingChildListSourceHttpTests.cs",
+      "bytes": 8378,
+      "sha256": "c3b66d4aa94c0e781664f5b17445af98afb6ee228a490117e31d0e7e91e8a4b5"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/AccountingContractTests.cs",
+      "bytes": 11450,
+      "sha256": "d0182ba200ed3916536823f5d5dd2c82bb8eacc08792de8cdc689cfefc1f21b6"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/AccountingJwtExternalizationTests.cs",
+      "bytes": 6135,
+      "sha256": "14f8aad5d4cf911a45ff754c1a6b16b270c170d257a7245dff6e0620718ac505"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/AccountingOpenApiHttpContractTests.cs",
+      "bytes": 9351,
+      "sha256": "52e59b7fa5024783e445599382e05f64ede9abf64c37fbc1f0a588abaa0aebda"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/AccountingOpenApiXmlHttpContractTests.cs",
+      "bytes": 3813,
+      "sha256": "15cef12b38f83b9ea8fe6b49754c7e29406390bcf50d448a4faa4ec5726bee10"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/AccountingPostgresMigrationTests.cs",
+      "bytes": 22792,
+      "sha256": "273df3564dff8ddee7f3d319bbb1dd6a69abf88af40ace3bd5e1fd735c75eba9"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/Caching/DistributedAccountingCacheTests.cs",
+      "bytes": 2418,
+      "sha256": "0579ab4ed5d486cd02de46cceed1a37f206b247cdef85f35554a3a6d67c20866"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/Data/TimestampMigrationContractTests.cs",
+      "bytes": 3923,
+      "sha256": "4faf43abff517fa8b0ca824acda9a461a99d6efe6bd858f700a82356cd506045"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/FinancialLoggingBoundaryTests.cs",
+      "bytes": 8326,
+      "sha256": "2f969457efb892a49ea79d9fb2ab63d8e32631d130f9b0d2bef463470f19533a"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/Fixtures/AccountingBoundaryHttpFixture.cs",
+      "bytes": 36911,
+      "sha256": "f2535f5cef895bf57f8fd65459f53138232feec4e3fb786849a6e98142c74ef6"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/Fixtures/InvoiceDelegationChainFixture.cs",
+      "bytes": 18306,
+      "sha256": "8c0fe283a9695200d78de088f47dc01ddd328cfc4f8330364b3ba7f3f70c6b7f"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/Fixtures/PaymentListHttpFixture.cs",
+      "bytes": 17880,
+      "sha256": "fbc4ca00e00ba2ecdc84751500e8e1126a2650dbe683214642ceba04a2b6954f"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceCompletionCapabilityVerifierTests.cs",
+      "bytes": 7500,
+      "sha256": "24b797f783bf9a8ce6902e444aed397742a3c63c667dc6efe3c4e97364d77123"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceCreationAdmissionPostgresTests.cs",
+      "bytes": 10918,
+      "sha256": "d14d969a256f1ea4b96df90bfad0ae32f02cb82aa9b523c80e494334a1b2f19b"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceCreationControllerContractTests.cs",
+      "bytes": 4121,
+      "sha256": "f8f8d577d524911f6ef46fcc0e9528e873a97189bd3dc2186d42aac070ac7054"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceCreationDelegationVerifierTests.cs",
+      "bytes": 4432,
+      "sha256": "a5a9168a55d5550acac9dc53f1526ffbdb9db9812c675ad3acd81d7d9b53a857"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceCreationDownstreamClientTests.cs",
+      "bytes": 7101,
+      "sha256": "436ab1e6957e06b71e59925d6c2ff2679b2fb485d529bc92218092a38f010b19"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceCreationOriginAdmissionTests.cs",
+      "bytes": 20936,
+      "sha256": "dd78f1b06d12c6339105bbc8a7725ddc6b498e541ea819f097072a30adc7ef10"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceCreationWorkflowTests.cs",
+      "bytes": 25662,
+      "sha256": "5d3db4f7b5a387ba0f237d3d9e9d2db936085c4f8bcab5d6731595b88dd21b49"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceDelegationChainHttpTests.cs",
+      "bytes": 10483,
+      "sha256": "5ac28e7799885808a19d2b7cb7e40314fff397777dca17e4b88df97939f96389"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceEmployeeCompletionAuthorityHttpTests.cs",
+      "bytes": 4422,
+      "sha256": "596e99bd79c53ea3f484844b46054acd758d48ca77805c30e75b6b1255d1b59c"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceEmployeeCompletionPhasePostgresTests.cs",
+      "bytes": 8517,
+      "sha256": "27217bb7b5f6f013bb601988271908e5c1cbb79e85dcaab97e449ca1c5eb75c1"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceEmployeeCompletionRegisteredTransportTests.cs",
+      "bytes": 13447,
+      "sha256": "7b96d724d8eb50b3852dc77efdb5f6b7534ab85120a2c5c26e9a2cede539010f"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceEmployeeCompletionWorkflowTests.cs",
+      "bytes": 16931,
+      "sha256": "efcd22537944027ba35263e74744d26133f791b78b3c74286b646b6100aeb8b3"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceEmployeeDecisionResumeWorkflowTests.cs",
+      "bytes": 8517,
+      "sha256": "5e225a077c40ece2100f5d42631a1b4272be29e0317a6d256a10336895ca65f2"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceEmployeePreparationErrorHttpTests.cs",
+      "bytes": 12925,
+      "sha256": "455fcb64cd89855781bd95d97c5c84927f06156285d66537915ec623b0589d49"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceEmployeeQuotationCompletionClientTests.cs",
+      "bytes": 11250,
+      "sha256": "d6135bbd69c0284c1d09fd1227c9b397e609ed034d4232983c211ae09b13c673"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceFinancialOwnershipHttpTests.cs",
+      "bytes": 6168,
+      "sha256": "3f1e3af66bfd7d6f2c7cf8f7c54adf1f1c45350e1bb85f196fb4b3b15ebbd8bc"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceFinancialOwnershipPostgresTests.cs",
+      "bytes": 10769,
+      "sha256": "c4338f67cb906b4ce690f0cd3f3df711ecafa2b9f532a5bfa6395d29185256a6"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceFinancialOwnershipRegisteredOptionsTests.cs",
+      "bytes": 8149,
+      "sha256": "88e59e991f98353ff015f5aa06d7f080e93f7b7caea8757ab23029db4aa35bb2"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceFinancialPreparationOwnershipTests.cs",
+      "bytes": 7399,
+      "sha256": "cc8cf7ab4a5c3d12fab04b3be14e94384e51437cfb24f03d05fee84686c1f8ce"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceMasterQuerySourceHttpTests.cs",
+      "bytes": 8210,
+      "sha256": "533322c30f735bc3120b7302178f61478994661b9d81dcac89abf74d259e9767"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceNotificationConsumerTests.cs",
+      "bytes": 12457,
+      "sha256": "65ea8f3d2bb90bc264f90f727d18c09cebd6b8ac23b0d0b8246b0ef086043420"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceNotificationControllerRecoveryTests.cs",
+      "bytes": 10573,
+      "sha256": "eba5949aa90806846a10abb9b7ea5b15be36fce5c83ec00e6aef1fccf555c4a7"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceNotificationCorrelationBindingTests.cs",
+      "bytes": 11093,
+      "sha256": "07922ae654d1d06e1214ef73619da2f79a67dc29c426aa85f223eccbd689e5ae"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceNotificationCorrelationFoundationTests.cs",
+      "bytes": 41801,
+      "sha256": "04fc8daa4ed6a4f9be0640eb4bb7e2781487b3e7017e8a5bed1fd39ac86dca16"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceNotificationIntentAcceptanceTests.cs",
+      "bytes": 35605,
+      "sha256": "96633076ef05a5cff6b77ba6b1006c3316e9638d0ecf70e8bded0c4b4b51b091"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceNotificationIntentReceiptTests.cs",
+      "bytes": 3355,
+      "sha256": "ea2c5ee7547f38dcad3e0468439079dec9ae59c3721824215ec70b4b2d56a0c4"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceNotificationPayloadSnapshotTests.cs",
+      "bytes": 2860,
+      "sha256": "f0c35f29457f78c4e4e401f074aa90ed2881a27f947ebf81bf00c3d0924cba0f"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceNotificationPhaseFenceContractTests.cs",
+      "bytes": 15089,
+      "sha256": "68d2a85764f0c8240daef47ab18c49def4b6998fa5b72ffda8242144e7166b2a"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceNotificationPhaseStoreTests.cs",
+      "bytes": 18465,
+      "sha256": "1fffc6f5d4aefac934545c95f4724a823d7c7c3b84da03d8b8bdddda33ede371"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceNotificationReceiptBindingTests.cs",
+      "bytes": 17419,
+      "sha256": "abacb0f1597cf6760581036298a2b4f15ae4471feaaaf1cce2046a130801e569"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceNotificationRegistrationTests.cs",
+      "bytes": 2817,
+      "sha256": "7d5d7a13f1527a4aa92e5368d9e0bdd0fc8c75b046e906d8efa03dd0e3d80dcc"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceNumberSourceHttpTests.cs",
+      "bytes": 8155,
+      "sha256": "5ca86b7fc4c0d15c853a5c32b3159fedb4c1883b0d0c12838b0eadf964b21136"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceReceiptFileMetadataHttpTests.cs",
+      "bytes": 9877,
+      "sha256": "5722ddac195734e0bf51ab9cff8e817112da04e55bb9c8eb3d624292a216b8cb"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceReceiptFileMetadataMigrationTests.cs",
+      "bytes": 18698,
+      "sha256": "dc60287b65ea0433a4378c51bd428554dcde3c89177f355908a0fa6c6ff92c92"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceReceiptFileParentSourceHttpTests.cs",
+      "bytes": 11846,
+      "sha256": "fe92b966699b20adc721ad5f4958ced4bf09f7ad8d228547c28728c6eacf12f0"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceReceiptHttpRejectionTests.cs",
+      "bytes": 6078,
+      "sha256": "868270f159599fd1ea78de6a38337a71592d052e7daece3231c37ba009ced65b"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceReceiptMasterScalarSourceHttpTests.cs",
+      "bytes": 14938,
+      "sha256": "863b4a9442d4ebdd3fdfd0f91a1cb9ec414c9f5b36ae54a39ac840de0628cb32"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceReceiptOrderItemSourceHttpTests.cs",
+      "bytes": 17401,
+      "sha256": "117d0c61728c15eebe7891b11063d5324de995022125f8d4c5927bcf8a8cadb2"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceReceiptPaymentDateSourceHttpTests.cs",
+      "bytes": 10282,
+      "sha256": "ef8b4466c9fae82a0e4e1817fb67015d493183579b42797e2c94044eac945f78"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/InvoiceSourceAttributionWireTests.cs",
+      "bytes": 3683,
+      "sha256": "32c4ae1b2e56f40e894b244a3a2a8962f213c7351f3f73df105ded593c11e3d6"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/Legacy.Maliev.AccountingService.Tests.csproj",
+      "bytes": 1855,
+      "sha256": "ceb405949f30ed48800525596c9d1b42d71725628d47c6913ab842c053501e3d"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/MasterStringSourceHttpTests.cs",
+      "bytes": 17037,
+      "sha256": "1044b8f5608746a0546405c16bc2857161e71934ed11ce99244680937d453733"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/MasterStringSourceMigrationTests.cs",
+      "bytes": 31076,
+      "sha256": "364f1b7ff4cd07402782f17a7e6bb4301c9d6cb45e9294e5abe63952638dc5b5"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/MasterStringSourceStoreTests.cs",
+      "bytes": 13066,
+      "sha256": "3f1eb255e0caaa7b1ed754e56d42a7c492b739e234917e0b09bced85964cf9bc"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/PaidInvoiceOutcomeReadbackTests.cs",
+      "bytes": 2905,
+      "sha256": "89c4d43f7223ea80087968a714301b649d59e89344681c67229189fb8c66432f"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/PaidInvoiceOutcomeWireTests.cs",
+      "bytes": 10722,
+      "sha256": "9c0c92c4b68ef2bf737bf1c9d26842cb1eb0af2b0313fbc6bebb60ab570efd06"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/PaidInvoiceSourceReadbackHttpTests.cs",
+      "bytes": 11067,
+      "sha256": "5b0e3b310e235f15c4293499b263c1215486499b2c3319b55ecb3f0090538481"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/PaymentAccountContractTests.cs",
+      "bytes": 4700,
+      "sha256": "d40e092a31e2e9a58531a1f40e2a6533c03ce1a5f1e1d111dd3a76fc12d2ceb9"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/PaymentAtomicConcurrencyPostgresTests.cs",
+      "bytes": 4053,
+      "sha256": "808378d83a204966de170ba880dd45ee38c79025592da59523bbfadd3d441d67"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/PaymentCatalogHttpContractTests.cs",
+      "bytes": 9521,
+      "sha256": "926fcfc8b7cab74a5fda060fcc9cdd6e1dd69e069133fcc8bac0c6b4c2e28085"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/PaymentFileMetadataHttpTests.cs",
+      "bytes": 8576,
+      "sha256": "179c26bdb70f49f107452a6a31a0e53a9dd8ad216101c4ff6de9ee8509a9dd53"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/PaymentFileMetadataMigrationTests.cs",
+      "bytes": 16638,
+      "sha256": "14662ef423ad629dbdd8453aa0223384a65dd0eee000c84f36cc59da9cc5f8af"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/PaymentListHttpContractTests.cs",
+      "bytes": 15306,
+      "sha256": "0c63fee135ca3103bef97a531cacc18ea743e2d531b4b4061df8bc297f70f339"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/PaymentMasterQuerySourceHttpTests.cs",
+      "bytes": 4668,
+      "sha256": "db463075101dced4a19c46f28e69b765cb483e9b04db7537e555eb8952a390f6"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/PaymentOffsetDateHttpTests.cs",
+      "bytes": 9648,
+      "sha256": "8cd46075761b8b5be20b11f2142dce9745d9051a2efd0bbac76b3f3f685369bb"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/PaymentProducerDateHttpTests.cs",
+      "bytes": 4605,
+      "sha256": "49c19fae557c54fd165696f7fcc4fa3650d52efd59e7339c5c123c2186f4ed74"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/PaymentReadDefaultsSourceHttpTests.cs",
+      "bytes": 8964,
+      "sha256": "dcc6a6020dc3ae425d70d3b2138e02789b26674a81130ac003718288bdba9bac"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/PaymentRecordHttpBoundaryTests.cs",
+      "bytes": 10194,
+      "sha256": "117e8e9bb6878916bb5ddbfa974c20ba40fb4d7c080b5c0b13f5b891a231128c"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/PaymentSummaryCurrencyEdgeHttpTests.cs",
+      "bytes": 12875,
+      "sha256": "9494a7d19be047ea5e2b79be267a582e371e04a20a35f99d1a5d83cf55089025"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/PaymentSummaryHttpContractTests.cs",
+      "bytes": 8182,
+      "sha256": "f4ef2ce510b783654679e91ac89074b340208b6547adf2fc7caba5a2bd686171"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/PaymentSummaryLookupIdentityHttpTests.cs",
+      "bytes": 8398,
+      "sha256": "63f9cea008c904e6021d70056677a87fcb2b43df9fb99907645e6c746bb95a02"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/PaymentSummarySourceWindowHttpTests.cs",
+      "bytes": 6858,
+      "sha256": "5b7ee50eb62aaf2a6c4f559a2e2c0724b2d7f975354406fdbcd61a9f5bd94e8f"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/PublishWorkflowPermissionContractTests.cs",
+      "bytes": 2300,
+      "sha256": "66e669851d64e472c9684407212d589675cc51fc3c537189184279b0f1a037b8"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/QuotationAtomicCompletionContractTests.cs",
+      "bytes": 19117,
+      "sha256": "948d3b2601dcb7cc0ff86940346f50ba4e76211458ae37658dfef18d903c45b8"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/ReceiptCreationRetryTests.cs",
+      "bytes": 20581,
+      "sha256": "62df667239404f64f2cb3004feb615271853fc4410d5f2e1fe965f49bebd6da9"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/ReceiptDownstreamClientContractTests.cs",
+      "bytes": 8535,
+      "sha256": "fc17c285d70d7d99105129061a23e19eb7ac1afb0b3f8770b05ae014532c7ab1"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/ReceiptInvoiceCacheHttpTests.cs",
+      "bytes": 14893,
+      "sha256": "8f53cc435476256dca4c70b9599f4163ce3d272ad1d39f26fd48af16bed64201"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/ReceiptMasterQuerySourceHttpTests.cs",
+      "bytes": 6713,
+      "sha256": "16222e49e5bbdc88bf0019bfcdf732a1e3e1086e91cda864ec3a95a17ecce049"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/ReceiptSortSourceHttpTests.cs",
+      "bytes": 9063,
+      "sha256": "4af8cef771cbd1a5bce0b47a0332b2c9e9bad30ac60f1151b5df8f3cc9a2f4ff"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/ReceiptWorkflowControllerContractTests.cs",
+      "bytes": 5664,
+      "sha256": "40d4ab94bc9e2f1816ddeafdc1ab13d5bff33b6409934ffc7c3ff50157b31001"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/ReceiptWorkflowTests.cs",
+      "bytes": 9706,
+      "sha256": "937338fd3dfa128d396f9cf17dceeeb9bc9d52e626a76817f3a4c4ac516e3672"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/SourceMutationProof.cs",
+      "bytes": 2404,
+      "sha256": "c7b92818fd2826959a65a49189e4b0ec36ec030a4578d8bed8eff7886c76d934"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.Tests/Workflows/WorkflowContractTests.cs",
+      "bytes": 27571,
+      "sha256": "1a6843bd9ec192d69488e0490f05cca4e7d45c4ad2f7dc53c2ea985cb924c733"
+    },
+    {
+      "path": "Legacy.Maliev.AccountingService.slnx",
+      "bytes": 551,
+      "sha256": "b6a8ec7c2723e8818b74e7d5ba05fe00e1b095ef475c0f84b366073236b83f04"
+    },
+    {
+      "path": "README.md",
+      "bytes": 5430,
+      "sha256": "db60bd9ba6fae7c824b6650cf06e9f1d34a48972a58b1c1b0208bc54bf561043"
+    },
+    {
+      "path": "deploy/disabled/README.md",
+      "bytes": 1412,
+      "sha256": "e2aa9ecaa6d504f5622b7ff704586811588baa1024fd03eb9912d6dca3b4d6d2"
+    },
+    {
+      "path": "deploy/disabled/accounting-deployment.template.yaml",
+      "bytes": 2258,
+      "sha256": "97ea10e5a2035af8eb9bab1821b6c186bca941d5aca40a7c1fa2afcbed3397db"
+    },
+    {
+      "path": "deploy/disabled/source-obligations.json",
+      "bytes": 3707,
+      "sha256": "fe02e58c2849d16599f3b97c94fb614833ce54b6e27d9d87f1b7923640935541"
+    },
+    {
+      "path": "docs/accepted-auth-session-chain-design-20261001.md",
+      "bytes": 10143,
+      "sha256": "7672c507c23503dfce6eb9d2ac7cfb52efdb95eb07debbd9e2a7a679ad950e51"
+    },
+    {
+      "path": "docs/invoice-delegation-chain-acceptance.md",
+      "bytes": 10611,
+      "sha256": "e2e4b6ebd41c505de9a4713a9e7ee4db1eada525cfda651c357a75bc8b6922ce"
+    },
+    {
+      "path": "docs/invoice-master-query-source.md",
+      "bytes": 4296,
+      "sha256": "a6a313675a208b127ce46cd9c6aee754d55d2b02c68e333a1359017b8ee51046"
+    },
+    {
+      "path": "docs/invoice-notification-correlation-foundation-design-20261001.md",
+      "bytes": 41156,
+      "sha256": "8051cd64af0f62d6d8ff12684e8395e43b7ca2b9e5e604a2212ff79699e347b0"
+    },
+    {
+      "path": "docs/invoice-notification-intent-design-20261001.md",
+      "bytes": 30014,
+      "sha256": "5de119b5424c5a54092ab936661f5cc5794864f60ead9146a10db66d150679c4"
+    },
+    {
+      "path": "docs/invoice-notification-phase-fences-design-20261001.md",
+      "bytes": 32970,
+      "sha256": "9399633951d7a313d1b7809a978b9e11a03a0fffc347e66e08a27839f772928f"
+    },
+    {
+      "path": "docs/invoice-notification-v2-consumer-20261005.md",
+      "bytes": 3928,
+      "sha256": "76ecff9bbff7388872a20b2089a275ac32f1aa50bca87fbdc925c16be5bedf61"
+    },
+    {
+      "path": "docs/invoice-number-source.md",
+      "bytes": 2211,
+      "sha256": "21d85adf513d29ce66c4284e96465837feecf756d7b62bcdf917693e5e51bf19"
+    },
+    {
+      "path": "docs/invoice-receipt-file-parent-source.md",
+      "bytes": 4411,
+      "sha256": "47e005d9ee91bca1ec18d8c7d549ed73b69a027a5c4a4f806724043d40b88c33"
+    },
+    {
+      "path": "docs/invoice-receipt-master-scalar-source.md",
+      "bytes": 4355,
+      "sha256": "93e70c61a584e1de0d5fbbba4d1213e73294c4c7e4c0f2cc355a5b234e045c56"
+    },
+    {
+      "path": "docs/invoice-receipt-order-item-source.md",
+      "bytes": 3998,
+      "sha256": "df6752d1d73662c8e7ff586b8907b026fc5babea10d40c1c6dfa3c727ef230eb"
+    },
+    {
+      "path": "docs/invoice-receipt-paymentdate-source.md",
+      "bytes": 4967,
+      "sha256": "182b8ed378d5e17c3b6ee580c778b4c0d75df1e865727af0c9dd5a85b9feedf7"
+    },
+    {
+      "path": "docs/master-source-strings-boundary.md",
+      "bytes": 2937,
+      "sha256": "3f729a325cfc804ebdfc6d13777d1835cee7e498d339c57da597d64929acaff8"
+    },
+    {
+      "path": "docs/payment-date-currency-boundary.md",
+      "bytes": 3839,
+      "sha256": "aadf32c14282566ccd87d1c035ac6141fb1a5a562fd03f5a64f78be4c5aa9795"
+    },
+    {
+      "path": "docs/payment-list-contract-design-20261002.md",
+      "bytes": 48418,
+      "sha256": "d84711d1901fdea41af185c740b763d57776a9a5a455f257a37113d3142692eb"
+    },
+    {
+      "path": "docs/payment-read-defaults-source.md",
+      "bytes": 3611,
+      "sha256": "73ef6d85fd6dc3df58c276dfb2ca53b9c10f2411fc889582c599711c42207c48"
+    },
+    {
+      "path": "docs/payment-summary-identity-design.md",
+      "bytes": 3151,
+      "sha256": "336dcaefb2600049b9397c0c99138ca5dca29598f376a5c6cda185b87a5e3b3e"
+    },
+    {
+      "path": "docs/receipt-create-retry-design.md",
+      "bytes": 7014,
+      "sha256": "cea1099f5c7198c2cd1e748838545cdb5e2804611aca6c3976d28f52b772deea"
+    },
+    {
+      "path": "nuget.config",
+      "bytes": 197,
+      "sha256": "aec93b5637ab6d62470979a008990a4a336a287ab83a3f2541849ae735674055"
+    },
+    {
+      "path": "scripts/Render-DormantLegacyAccountingDeployment.ps1",
+      "bytes": 1820,
+      "sha256": "8180980d828771dd64f6c7af8a83e71eb4af3f0f956a6fc187bd226af605bb66"
+    },
+    {
+      "path": "scripts/employee-completion-expected.json",
+      "bytes": 10261,
+      "sha256": "5e4372f4d99037cdba3ab68ad3993deee3908f24e3fc3e41c71a78c7152060d8"
+    },
+    {
+      "path": "scripts/file-metadata-expected.json",
+      "bytes": 2208,
+      "sha256": "d2c2d299cd956a470c19067e426c1e759f5fe5dacc62d7a52fe99b1921124ff7"
+    },
+    {
+      "path": "scripts/paid-invoice-wire-expected.json",
+      "bytes": 558,
+      "sha256": "732f2d6abca24556074fe12eb802e2da2ae27fe3f937ee3dc3eb2af3a35f2bfd"
+    },
+    {
+      "path": "scripts/payment-file-metadata-expected.json",
+      "bytes": 1883,
+      "sha256": "310d227c6cb7d4b0da9a7e03c276a37a567d683939031cb5f73e5531e5547f01"
+    },
+    {
+      "path": "scripts/retain-paid-invoice-wire.py",
+      "bytes": 8730,
+      "sha256": "141fc5226d6d6438c57bbabd85c709ff9cd7b9900b5834184268a95bc6e20d28"
+    },
+    {
+      "path": "scripts/test-paid-invoice-wire-reader.py",
+      "bytes": 11129,
+      "sha256": "8e85f6a31ce3797f014f020d4f2a72aeb65ec8d79952216b1260ccfaea980487"
+    },
+    {
+      "path": "scripts/test_atomic_producer_inputs.py",
+      "bytes": 2627,
+      "sha256": "972e2ad0b0ac04031034adc90ad4cbd722f549545586051a7448016e14841c8d"
+    },
+    {
+      "path": "scripts/test_master_source_strings_gate.py",
+      "bytes": 7577,
+      "sha256": "6ca3259641b4c5150d5bb97cb5e8eed788b2c6070e88ad6166e4ca70c5112e7c"
+    },
+    {
+      "path": "scripts/tests/test_dormant_deployment.py",
+      "bytes": 6981,
+      "sha256": "aa3227dd3fce17831aab9ba7a40a43730676f4bcaa9103d15b2ccd9fbf30cc2f"
+    },
+    {
+      "path": "scripts/verify-accounting-child-lists.py",
+      "bytes": 2966,
+      "sha256": "1fb25147919416028a2aa86b3efdcab5d0678d2dc91f7b70cc46627fb9339865"
+    },
+    {
+      "path": "scripts/verify-atomic-protocol-results.py",
+      "bytes": 2889,
+      "sha256": "828e77b7198cf3b397f120131f26e18a24d908426f51108584c4031ac85e0f3b"
+    },
+    {
+      "path": "scripts/verify-defaults-cache-compat-results.py",
+      "bytes": 2999,
+      "sha256": "643da0db0e9cefede0ceb684a94056a7c091b285164242e0dffe1053a520a103"
+    },
+    {
+      "path": "scripts/verify-employee-completion.py",
+      "bytes": 6441,
+      "sha256": "5e5360270fe34e184883e49df2747dfd4818236d1b9be103adf7688f8a22149f"
+    },
+    {
+      "path": "scripts/verify-file-metadata.py",
+      "bytes": 6436,
+      "sha256": "c91516ad59a7e75df9387938e7d9d7592231967f94f0e473eb6fa0cc7898f469"
+    },
+    {
+      "path": "scripts/verify-invoice-query.py",
+      "bytes": 6614,
+      "sha256": "c476e9512018cc3fa625077659ad0d875ab54d96651d9fc7bfeaa4baca3ce737"
+    },
+    {
+      "path": "scripts/verify-invoice-receipt-file-parent.py",
+      "bytes": 5116,
+      "sha256": "42688d4afe69a7292a5295f44425348754c66a2eef27a5019bdefeb9c69d2afc"
+    },
+    {
+      "path": "scripts/verify-invoice-receipt-master-date.py",
+      "bytes": 4898,
+      "sha256": "2deb00438cc6e98595852b85057ba9c24abdf9fdae0c3c62ab011b692d942a3b"
+    },
+    {
+      "path": "scripts/verify-invoice-receipt-master-scalar.py",
+      "bytes": 5244,
+      "sha256": "73a7561d5824810eb4180fb314729fe4320daef3fc7069a5eea9b56c1c18cd17"
+    },
+    {
+      "path": "scripts/verify-invoice-receipt-order-item.py",
+      "bytes": 5137,
+      "sha256": "b56d001c9f73ca47797539f30c4dc4f0626e54636b78516bef1887c2d80eb024"
+    },
+    {
+      "path": "scripts/verify-joined-public-results.py",
+      "bytes": 1732,
+      "sha256": "2c2fd0c8af1dab109e9d01763be13c9947645addedb61c2cb5e5df780368a6d7"
+    },
+    {
+      "path": "scripts/verify-master-source-strings.py",
+      "bytes": 13442,
+      "sha256": "e57d1e56816caf4f562c2c3a451ba7590021430ae7691b7057b01d4cc2398a4e"
+    },
+    {
+      "path": "scripts/verify-paid-invoice-wire.py",
+      "bytes": 7322,
+      "sha256": "1338380da5b5edeb0396a7d5ec1134e86565f4ddf6bf5f4a73fb2d608b3e37a7"
+    },
+    {
+      "path": "scripts/verify-payment-date-currency.py",
+      "bytes": 9207,
+      "sha256": "f072b3deaa3d8df4229590faff29fe99be2c8c8252d65ca6d8ad1d5414863e99"
+    },
+    {
+      "path": "scripts/verify-payment-file-metadata.py",
+      "bytes": 6467,
+      "sha256": "0978d700efcc56ab58459feee7b2c711538fe2036c537a05866f19c861882261"
+    },
+    {
+      "path": "scripts/verify-payment-query.py",
+      "bytes": 3475,
+      "sha256": "f0bf65f28783d6e512b5b4ed05735f41e166912718e72b3d263484e068bbbfc4"
+    },
+    {
+      "path": "scripts/verify-payment-read-defaults.py",
+      "bytes": 4964,
+      "sha256": "369c1918f4e5c0b9b0253da9725e1edda4c304c2a0d0a8c1686cde10f339274c"
+    },
+    {
+      "path": "scripts/verify-payment-summary-identity.py",
+      "bytes": 5505,
+      "sha256": "c1cc0089ca2387981ce6aef6941f0d2d5008510f2b5cde88ac52b0d1c66a5e6f"
+    },
+    {
+      "path": "scripts/verify-receipt-create-retry.py",
+      "bytes": 5312,
+      "sha256": "169480ddaa1bc03c89f671c3f5fcddb48c6c847587a6e6cd05e2e34f852c5421"
+    },
+    {
+      "path": "scripts/verify-receipt-invoice-cache.py",
+      "bytes": 3272,
+      "sha256": "da9258327d3e559bb65bbd42eebf93bcbfdbf745a0f5f5a1cc6e1d9de084d5b4"
+    },
+    {
+      "path": "scripts/verify-receipt-query.py",
+      "bytes": 4178,
+      "sha256": "8de38f3008935553f176d03e92d3451dd7ca7da82579cda16cfae351badf35b0"
+    },
+    {
+      "path": "scripts/verify-runner-coverage.py",
+      "bytes": 2081,
+      "sha256": "6ec3738b76ee8664bece415f25a1f1a8a1f145448301fa9035ca91a11a46bec8"
+    },
+    {
+      "path": "scripts/verify_atomic_producer_inputs.py",
+      "bytes": 2964,
+      "sha256": "975e54b2d6e538733ee839bba08abb7640ba052ec9ab3ca11889859eed7c28b4"
+    },
+    {
+      "path": "tooling/prepare-delegation-auth-proof.ps1",
+      "bytes": 9583,
+      "sha256": "b7c06c59dec578427f19d8bd861e9334f967dcf0f913bf783458331e251f2476"
+    },
+    {
+      "path": "tools/CommerceAtomicProtocol.Tests/AtomicProtocolHttpTests.cs",
+      "bytes": 21976,
+      "sha256": "56d16c1f6d6b76c0faa083f5862c139259e76b29a82efcf899c5886c1db957a2"
+    },
+    {
+      "path": "tools/CommerceAtomicProtocol.Tests/AtomicProtocolScenario.cs",
+      "bytes": 19003,
+      "sha256": "37be1be6bfccd4ba5bc8a22601b4c806fa815e287d6d8407bbf84a04d8203478"
+    },
+    {
+      "path": "tools/CommerceAtomicProtocol.Tests/Commerce.AtomicProtocol.Tests.csproj",
+      "bytes": 2029,
+      "sha256": "7b66ae7fb1c15d7a2226ccbb2b328e498b22f7e4d26fb0107c46d3b13ddf9f4f"
+    },
+    {
+      "path": "tools/CommerceAtomicProtocol.Tests/README.md",
+      "bytes": 7687,
+      "sha256": "ae6b7367f539401250d6e911743f895606a39d7545aa990a9d6afc0d25a88e58"
+    },
+    {
+      "path": "tools/CommerceAtomicProtocol.Tests/public-graph-accepted-da972.json",
+      "bytes": 11679,
+      "sha256": "0063a45fa40ff6e6cb0db2a5e7a8cdcb09087dae59c87fc641f9479ee8004d4a"
+    },
+    {
+      "path": "tools/CommerceAtomicProtocol.Tests/public-graph-accepted-f12.json",
+      "bytes": 9612,
+      "sha256": "6ed46a10f7b21ece87aa8a397bede5f553138b3764b087ae0fa31f7a14ab4a31"
+    },
+    {
+      "path": "tools/CommerceAtomicProtocol.Tests/public-graph.json",
+      "bytes": 61710,
+      "sha256": "4831fc259077338ec9b286b64a5f425498da9077a40e596df1c99a5de08df604"
+    },
+    {
+      "path": "tools/CommerceJoinedAuth.Tests/AccountingQuotationBaselineHttpTests.cs",
+      "bytes": 21014,
+      "sha256": "bce9459edb535c1dbb2c1df528a0208760f97f58f8eb501099340ec654d0a03c"
+    },
+    {
+      "path": "tools/CommerceJoinedAuth.Tests/Commerce.JoinedAuth.Tests.csproj",
+      "bytes": 2126,
+      "sha256": "d7a1e9d1d4b291c10c15be8e452749a418c66632b1b481b47116b89f17d294a2"
+    },
+    {
+      "path": "tools/CommerceJoinedAuth.Tests/FrozenAuthHost.cs",
+      "bytes": 12620,
+      "sha256": "2d1f025965171cf92b9a68c4897c0734e7fdb5ba5ced8385e829912c08d6f539"
+    },
+    {
+      "path": "tools/CommerceJoinedAuth.Tests/FrozenQuotationHostFixture.cs",
+      "bytes": 17572,
+      "sha256": "ec71b8b18f72d40f17a4641a50dade39345aaac13e18f89551165494bf1a4235"
+    },
+    {
+      "path": "tools/CommerceJoinedAuth.Tests/JoinedAuthFinancialBoundaryTests.cs",
+      "bytes": 8839,
+      "sha256": "f563e39dee37bcd654093772fcdc3583058b30c868b2ed21c7bd86b1df407bc0"
+    },
+    {
+      "path": "tools/CommerceJoinedAuth.Tests/README.md",
+      "bytes": 3449,
+      "sha256": "2d28a9e59911bf3892eb72d373b5a32b2c0c5a72bc7c5c43fb2408b79b0442fc"
+    },
+    {
+      "path": "tools/CommerceJoinedAuth.Tests/public-graph.json",
+      "bytes": 6955,
+      "sha256": "fa1945a1ae3c2f79c7386d16b5b1c691b2bf93c0c41c577865f5079794a7d478"
+    },
+    {
+      "path": "tools/CommerceJoinedAuth.Tests/public-graphs/commerce-joined-normal-iam-public-20261005.json",
+      "bytes": 3988,
+      "sha256": "53f25030b7646f19e69d4aa64e0e1da1f98c58494e5c89a8727c22167ab246f8"
+    },
+    {
+      "path": "tools/CommerceJoinedAuth.Tests/public-graphs/commerce-joined-public-20261005.json",
+      "bytes": 2945,
+      "sha256": "dc86d100930ccfe7133de1b7c05ec8318ac33e5a66d46dff23db427c5a207d26"
+    },
+    {
+      "path": "tools/PaidInvoiceOutcomeWire/README.md",
+      "bytes": 2100,
+      "sha256": "f4260d0e85d101725a9afb9b9bb8ca16eb09f62d56fc6bb3a2a4863396d3eec8"
+    }
+  ],
+  "entries": [
+    {
+      "path": "candidate/manifest.json",
+      "bytes": 36928,
+      "compressedBytes": 6572,
+      "crc32": 3666471247,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "cc314f03b3cee337ddd2ea40609a7c40d664a8e8177eae82b6a87b353590d0a2"
+    },
+    {
+      "path": "candidate/raw/.github/workflows/_build-and-test.yml",
+      "bytes": 2686,
+      "compressedBytes": 926,
+      "crc32": 3695330698,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "0441c8402887a1c1723db1fb750fb7e68c3225c5213baab8d15fe9fb8ef59e14"
+    },
+    {
+      "path": "candidate/raw/.github/workflows/accounting-child-list-source.yml",
+      "bytes": 2257,
+      "compressedBytes": 888,
+      "crc32": 3692803743,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "f5233bab9eb2b8b9ae43a0f33f22487e48360c4b4bce6a4ee14f4c81b7086c2f"
+    },
+    {
+      "path": "candidate/raw/.github/workflows/atomic-focused-validation.yml",
+      "bytes": 2341,
+      "compressedBytes": 887,
+      "crc32": 4240874708,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "84de646d7c11daecf11f23b19ef0b968b4b44017830f3f197d0445d0a04eb37a"
+    },
+    {
+      "path": "candidate/raw/.github/workflows/atomic-protocol-validation.yml",
+      "bytes": 6650,
+      "compressedBytes": 1870,
+      "crc32": 950605786,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "c92a0bfe8c1b576970091288383550f9e5f95a9b4ffc03a47e7b0b375925dd36"
+    },
+    {
+      "path": "candidate/raw/.github/workflows/employee-completion.yml",
+      "bytes": 3564,
+      "compressedBytes": 1163,
+      "crc32": 1345382134,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "e8a87ae596586f323de9fd5ac85632b8319ca074f6918775a70dbf4c24daa006"
+    },
+    {
+      "path": "candidate/raw/.github/workflows/invoice-master-query-source.yml",
+      "bytes": 2352,
+      "compressedBytes": 903,
+      "crc32": 250392682,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "adadcf14a018ae6a53e767605b833ce47fb249a4823de7c02dd4389bf0dc65e5"
+    },
+    {
+      "path": "candidate/raw/.github/workflows/invoice-notification-focused.yml",
+      "bytes": 2452,
+      "compressedBytes": 913,
+      "crc32": 2243460888,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "93533551e65a0a989c69ae682ea0428cfcc55594601056ee7716634708ca6050"
+    },
+    {
+      "path": "candidate/raw/.github/workflows/invoice-receipt-file-metadata-source.yml",
+      "bytes": 2319,
+      "compressedBytes": 895,
+      "crc32": 1336418237,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "94e49145efd9753eb0b3b6aeb2a9b94a3af3b21eb219e866ec7abb61fdd0c253"
+    },
+    {
+      "path": "candidate/raw/.github/workflows/invoice-receipt-file-parent-source.yml",
+      "bytes": 2268,
+      "compressedBytes": 873,
+      "crc32": 3649793948,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "3e64252b3729e0e34b67b4f185f60c521283d2f79aaf43a621b97a9ece85e22c"
+    },
+    {
+      "path": "candidate/raw/.github/workflows/invoice-receipt-master-date-source.yml",
+      "bytes": 2269,
+      "compressedBytes": 876,
+      "crc32": 2766439393,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "e12c1180557639eb1e0908b5a861bb0d54ea79b2a28240d1cf07d8dca640887a"
+    },
+    {
+      "path": "candidate/raw/.github/workflows/invoice-receipt-master-scalar-source.yml",
+      "bytes": 2286,
+      "compressedBytes": 875,
+      "crc32": 3665565752,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "6dfa19ad4deafb44eccc0294837a936d7816d70578f71e384d390f4f495f8113"
+    },
+    {
+      "path": "candidate/raw/.github/workflows/invoice-receipt-order-item-source.yml",
+      "bytes": 2283,
+      "compressedBytes": 888,
+      "crc32": 4294862459,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "24600638369d4fb7af6251bc8ca9147e541cf528bac8f4eb9a976eb4e869df2e"
+    },
+    {
+      "path": "candidate/raw/.github/workflows/master-source-strings.yml",
+      "bytes": 2559,
+      "compressedBytes": 968,
+      "crc32": 712679887,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "7c3ea5b0918631afe37aabc0feb1158f5706ea1ef58e6d26510b8d1afddea178"
+    },
+    {
+      "path": "candidate/raw/.github/workflows/paid-invoice-wire.yml",
+      "bytes": 2396,
+      "compressedBytes": 943,
+      "crc32": 345803323,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "33c8dad4dc603ae865bd7ce6433332f7a3a7fa3e0161737e0d6cd68c81cf3efe"
+    },
+    {
+      "path": "candidate/raw/.github/workflows/payment-date-currency.yml",
+      "bytes": 2641,
+      "compressedBytes": 1005,
+      "crc32": 1474332961,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "c5f3d6e21f063efe020c4b8f553e09761f59bdccdaed194daccad5231cc8c64c"
+    },
+    {
+      "path": "candidate/raw/.github/workflows/payment-file-metadata-source.yml",
+      "bytes": 2341,
+      "compressedBytes": 888,
+      "crc32": 302087546,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "dbec1e53f8d5dbb073a039ed8d9d271128d029cd48929830f2dccd5df349a927"
+    },
+    {
+      "path": "candidate/raw/.github/workflows/payment-master-query-source.yml",
+      "bytes": 2289,
+      "compressedBytes": 889,
+      "crc32": 3954142595,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "1d1a15ccae4038130b5ce1e563b48a614cb74568b89c363d9ad9589212b15c01"
+    },
+    {
+      "path": "candidate/raw/.github/workflows/payment-read-defaults-source.yml",
+      "bytes": 2202,
+      "compressedBytes": 858,
+      "crc32": 551141336,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "558fc0224e6b05270fba0f8ee79dcf9534c2376ebb59edfbe062e5df788d3259"
+    },
+    {
+      "path": "candidate/raw/.github/workflows/payment-summary-identity.yml",
+      "bytes": 2344,
+      "compressedBytes": 904,
+      "crc32": 2889834337,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "3dfd6f0782588d7e126c5216fdc5d7e1232a6e183f212ca538877b71d21c2b94"
+    },
+    {
+      "path": "candidate/raw/.github/workflows/receipt-create-retry.yml",
+      "bytes": 2205,
+      "compressedBytes": 862,
+      "crc32": 3091012539,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "a2f22d5f3f112ccc1701ba9d2624fa204e204b5bb5b6c2806648d4685cde49c8"
+    },
+    {
+      "path": "candidate/raw/.github/workflows/receipt-invoice-cache.yml",
+      "bytes": 2197,
+      "compressedBytes": 860,
+      "crc32": 461048454,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "3f9cdbca179f0a756fb1cdc2bdece0e3e3a318ba0b4d0af807b600685dc09937"
+    },
+    {
+      "path": "candidate/raw/.github/workflows/receipt-master-query-source.yml",
+      "bytes": 2344,
+      "compressedBytes": 902,
+      "crc32": 4102098300,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "276b5fb61f8198a82527dd8054ea7fc6dd055939814560ef3bc0fd336fda2d86"
+    },
+    {
+      "path": "candidate/raw/Legacy.Maliev.AccountingService.Api/Authorization/AccountingIamComposition.cs",
+      "bytes": 2534,
+      "compressedBytes": 1008,
+      "crc32": 529010042,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "0e5ab0c8cd82fb61de7c4e27aedf7fb0c0dd23050fa4e2e61cf2a80826110cf3"
+    },
+    {
+      "path": "candidate/raw/Legacy.Maliev.AccountingService.Api/Controllers/CrudController.cs",
+      "bytes": 3086,
+      "compressedBytes": 1088,
+      "crc32": 1070761430,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "45320d8e640a5314a36402b12e4352e1c6fe586b7982903cc0a32d776538770a"
+    },
+    {
+      "path": "candidate/raw/Legacy.Maliev.AccountingService.Api/Controllers/InvoiceFinancialOwnershipController.cs",
+      "bytes": 2385,
+      "compressedBytes": 975,
+      "crc32": 876238921,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "2f8ab720c9d671875e0973d411994713f1e7145333406b3815ef666b9e351403"
+    },
+    {
+      "path": "candidate/raw/Legacy.Maliev.AccountingService.Tests/AccountingIamProfileCompositionTests.cs",
+      "bytes": 4387,
+      "compressedBytes": 1479,
+      "crc32": 1750347140,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "ba65cafa1c4f312c07169a4edc9c0ff1a3fa3dd27c969c7a2383abec6ad68956"
+    },
+    {
+      "path": "candidate/raw/Legacy.Maliev.AccountingService.Tests/FinancialCallerReplayIsolationTests.cs",
+      "bytes": 7295,
+      "compressedBytes": 1922,
+      "crc32": 730173385,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "92b05f10284eecbc39f7e98e21785c2853bc26262f81ce9db7c7ea08887b5311"
+    },
+    {
+      "path": "candidate/raw/Legacy.Maliev.AccountingService.Tests/Fixtures/AccountingBoundaryHttpFixture.cs",
+      "bytes": 37385,
+      "compressedBytes": 8705,
+      "crc32": 960128364,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "bdd1760589f7bf278ef13b7f27c799753b0be7cec51938e34eafd50a67448a63"
+    },
+    {
+      "path": "candidate/raw/Legacy.Maliev.AccountingService.Tests/InvoiceFinancialOwnershipHttpTests.cs",
+      "bytes": 6307,
+      "compressedBytes": 1877,
+      "crc32": 2441070340,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "e26ed9cdf8cfeab3900314b4e9b0fb1b5086b6ae4c7cbd2d602fe1cd93196998"
+    },
+    {
+      "path": "candidate/raw/Legacy.Maliev.AccountingService.Tests/SourceMutationProof.cs",
+      "bytes": 2761,
+      "compressedBytes": 1081,
+      "crc32": 4121617126,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "124ff1d064ccd9a458518502c6cc0d8af76a9a9a99f0f39bb6f3bbd731a7c6d3"
+    },
+    {
+      "path": "candidate/raw/Legacy.Maliev.AccountingService.Tests/Workflows/WorkflowContractTests.cs",
+      "bytes": 27571,
+      "compressedBytes": 5850,
+      "crc32": 1271440014,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "d9f665bc2f44deb405376c834998ea38fed6c65ec7e5386b0aed919193e86b3a"
+    },
+    {
+      "path": "candidate/raw/docs/accounting-iam-profile-consumer.md",
+      "bytes": 1783,
+      "compressedBytes": 924,
+      "crc32": 974140715,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "24a88e99aa7ced6869b724e30e5b1346bb6f1262d6e98993a59b91ff2ca61230"
+    },
+    {
+      "path": "candidate/raw/docs/financial-caller-replay-isolation.md",
+      "bytes": 2238,
+      "compressedBytes": 1128,
+      "crc32": 1578561172,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "6b8050d7cfdf6af13bac6559a94862ad1cd81bd01e66aa1e63b7d5b632f42dd4"
+    },
+    {
+      "path": "candidate/raw/provisioning/iam/README.md",
+      "bytes": 2076,
+      "compressedBytes": 1023,
+      "crc32": 2933959549,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "559f120a77130a4ddbf33a2816f59bc2b79054ee182045b736b4ec77b947630d"
+    },
+    {
+      "path": "candidate/raw/provisioning/iam/accounting-financial-ownership.json",
+      "bytes": 250,
+      "compressedBytes": 166,
+      "crc32": 3161445415,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "7ef027009178f40ec7d21645d4fb15dea39e779c4a5929edb8cde10a46074ef7"
+    },
+    {
+      "path": "candidate/raw/provisioning/iam/ordinary-principal-boundary.md",
+      "bytes": 3883,
+      "compressedBytes": 1846,
+      "crc32": 539173329,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "bbf4aa91cf5fb021792c345c9fed6116e818040476e272b2ecdc2eaf0ebc44ad"
+    },
+    {
+      "path": "candidate/raw/scripts/Register-AccountingFinancialOwnershipPermission.ps1",
+      "bytes": 3052,
+      "compressedBytes": 1297,
+      "crc32": 231956850,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "0e5c33fefc12ac6fff2f88f3250bba0c69a116da93f81d27de7d36cc428a6fa4"
+    },
+    {
+      "path": "candidate/raw/scripts/employee-completion-expected.json",
+      "bytes": 10261,
+      "compressedBytes": 2359,
+      "crc32": 3659273342,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "1ccbcc8480e3642fa0cf6cdf4e83f3f1152dc7b0f8b07e30388634ca4bf2f5ef"
+    },
+    {
+      "path": "candidate/raw/scripts/file-metadata-expected.json",
+      "bytes": 2208,
+      "compressedBytes": 852,
+      "crc32": 1394051120,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "136710ceead0537c12ed21d76d0b3e8cdb1b488ec1cb8221079f0999f9f664d4"
+    },
+    {
+      "path": "candidate/raw/scripts/paid-invoice-wire-expected.json",
+      "bytes": 558,
+      "compressedBytes": 340,
+      "crc32": 2743261112,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "52fdd2427247c48292a1fb325950a16cbe9eb8191881e85364ddb7e5856b12d0"
+    },
+    {
+      "path": "candidate/raw/scripts/payment-file-metadata-expected.json",
+      "bytes": 1883,
+      "compressedBytes": 751,
+      "crc32": 118297229,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "b898027c19c27c590d32cbf2b6323313df8678a6f6f3e7b3b4d678400e61243a"
+    },
+    {
+      "path": "candidate/raw/scripts/tests/test_employee_completion_inventory.py",
+      "bytes": 5057,
+      "compressedBytes": 1800,
+      "crc32": 1656003425,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "cdac24517c771be62bc43acb19b7de5d6ec935f8b6990399e27360348e24d339"
+    },
+    {
+      "path": "candidate/raw/scripts/verify-employee-completion.py",
+      "bytes": 6441,
+      "compressedBytes": 2365,
+      "crc32": 921781458,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "a9ac1d70322954a219e3191947de58a79093be4a094847d175797d82662bd7ed"
+    },
+    {
+      "path": "candidate/raw/tooling/Accounting.PermissionRegistration.Tests/Accounting.PermissionRegistration.Tests.csproj",
+      "bytes": 1581,
+      "compressedBytes": 625,
+      "crc32": 1100629311,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "172c7ea9502ff11b3222bccc17b8f8e4f692c79c722d40001b5660b6e5488759"
+    },
+    {
+      "path": "candidate/raw/tooling/Accounting.PermissionRegistration.Tests/FinancialOwnershipRegistrationTests.cs",
+      "bytes": 3829,
+      "compressedBytes": 1122,
+      "crc32": 3905044363,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "252c2f0787282f32f39e141d2bce9cb1bc42daa2a6c9b913069efd3bf5174c69"
+    },
+    {
+      "path": "candidate/raw/tooling/Accounting.PermissionRegistration.Tests/OrdinaryFinancialPrincipalTests.cs",
+      "bytes": 18574,
+      "compressedBytes": 4874,
+      "crc32": 2999832606,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "4bc52967b22a9b41172fe99d5f297450516a3777a0fc3b3e0a4606296c6e1abe"
+    },
+    {
+      "path": "candidate/raw/tooling/Accounting.PermissionRegistration.Tests/OwnedCleanupRecovery.cs",
+      "bytes": 2441,
+      "compressedBytes": 870,
+      "crc32": 240777634,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "587c8b40b330fe9e7da22261f4c71af016eaff508f2174dbd9c1a2c1a60dc2da"
+    },
+    {
+      "path": "candidate/raw/tooling/Accounting.PermissionRegistration.Tests/OwnedCleanupRecoveryTests.cs",
+      "bytes": 4995,
+      "compressedBytes": 963,
+      "crc32": 1092197644,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "235136dfba61142d55e72c9be0efd28034c3061cbb08a2a8e2afaf9455cf66b5"
+    },
+    {
+      "path": "candidate/raw/tooling/Accounting.PermissionRegistration.Tests/OwnedFinancialPrincipalTestContainers.cs",
+      "bytes": 3622,
+      "compressedBytes": 1370,
+      "crc32": 41630008,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "e50457fc02634024ec5b9fb37328f008139a06dd806c08dbbf0a63ed8f1ac129"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.CompatibilityContracts/.gitattributes",
+      "bytes": 39,
+      "compressedBytes": 34,
+      "crc32": 2166835507,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "91c171a7f4e295966f6e40aba83b0a11a56b4c99b59b9c55fcf54f15df207bc0"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.CompatibilityContracts/.github/dependabot.yml",
+      "bytes": 423,
+      "compressedBytes": 193,
+      "crc32": 84851831,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "e81f3e1eeecb10098563cb9138649958782e712eb5dcbd56179ee9ecf93982be"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.CompatibilityContracts/.github/workflows/_build-and-test.yml",
+      "bytes": 792,
+      "compressedBytes": 412,
+      "crc32": 2614190733,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "52fa7e1c93387cb4036ee3ccf7e87e036d8b1552c568f6835d4d024600afe7df"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.CompatibilityContracts/.github/workflows/ci-develop.yml",
+      "bytes": 247,
+      "compressedBytes": 177,
+      "crc32": 2317594291,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "55438892e1be3a3f5ff3e3e96aa69d74fc50884f1f465ce0ef1bc7e733ff825f"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.CompatibilityContracts/.github/workflows/ci-main.yml",
+      "bytes": 241,
+      "compressedBytes": 176,
+      "crc32": 498678149,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "4a5aeebe5da345b1fd15ff1a81197914a8bcd2fdb4c478bf04166ceeca273892"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.CompatibilityContracts/.github/workflows/ci-staging.yml",
+      "bytes": 247,
+      "compressedBytes": 177,
+      "crc32": 4242409951,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "626bc3b27313d26d916ca2cce22b6a40447aad7fe0f2d9b0e8d565bafb61a43c"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.CompatibilityContracts/.github/workflows/pr-validation.yml",
+      "bytes": 275,
+      "compressedBytes": 187,
+      "crc32": 2364754528,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "11b3efa5dfab28b675891a89f33567e052efee01fb4bf4a1bf2b2be3713d9397"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.CompatibilityContracts/.gitignore",
+      "bytes": 82,
+      "compressedBytes": 74,
+      "crc32": 2741479433,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "51e17ee2b0482a62c369fdc28bd5f63a975531afd9f84fa5efbfb63526b31a6a"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.CompatibilityContracts/AGENTS.md",
+      "bytes": 1493,
+      "compressedBytes": 644,
+      "crc32": 2607921605,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "e23ce9504f05a156b935c25259a1c1c366eb545ef18e87b52a41bce04f9f0f29"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.CompatibilityContracts/Directory.Build.props",
+      "bytes": 377,
+      "compressedBytes": 186,
+      "crc32": 3380698733,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "1ed87f1b0cf8d42c77558b99547a1eb0c444f222527b6932e5586cbd3e42c2bc"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.CompatibilityContracts/Legacy.Maliev.CompatibilityContracts.slnx",
+      "bytes": 249,
+      "compressedBytes": 100,
+      "crc32": 1768146155,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "f8412ccb32dbf0b0399d11fd28383028c6a1979946a87e7f71c3b874f8b55f6d"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.CompatibilityContracts/README.md",
+      "bytes": 1443,
+      "compressedBytes": 664,
+      "crc32": 3943557004,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "73a6602df83deb65bc66cfe3332686c93eef0230c3c1ccf9144afea76040a110"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.CompatibilityContracts/global.json",
+      "bytes": 81,
+      "compressedBytes": 75,
+      "crc32": 2462188557,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "b48d6da8fa62c0da7cc8a2da4ea036ac55836660a448ba533135abb5b8451b73"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.CompatibilityContracts/nuget.config",
+      "bytes": 197,
+      "compressedBytes": 139,
+      "crc32": 3528484626,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "aec93b5637ab6d62470979a008990a4a336a287ab83a3f2541849ae735674055"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.CompatibilityContracts/src/Legacy.Maliev.CompatibilityContracts/Iam/PermissionRegistrationRequest.cs",
+      "bytes": 2507,
+      "compressedBytes": 619,
+      "crc32": 646136842,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "037f981561153af4dd0d1969f98c599e4f8f013c0465732a0c45d242d6cc5bf7"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.CompatibilityContracts/src/Legacy.Maliev.CompatibilityContracts/Legacy.Maliev.CompatibilityContracts.csproj",
+      "bytes": 871,
+      "compressedBytes": 415,
+      "crc32": 3039427234,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "11bdd1d8f71bafe7c49f1cb9957b6368e8a8c0af9c44e8bf5ae50af747ead005"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.CompatibilityContracts/src/Legacy.Maliev.CompatibilityContracts/Shared/MessageEnvelope.cs",
+      "bytes": 1591,
+      "compressedBytes": 571,
+      "crc32": 872918340,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "81120a5065869e23a39a8b0bd3ae5e8130eab245a106252bcf9897b54b2d75ee"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.CompatibilityContracts/tests/Legacy.Maliev.CompatibilityContracts.Tests/IamRegistrationContractTests.cs",
+      "bytes": 4347,
+      "compressedBytes": 1150,
+      "crc32": 47185361,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "4cbe6bd7a2acdae2502965b2c76f396361128a55f27269686948b54926a1b432"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.CompatibilityContracts/tests/Legacy.Maliev.CompatibilityContracts.Tests/Legacy.Maliev.CompatibilityContracts.Tests.csproj",
+      "bytes": 810,
+      "compressedBytes": 338,
+      "crc32": 4150281363,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "4765b1b02168e926034495b9e4c3fba49bb2c3bec6c47b6546186ea0c01f25c5"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/.editorconfig",
+      "bytes": 62,
+      "compressedBytes": 56,
+      "crc32": 356041920,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "c8208a2f140351680b233171c060ea28bd8b1be2816445764b33f4194f457576"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/.gitattributes",
+      "bytes": 39,
+      "compressedBytes": 34,
+      "crc32": 2166835507,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "91c171a7f4e295966f6e40aba83b0a11a56b4c99b59b9c55fcf54f15df207bc0"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/.github/dependabot.yml",
+      "bytes": 703,
+      "compressedBytes": 243,
+      "crc32": 3782073707,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "335aa96947b0b5b12bdca3f41b4f025cd1d5a758058e01d9793b23fb65bb8a67"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/.github/workflows/_build-and-test.yml",
+      "bytes": 9939,
+      "compressedBytes": 2440,
+      "crc32": 2872044941,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "86a517f46d7b9301ce478874bccf0192882797791336d5811d01bd735a4f87e0"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/.github/workflows/ci-develop.yml",
+      "bytes": 247,
+      "compressedBytes": 177,
+      "crc32": 2317594291,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "55438892e1be3a3f5ff3e3e96aa69d74fc50884f1f465ce0ef1bc7e733ff825f"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/.github/workflows/ci-main.yml",
+      "bytes": 241,
+      "compressedBytes": 176,
+      "crc32": 498678149,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "4a5aeebe5da345b1fd15ff1a81197914a8bcd2fdb4c478bf04166ceeca273892"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/.github/workflows/ci-staging.yml",
+      "bytes": 245,
+      "compressedBytes": 180,
+      "crc32": 2360517627,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "f48c53159877c426a873bbcf725cbaff784985ca2852bdd44bcb96ea83b01b19"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/.github/workflows/pr-validation.yml",
+      "bytes": 275,
+      "compressedBytes": 187,
+      "crc32": 2364754528,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "11b3efa5dfab28b675891a89f33567e052efee01fb4bf4a1bf2b2be3713d9397"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/.gitignore",
+      "bytes": 97,
+      "compressedBytes": 82,
+      "crc32": 3332851324,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "8504135686608a5ef0f407045f398cd5ce78f38fd71e11376343b3e0792d7458"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/AGENTS.md",
+      "bytes": 1651,
+      "compressedBytes": 759,
+      "crc32": 1540396715,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "8fd5aeb63f773ded6a032cf2cba1db04f10a8083bae8c5e6941e4dd58bf970c0"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/Directory.Build.props",
+      "bytes": 598,
+      "compressedBytes": 282,
+      "crc32": 3596927048,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "56228ebe62fe27ad7377a27dcbd954968cd05aaf8ae5a3fa113f3e1da773a8de"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/Legacy.Maliev.ServiceDefaults.slnx",
+      "bytes": 221,
+      "compressedBytes": 92,
+      "crc32": 16588965,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "27306562c9b1ca3e025a6616c2bdbcd0d201944d9fea5350772ddc9773557fb1"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/README.md",
+      "bytes": 5531,
+      "compressedBytes": 2583,
+      "crc32": 1118942309,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "7e876aa93d272c56b2345785218d6c8e4b467c7e2b248cbe11a1a0f598c06c28"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/docs/completed-response-failure-ownership.md",
+      "bytes": 1401,
+      "compressedBytes": 698,
+      "crc32": 564456753,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "37fd59d878051a7b0249ebb3e424044198393383d6090c56e7f53e3409eed01b"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/docs/iam-private-failure-ownership.md",
+      "bytes": 5107,
+      "compressedBytes": 2284,
+      "crc32": 3577599229,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "20edaa1540c81b49930ab81f19f51a023571a0cf01d8d37ea3acf6ace8d134e7"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/docs/legacy-token-owner-deadline.md",
+      "bytes": 2014,
+      "compressedBytes": 1039,
+      "crc32": 1457818461,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "51d30e1c0a50d3121f6ddaf9764883b4966b38f1fa153d7479d1e6d5202d9711"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/docs/localization-source-compatibility.md",
+      "bytes": 5657,
+      "compressedBytes": 2869,
+      "crc32": 2360257378,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "d3080c62f114b9b83c6041ead4ddd6f747302f93a1df0df0c98e99e9635ec58d"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/docs/native-logging-wire-proof.md",
+      "bytes": 3714,
+      "compressedBytes": 1832,
+      "crc32": 3025239252,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "d0c7e16437403b4f841c13f3db8c6b779bbcd4ee9dcccabef612525a156d0732"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/docs/private-failure-producer-design-20261002.md",
+      "bytes": 14184,
+      "compressedBytes": 6069,
+      "crc32": 1837488162,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "311cff2de17216791ff67109a1712232b2d83cf347e392cc6d1dc376a25387d8"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/docs/private-failure-source-compatibility.md",
+      "bytes": 3999,
+      "compressedBytes": 2039,
+      "crc32": 4037356081,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "138e20c4b7b8033e71591378fea3bff49311424c02ed5365f9e2f8b169cdffd6"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/docs/private-http-transport-acceptance-design-20261002.md",
+      "bytes": 8201,
+      "compressedBytes": 3615,
+      "crc32": 1980220961,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "fbdc67bf9b5ec2725a855c1333b6a37dea286fa3c4a3f60c7179537e9d1aa44c"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/docs/private-request-observation-design-20261003.md",
+      "bytes": 16792,
+      "compressedBytes": 7249,
+      "crc32": 1847573012,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "54e329fd1c4d03beda2ed2db104d462bcd3d5aae347ff727b458d7e7cbd1807e"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/docs/private-send-observation-ownership.md",
+      "bytes": 2020,
+      "compressedBytes": 966,
+      "crc32": 845339807,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "2f38d60fea8c30b46ad3aed8e7519cc7b928b085e5d981270124c9abd5778215"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/docs/private-startup-boundary-design-20261002.md",
+      "bytes": 10545,
+      "compressedBytes": 4181,
+      "crc32": 626722996,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "dbc18ecda5733a4cfecf5c02a72fb8fb29d3d5ca89c4e03d838aec05f59e5688"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/docs/private-terminal-http-observer-design-20261002.md",
+      "bytes": 12200,
+      "compressedBytes": 5050,
+      "crc32": 1421440384,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "cbdf43716f900a2159b95db8c9c46501b2e5e93598f208344fd091bf4f5261ad"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/eng/Assert-OwnedCoverageEvidence.ps1",
+      "bytes": 3460,
+      "compressedBytes": 1296,
+      "crc32": 2920964420,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "3f052c88cf7a77233a6d6a84a475b31ef9b59027d3e472840656d550d7b7169b"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/eng/Export-CoverageEvidence.ps1",
+      "bytes": 5871,
+      "compressedBytes": 2052,
+      "crc32": 1144471752,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "fd00b6a2fc6e14beb768626c513a66d3539844595c026e15b035b97d9037d943"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/eng/Get-OwnedCoverageReport.ps1",
+      "bytes": 685,
+      "compressedBytes": 418,
+      "crc32": 888433925,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "439c475c938880a36410502c28cc0131e91634082a8d6cdabdfd97e88f2273c0"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/eng/Test-CoverageEvidence.ps1",
+      "bytes": 9298,
+      "compressedBytes": 2645,
+      "crc32": 3389480002,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "26ffc9952f89a136633b6013cce2561f6a9ca7ad989c91ffdeaf6989c80578ff"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/eng/Test-TypedResponsePackageConsumer.ps1",
+      "bytes": 9059,
+      "compressedBytes": 3190,
+      "crc32": 2940990376,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "daec79b71c799325a2b7edbadd2ccc398b27737953956ab0e8990df062e15e87"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/eng/coverage.runsettings",
+      "bytes": 841,
+      "compressedBytes": 333,
+      "crc32": 4248036397,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "37d47adfd377973470f267697e07045bc4f32a55bc007855a867455dce776907"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/global.json",
+      "bytes": 81,
+      "compressedBytes": 75,
+      "crc32": 2462188557,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "b48d6da8fa62c0da7cc8a2da4ea036ac55836660a448ba533135abb5b8451b73"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/nuget.config",
+      "bytes": 197,
+      "compressedBytes": 139,
+      "crc32": 3528484626,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "aec93b5637ab6d62470979a008990a4a336a287ab83a3f2541849ae735674055"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/AssemblyInfo.cs",
+      "bytes": 102,
+      "compressedBytes": 98,
+      "crc32": 3648466636,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "50b9c15ab1f0fe2def488072d2434f67f609c9bdc6c2b19358f28ed64f40f719"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Authorization/IAuthMetrics.cs",
+      "bytes": 677,
+      "compressedBytes": 269,
+      "crc32": 1627436586,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "c8f92faba768eb2defaf0b17407750a6c0c6f25a9b3d2de6c4acdb0b950805ea"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Authorization/PermissionAuthorizationHandler.cs",
+      "bytes": 17197,
+      "compressedBytes": 4349,
+      "crc32": 1454501342,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "687d32dc8d21fc6a150a3cfd40ba332b921bac7f32ada23ec7490177a7d86d17"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Authorization/PermissionAuthorizationPolicyProvider.cs",
+      "bytes": 4626,
+      "compressedBytes": 1336,
+      "crc32": 1306759640,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "d28a44a4add52e11cbb54d9cb8beb273d969b52c030d7241afb12dc387a8986d"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Authorization/PermissionRequirement.cs",
+      "bytes": 2631,
+      "compressedBytes": 792,
+      "crc32": 1135580360,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "aa8df5dbc098b67741f5564cf390b1a77cf2b0ca303105edd1eb2e4ffa5bcbff"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Authorization/RequirePermissionAttribute.cs",
+      "bytes": 4470,
+      "compressedBytes": 1385,
+      "crc32": 3680507983,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "4fa797ffcc231f5b92f916b90a0650d4f391eac5cd552c6cac9d924d82008f64"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Caching/CacheLogValue.cs",
+      "bytes": 718,
+      "compressedBytes": 437,
+      "crc32": 683824804,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "821ae5218cd3f3ef0bd54968145837660b092f8a8a976f6e0e5ed763b11344f9"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Caching/ICacheService.cs",
+      "bytes": 2576,
+      "compressedBytes": 581,
+      "crc32": 4114868188,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "ca0cb9b86d92ac7b37a5cab67ad0e3e6cae35ff9695774948e795e8cc6c16123"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Caching/InMemoryCacheService.cs",
+      "bytes": 8966,
+      "compressedBytes": 1890,
+      "crc32": 3852880027,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "01dc21381386d0a278a17e83f968f895a783f22d76141fb6881ffba0ee7af5d8"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Caching/RedisAvailabilityHealthCheck.cs",
+      "bytes": 997,
+      "compressedBytes": 442,
+      "crc32": 2526301778,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "bf34d883d56208e67962c3064780ced956824e6ab37c9cfa8ecb4f78f7411dc4"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Caching/RedisCacheService.cs",
+      "bytes": 9856,
+      "compressedBytes": 2004,
+      "crc32": 3579974535,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "5c9f4e8321a31a650ff08c16ea1adbc2338d50688a57a15524e8ff7134964022"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Database/SnakeCaseNamingHelper.cs",
+      "bytes": 3724,
+      "compressedBytes": 1089,
+      "crc32": 3425194426,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "96930338889040a674f2f4f7dcca54ae98b68dfe87c461cb28b994a1c03711f8"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Diagnostics/PrivateDependencyFailureHandler.cs",
+      "bytes": 3034,
+      "compressedBytes": 980,
+      "crc32": 238695034,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "c9e1f1d7accf1d001ef8e014ddb85657092719fe311f74bf418c6725995c956b"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Diagnostics/PrivateDependencyFailureObservation.cs",
+      "bytes": 968,
+      "compressedBytes": 506,
+      "crc32": 1447599472,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "31e88abed22576b952ccc4111093ff541d1fe44c5360d73cd6ae98e9188248e7"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Diagnostics/PrivateDependencyHttpClientExtensions.cs",
+      "bytes": 5414,
+      "compressedBytes": 1280,
+      "crc32": 3719864003,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "03e52d0eff38a1ff55b5924d2d0a41a762acca47d136c7a884347965c1750578"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Diagnostics/PrivateDependencyObservationContext.cs",
+      "bytes": 2170,
+      "compressedBytes": 864,
+      "crc32": 4146524568,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "bbcb1f8c290cd903fe000d2ca65a07ab0240e8b6822fa5ab43ba6e482034b370"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Diagnostics/PrivateDependencyOperationMapper.cs",
+      "bytes": 2364,
+      "compressedBytes": 903,
+      "crc32": 3050766436,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "2ccdc55d1e8bd94beccd9365e52dc28fed94c4a29fde8849393a31113c388fcf"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Diagnostics/PrivateRequestObservationPipeline.cs",
+      "bytes": 4646,
+      "compressedBytes": 1435,
+      "crc32": 328159153,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "58e7e9f76852799a9b54ad58f4529dcf5cec9e3c6b2bcbdad621c7e8093b230e"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Diagnostics/PrivateRequestObservationState.cs",
+      "bytes": 3855,
+      "compressedBytes": 1255,
+      "crc32": 1971064151,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "592dbafabae3b93a160c478df218b04ed50eb08a9695c87036e6e8c3078e74ad"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Diagnostics/PrivateStartupBoundary.cs",
+      "bytes": 3486,
+      "compressedBytes": 956,
+      "crc32": 3097211415,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "72487ace3b4f797f78c100afaec66018e8829e2e50853c5dbc05d07ebe90edaf"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Diagnostics/ProductionObservabilityDiagnosticException.cs",
+      "bytes": 391,
+      "compressedBytes": 226,
+      "crc32": 2829011148,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "1e3dfe27eced669d6e2d14a91112057c093621402c51c0f7c091e1fa133c1181"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Extensions.ApiDocumentation.cs",
+      "bytes": 5424,
+      "compressedBytes": 1326,
+      "crc32": 3026647430,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "e2e69acc3f6e7558074841cf06c5aafb05f2f45a41408ccc7f8c5f395022e3c6"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Extensions.ApiVersioning.cs",
+      "bytes": 1262,
+      "compressedBytes": 504,
+      "crc32": 2801561918,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "d73355cae6bca988ea3cd75efeaaebf4eb4a0fbb8217198d53da0f9422c80e05"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Extensions.AuthServiceTokenExchange.cs",
+      "bytes": 9437,
+      "compressedBytes": 1982,
+      "crc32": 2091598272,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "b480464172e42a932637d7b87947880b1a6f8b9dc33aa7bd94d7c808beff9210"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Extensions.Authentication.Cookie.cs",
+      "bytes": 4623,
+      "compressedBytes": 1488,
+      "crc32": 526256192,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "5572fdcf51a85738f8b8dc3c6c822189ded39efed0377fdcf5251ee0c9b6816e"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Extensions.Authentication.cs",
+      "bytes": 10677,
+      "compressedBytes": 2315,
+      "crc32": 3498316010,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "a39e5dde44a8fd406ce7aad6ea2f63b083cf7e8a2a1297af93d4e5854ebeea56"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Extensions.BackgroundServiceResilience.cs",
+      "bytes": 1737,
+      "compressedBytes": 620,
+      "crc32": 2136293610,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "7a4155057807c363cca9ac21ada9c1416c2edf549f37076591ef5aceb444c238"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Extensions.Caching.cs",
+      "bytes": 7467,
+      "compressedBytes": 1965,
+      "crc32": 1187886505,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "94fa3177963e877451eb2c03967163e3e38ee5e62f5e22b1a1ae872cdae372ce"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Extensions.Cors.cs",
+      "bytes": 5579,
+      "compressedBytes": 1375,
+      "crc32": 1067361011,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "217cede0788cf8611a94052ccb3f3c26966b8b3ae6bf81cc7ba7b7b7b1dc2666"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Extensions.Database.cs",
+      "bytes": 8784,
+      "compressedBytes": 2400,
+      "crc32": 1016085387,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "6e01fa4212904233e62e6a258a257b84feca7f6c8ae422765a06aa22f98e9638"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Extensions.HttpClients.cs",
+      "bytes": 11977,
+      "compressedBytes": 2109,
+      "crc32": 375123323,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "192c6573bfe3c0f8e026c7fc9a162ee96a4cb9c1b401c47ffc16dd21b1a7627d"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Extensions.IAM.cs",
+      "bytes": 3742,
+      "compressedBytes": 1260,
+      "crc32": 919822324,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "c0f97b7347a1bf400a9aedc7527a7020720bd4047cf8c12d200781f55a91e46f"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Extensions.IAMRegistration.cs",
+      "bytes": 2024,
+      "compressedBytes": 746,
+      "crc32": 3189514859,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "afd5d6831cc7f32091c1c2c5fb075bbbd563f6537e0629fda3b1d6e94931f8c1"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Extensions.LegacyServiceAuthentication.cs",
+      "bytes": 3666,
+      "compressedBytes": 1141,
+      "crc32": 2619332254,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "cc6d365118ed2f03633e3a8bd6ad4949791651c043ebed56a51dd4f5a7705056"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Extensions.MassTransit.cs",
+      "bytes": 9521,
+      "compressedBytes": 2451,
+      "crc32": 346398036,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "d178f512edb603e1da8f97575cf46f9bbf11d0c258aff244a1b2cbf8bf232797"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Extensions.Middleware.cs",
+      "bytes": 4847,
+      "compressedBytes": 1554,
+      "crc32": 3517144512,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "edb736abdd90c4dac4334781127a1a020a7c57c5b0ac8a2cb31686ca7686edef"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Extensions.PrivateFailureObservation.cs",
+      "bytes": 4480,
+      "compressedBytes": 1315,
+      "crc32": 3013086271,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "68292542311db44a48854d188f8b0b104971c52510dd18b1168ae9845ca927db"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Extensions.PrivateRequestObservation.cs",
+      "bytes": 2056,
+      "compressedBytes": 817,
+      "crc32": 2367118528,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "5e96a053530f7646404e9ffdcd0d2f7de620b0f3cb8dad12128e7b352f00aab0"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Extensions.RateLimiting.cs",
+      "bytes": 8935,
+      "compressedBytes": 1806,
+      "crc32": 3255680483,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "a15a09e2c4a1f2b203e56f739c21a4d7967897ecbc325d9a21107d54e84773b3"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Extensions.Redis.cs",
+      "bytes": 7120,
+      "compressedBytes": 1848,
+      "crc32": 3675567745,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "ad478557399007cf4aa3850f22a42e987753223054a25855c6f0903744c37267"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Extensions.Secrets.cs",
+      "bytes": 993,
+      "compressedBytes": 444,
+      "crc32": 1192879272,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "fcd6f3f4e7d14c394b22cdc5c4c052c690982b45b5e79f2ae6f9dd07db728061"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Extensions.ServiceRegistration.cs",
+      "bytes": 4914,
+      "compressedBytes": 1310,
+      "crc32": 2259837636,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "9ea5602e48bc033c555980f2b25892e8a49f095fd02a15e369e3a63627af36cc"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Extensions.cs",
+      "bytes": 13500,
+      "compressedBytes": 3806,
+      "crc32": 4054709582,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "73643c87d572e292a8bb5a9c29fe8476fd8ee817d74f80e1639cf3b5b707446e"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/IAM/AuthServiceTokenExchangeHandler.cs",
+      "bytes": 868,
+      "compressedBytes": 438,
+      "crc32": 2091015542,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "510ebf95f32ab2cb64fa3918c75e9fd1486c7a469acaf70bdb5289ad467ddebe"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/IAM/AuthServiceTokenProvider.cs",
+      "bytes": 20765,
+      "compressedBytes": 4837,
+      "crc32": 2065972143,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "9d51ada5721927261fc276df241bc38e6685ba263f9f8dba751c91259a429702"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/IAM/BackgroundIAMRegistrationService.cs",
+      "bytes": 11366,
+      "compressedBytes": 3079,
+      "crc32": 615927860,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "7c9b120870ae9b41e0223716ac7dbdfdf08fe7b7fa85ff907c444cd33bb9fe4e"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/IAM/IAMRegistrationHealthCheck.cs",
+      "bytes": 2861,
+      "compressedBytes": 886,
+      "crc32": 3165450247,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "fd3a1735cbf7ca7f17f106a46edd368bd4bff2fe1803d70248e72e56bae443a8"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/IAM/IAMRegistrationService.cs",
+      "bytes": 4082,
+      "compressedBytes": 1043,
+      "crc32": 760918294,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "5ba4464c409aa6b3622f4bab33316454f9cacb4b1fcb965a3bc15e2e5a1c8220"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/IAM/IIamServiceClient.cs",
+      "bytes": 4524,
+      "compressedBytes": 1187,
+      "crc32": 4286274964,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "62eb9950c7a8ff816f0084fdf1226f7925b727e7cf8e4a6abc0e03aafa9649fa"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/IAM/IServicePermissions.cs",
+      "bytes": 300,
+      "compressedBytes": 180,
+      "crc32": 4054514102,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "2381ba0c905141c5ec7447d4d1b165b9da2fb8bc254b87a08e5bbab27b0eb064"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/IAM/IamClientRegistrationGuard.cs",
+      "bytes": 3261,
+      "compressedBytes": 705,
+      "crc32": 3591393178,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "dbdb345c8a834bc6bbb813061fd8ffe6f50e349f6cb6e316d6edbb8e4789d7f7"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/IAM/IamServiceClient.cs",
+      "bytes": 16781,
+      "compressedBytes": 3958,
+      "crc32": 2818746004,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "f52c670486dc58abc3c9ee864db24cc30af97581b702c257b638985f940ffb5a"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/IAM/MalievIamRoles.cs",
+      "bytes": 7016,
+      "compressedBytes": 1864,
+      "crc32": 1163743897,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "29a5350fc2d9ffb011a36a063215320fd57d5af75e97770621f5cb58b65ce8c9"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/IAM/PermissionMatcher.cs",
+      "bytes": 4749,
+      "compressedBytes": 1482,
+      "crc32": 2955355415,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "eccb03922b191fcd5b1f3655127357d53c9dbab818010d5cb57ba5835d89e364"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/IAM/README.md",
+      "bytes": 2818,
+      "compressedBytes": 1376,
+      "crc32": 2101301905,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "1f31fef74a895890746397553ffcc6ee7eb30641fe94bc914906a8edabbaf007"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/IAM/ServiceAccountAuthenticationHandler.cs",
+      "bytes": 5129,
+      "compressedBytes": 1729,
+      "crc32": 4257994408,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "d5000934d801a3d1a2ddd3a37c7675f135751c1df24a115828de43040b7e1a92"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/IAM/ServiceAccountTokenProvider.cs",
+      "bytes": 8226,
+      "compressedBytes": 2097,
+      "crc32": 2975481433,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "285e9278b43f9936063f462ba4a4eef3c159fd597877d11da9e6dca6db8adf36"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Legacy.Maliev.ServiceDefaults.csproj",
+      "bytes": 3416,
+      "compressedBytes": 1033,
+      "crc32": 594049327,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "e0b355268560f876589b40fd0b935bb690197a1d12d6f13198bb2a83679eca5a"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/LegacyAuth/LegacyIamServiceAccessTokenProvider.cs",
+      "bytes": 1607,
+      "compressedBytes": 599,
+      "crc32": 1392413621,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "01b825d4a544f60eed13ea031c3709dcb3c827e9f44540b54916249b7ed6288e"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/LegacyAuth/LegacyIamServiceAuthenticationHandler.cs",
+      "bytes": 1255,
+      "compressedBytes": 564,
+      "crc32": 1811484638,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "788c4951a48fc7ec15a54cd0c2278d343f14234c55ab182dd4f316fd98498e12"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/LegacyAuth/LegacyServiceAccessTokenProvider.cs",
+      "bytes": 10795,
+      "compressedBytes": 2715,
+      "crc32": 1366437314,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "9fa6daae2f2082eba6e4dcfaa96761bfa6c80ade079afb73fbb0e34d55e49f34"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/LegacyAuth/LegacyServiceAuthenticationHandler.cs",
+      "bytes": 1232,
+      "compressedBytes": 560,
+      "crc32": 2787447147,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "af65b00aeafdd6323e9446da851e10f18a2cee9494fe3715a88e2f0c40136714"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Localization/RedirectUnsupportedCulturesMiddleware.cs",
+      "bytes": 2712,
+      "compressedBytes": 918,
+      "crc32": 597340336,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "5226a71e210cfb4c2f240fd6c172e18429b1a0fa95cb7841cd348aaa90cfe296"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Localization/RequestLocalizationCookiesMiddleware.cs",
+      "bytes": 2179,
+      "compressedBytes": 734,
+      "crc32": 1691536795,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "9487d01e8b8846f975a333269adb1ea7286b52c7bfae0bcc976fe136bdf6ca2e"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Logging/MalievCloudJsonConsoleFormatter.cs",
+      "bytes": 4448,
+      "compressedBytes": 1548,
+      "crc32": 3144561492,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "3000ff8e529b6a2b1f58b1ec12b816531db2f566e4657fb7a567493836c758ff"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Logging/PrivateFailureConsoleFormatter.cs",
+      "bytes": 6560,
+      "compressedBytes": 2129,
+      "crc32": 2164723592,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "4c851ca92380fa8365a1bcc32ab01f9d6a68c4f747802b922b28de01f06ac20e"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Middleware/CorrelationIdMiddleware.cs",
+      "bytes": 2598,
+      "compressedBytes": 989,
+      "crc32": 488255247,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "a0348054276f43e5b087720ad4f3d4ae81d7b5483b18ade27fb614b6d54443ee"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Middleware/ExceptionHandlingMiddleware.cs",
+      "bytes": 8930,
+      "compressedBytes": 2530,
+      "crc32": 3204811307,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "874a496bd238028c25c6e449d35d1b52ea241a44b5c7bda722cc2112cb851df7"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Middleware/RequestLoggingMiddleware.cs",
+      "bytes": 2371,
+      "compressedBytes": 895,
+      "crc32": 1400529994,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "764874e385000ec946dceddc7d8f1a806b5305e53e4f76100ada1f6fa20f57b6"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Middleware/RouteLogPath.cs",
+      "bytes": 542,
+      "compressedBytes": 319,
+      "crc32": 3990858596,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "9fc508e9d06bd0f637ac90677c52ea41bef78257cd44192ac519a954c52dd2d3"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Middleware/SecurityHeadersMiddleware.cs",
+      "bytes": 2212,
+      "compressedBytes": 843,
+      "crc32": 4078764395,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "9f6cde8cdac3ad4987b55eff6c58d4b2c3c8c24c4ddaf8801591e5e13e3cc29d"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/RateLimitPolicies.cs",
+      "bytes": 1342,
+      "compressedBytes": 446,
+      "crc32": 574171583,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "f20f6a30b15ad588a1f13cb78219c91263030ff81d63cb969cc20f4a788ea50f"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Resilience/LegacyHttpResilienceExtensions.cs",
+      "bytes": 1953,
+      "compressedBytes": 787,
+      "crc32": 2632472727,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "934a9270a68ae2c9af4fd28a6f7929d104a392e81987c4f7cb41a8ad2dea1c88"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Telemetry/SafeRequestLogContextProcessor.cs",
+      "bytes": 1180,
+      "compressedBytes": 562,
+      "crc32": 2031747977,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "cb76fb0692f43350c091d45a2379effbed4115ede1b9465e137cea43253744fd"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Telemetry/UrlQueryRedactionProcessor.cs",
+      "bytes": 3063,
+      "compressedBytes": 969,
+      "crc32": 2028995168,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "245a698880d040a8dacc58475c8555bda4cb3fa398876f3e0f6ab935c46c39d8"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/Testing/IAMTestHelpers.cs",
+      "bytes": 2582,
+      "compressedBytes": 992,
+      "crc32": 52699083,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "2f652999489bdcfb5cf33dca91467a79b589560e9ae27f59ad078b3c1ee70d8a"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/WebApi/Model/ApiResponse.cs",
+      "bytes": 561,
+      "compressedBytes": 295,
+      "crc32": 3649290054,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "5ed55bd800672b1fbc3c9d7b17de11f598a1f04407a66ba581ad1e160fd6042d"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/src/Legacy.Maliev.ServiceDefaults/WebApi/WebApiResponseReader.cs",
+      "bytes": 1539,
+      "compressedBytes": 660,
+      "crc32": 878588300,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "753faaae1cbbcc53f99d31e3e05c48b0a36e2424d8bafc1d8413a4dd4bbf2d7b"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/ApiDocumentationCompatibilityTests.cs",
+      "bytes": 1303,
+      "compressedBytes": 478,
+      "crc32": 1528975034,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "919ab223e5d59be0ab109c4ff7f0c321a2541a0e4fe4c38ee726838993436c95"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/AuthServiceTokenExchangeTests.cs",
+      "bytes": 45735,
+      "compressedBytes": 7730,
+      "crc32": 1542745197,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "00daed9fcaa4b4f15837e9401568a058b7e024fba5e8ce308c33ccf758c2e6b3"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/AuthenticatedServiceClientBehaviorTests.cs",
+      "bytes": 11645,
+      "compressedBytes": 2942,
+      "crc32": 3913583106,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "b943ba6ef119ba0cf21621a0699601114d8830d9502c18e4ad0aebf04a616cae"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/BackgroundIAMRegistrationServiceTests.cs",
+      "bytes": 7682,
+      "compressedBytes": 1520,
+      "crc32": 3802161380,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "bdc05038e170b3f589cf9bca91f3733b7b89df8413ca7c2164475e70118b49ac"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/BackgroundIamPublishedContractTests.cs",
+      "bytes": 14086,
+      "compressedBytes": 3054,
+      "crc32": 3454347005,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "e7911d6ae82387267d0bb661a4b49d6140845612d2ebb1540c96f7d2b8b41850"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/CachePrivateDiagnosticBoundaryTests.cs",
+      "bytes": 4274,
+      "compressedBytes": 1466,
+      "crc32": 2010186214,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "ad0132bc41f2b7f181e1fcebe29703b516945dbb531879bed3cadd1f202ef070"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/Caching/CacheCancellationTests.cs",
+      "bytes": 3277,
+      "compressedBytes": 819,
+      "crc32": 210194564,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "59d03389b2106a3caefe83008c1f97a4e9db2974c26c474bb517bf6a88c42b59"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/Caching/CacheLoggingContractTests.cs",
+      "bytes": 1049,
+      "compressedBytes": 555,
+      "crc32": 3432421696,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "e281cf7cb38c1356254bd71a3ad6ebeb81e55abc9889b902f167460dcefac7f7"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/Caching/InMemoryCacheServiceTests.cs",
+      "bytes": 4326,
+      "compressedBytes": 1238,
+      "crc32": 2618380367,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "e9b1440e39c2081c32f5e378e752b88ba378cf1b5e881df94224041d21bafa33"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/Caching/StandardCacheTests.cs",
+      "bytes": 3070,
+      "compressedBytes": 1001,
+      "crc32": 1308418917,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "7d25fc7b75105a29f820c6baa731e542bc64348839256c951cbd0cb1c87f963b"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/ClientAndRedisRegistrationBehaviorTests.cs",
+      "bytes": 5960,
+      "compressedBytes": 1442,
+      "crc32": 2018078191,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "85c08ddc4b19560d1d5a7140bf76c7d2188667537583fe7bd956a51dcb1e9371"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/CompatibilityBaselineTests.cs",
+      "bytes": 1570,
+      "compressedBytes": 590,
+      "crc32": 4027675226,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "75bad788c699bada2b654913c0e53ad30fbd454411da044151a6f0f761b17a15"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/CompatibilityDependencyTests.cs",
+      "bytes": 6185,
+      "compressedBytes": 1677,
+      "crc32": 1819794023,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "90f022e6c29030a36bb19e04ae4866ff4f5b58ddad876df1027b0fe3d3c35afc"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/DatabaseMigrationBoundaryTests.cs",
+      "bytes": 1804,
+      "compressedBytes": 681,
+      "crc32": 829418463,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "697b7eb5b0c79f1938d9c84870a01705fdaa049b03b8d982f5e037ee80efa33f"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/DatabaseRegistrationBehaviorTests.cs",
+      "bytes": 4701,
+      "compressedBytes": 1315,
+      "crc32": 1483384092,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "da79360be62eb74425ab89574a8356adc98702ac08332e772c991e660a0f0cf9"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/DefaultEndpointsBehaviorTests.cs",
+      "bytes": 2842,
+      "compressedBytes": 968,
+      "crc32": 1339863421,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "335797b19108de040c0cd9dc631f7b7a6fe8cc62acd96191ee8da23c6f629845"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/HttpInfrastructureBehaviorTests.cs",
+      "bytes": 6386,
+      "compressedBytes": 1799,
+      "crc32": 1375049010,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "4d9fa77d413d2e4263574192ed4d6378dc24f6181357ce6cf46b600f66bcb3ec"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/IAMRegistrationHealthCheckTests.cs",
+      "bytes": 3342,
+      "compressedBytes": 860,
+      "crc32": 3658499046,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "96e21af497786db25631efb99dbfd5b4add83531ba9444c7ab1f2b42815f6cec"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/IamPermissionCacheIsolationTests.cs",
+      "bytes": 10455,
+      "compressedBytes": 2411,
+      "crc32": 1532665949,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "3ac385153d71e28a7bfaf85ca0cc7e6a3f07da331101912043950cd2a5b963df"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/IamPrivateDiagnosticBoundaryTests.cs",
+      "bytes": 23690,
+      "compressedBytes": 5417,
+      "crc32": 3816128566,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "b2074bf1f6969d509c0d9f74abf62edea6204eccde9a00dd9765793329bb4cd5"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/IamPrivateObservationOwnershipTests.cs",
+      "bytes": 10713,
+      "compressedBytes": 2653,
+      "crc32": 2987840834,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "5634cc0fb8d0f33f621d5b3559c9193625d3ff43850853c6ed027a80fa1778a6"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/IamRoleAuthorizationContractTests.cs",
+      "bytes": 6399,
+      "compressedBytes": 1555,
+      "crc32": 1126754151,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "9930a4596956dbe93480eb20af6520d12cd2e606e34ba5a2b95cac03cb3ec979"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/IamServiceClientTests.cs",
+      "bytes": 12835,
+      "compressedBytes": 2823,
+      "crc32": 1913734986,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "a87ef3d4d5868b03c7e66932af5035bb5f32647cd92872266e08b614ec603692"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/JwtAuthenticationSecurityTests.cs",
+      "bytes": 16855,
+      "compressedBytes": 2652,
+      "crc32": 2072669339,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "fd921a7e828cbfd4d19947548252d8512bab40fd6f20f02cf8fe09edb5cf5556"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/Legacy.Maliev.ServiceDefaults.Tests.csproj",
+      "bytes": 1341,
+      "compressedBytes": 456,
+      "crc32": 3576836511,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "31637e4ae54040500a8968b188ec74223c0487a5c41d6ebca8c38f1f77888cb4"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/LegacyIamServiceAuthenticationTests.cs",
+      "bytes": 16549,
+      "compressedBytes": 3258,
+      "crc32": 153780312,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "2d72248cdc6c0f2f7482595e3652df245d27b523bc47a654baf45426e0ec757b"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/LegacyServiceAuthenticationTests.cs",
+      "bytes": 6621,
+      "compressedBytes": 2015,
+      "crc32": 3786305415,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "231b5e462c310ad64344994efc6869fe696bb96c4d6f33adaf547b66b2a23957"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/LegacyTokenExchangeDeadlineTests.cs",
+      "bytes": 13255,
+      "compressedBytes": 3126,
+      "crc32": 3416293223,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "baca5067adbb3221f7256d84e99871ea2916784a131edc8292d987e9f659d713"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/LocalizationCookieCompatibilityTests.cs",
+      "bytes": 8417,
+      "compressedBytes": 2069,
+      "crc32": 1280192871,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "0217cad8925a8b83f32581073d76047ac1aa1be5247ec3078dbb7728ca30be21"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/LocalizationRouteCompatibilityTests.cs",
+      "bytes": 5557,
+      "compressedBytes": 1395,
+      "crc32": 2593775475,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "d473a8fb2c7dd3a71a719e84d7e88db6545eeeb9ece8e50e7020d725e280e1cc"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/MessagingRegistrationBehaviorTests.cs",
+      "bytes": 4061,
+      "compressedBytes": 1395,
+      "crc32": 2472493908,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "12dbfb041cdda018773308686ed0f277e8f1b1b2cd5757083d2742b87f0f3916"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/Middleware/ExceptionEventLoggingTests.cs",
+      "bytes": 9055,
+      "compressedBytes": 2101,
+      "crc32": 3904980020,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "7198331c91d4aac220248ca9b5e2e1dcaa168b4a233fcc1243ad503e7c590e99"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/Middleware/ExceptionHandlingMiddlewareTests.cs",
+      "bytes": 3318,
+      "compressedBytes": 1063,
+      "crc32": 404959462,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "7813cfe9baaa97cb3ba43390ea74580c36e8af5bb266689460056be5819b483f"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/Middleware/ExceptionHttpContractTests.cs",
+      "bytes": 5766,
+      "compressedBytes": 1634,
+      "crc32": 2729719202,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "7b2e3a380b932fb20fcaa144511b3624a6c50bd19c43f9fd831abff228931236"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/Middleware/ForwardedHeadersSecurityTests.cs",
+      "bytes": 2365,
+      "compressedBytes": 669,
+      "crc32": 892896540,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "30756da88772d73e1b3d97b597d53ad0a1edade70bc0dd18c6438f51dc283342"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/Middleware/RequestLoggingPathTests.cs",
+      "bytes": 3250,
+      "compressedBytes": 1048,
+      "crc32": 1841865124,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "7fff297580023e455ba7227bd20da0973c9a308718e633da826803bcfda1ed63"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/NativeJsonLoggingTests.cs",
+      "bytes": 2953,
+      "compressedBytes": 885,
+      "crc32": 2063079370,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "834730c7151bb8ee5f1cc04a6d4302325d92de2defdce975ca209dca1bac3426"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/NativeLoggingWireTests.cs",
+      "bytes": 17326,
+      "compressedBytes": 4153,
+      "crc32": 1233902440,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "5e0a5146d6912f8318af3d7ec8986f117a0856b5e9ac270517ed30675098a6fe"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/OpenApiEndpointBehaviorTests.cs",
+      "bytes": 6685,
+      "compressedBytes": 1717,
+      "crc32": 2021231711,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "edf6216049a5fef6a1c59a9eef4e9f106ab1a1c5dbc54e4c4b732e8480e651f4"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/PermissionAuthorizationPolicyTests.cs",
+      "bytes": 35640,
+      "compressedBytes": 4801,
+      "crc32": 912555621,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "bb2c94f46134d81305adb7684ff498b2f0c77e2465ebf2824d26cb9ad4199be7"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/PermissionAuthorizationSemaphoreTests.cs",
+      "bytes": 2650,
+      "compressedBytes": 910,
+      "crc32": 3320107334,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "fa1e770224758a146ad5b266920a2a60c28e48ba3055f45b96e2c425931383ed"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/PrivateDependencyNativeDeadlineTests.cs",
+      "bytes": 21598,
+      "compressedBytes": 4341,
+      "crc32": 414160580,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "9cae6f4c5ff012eb6bf3cd175ed65c4d47b2dc1a352093a8b141ee676a130d97"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/PrivateDependencyOperationNameTests.cs",
+      "bytes": 14602,
+      "compressedBytes": 3462,
+      "crc32": 2338072628,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "aabb08ebf6fa840bfa3387ad07eec3a3db7d31266f81382fe83f637e82704ce0"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/PrivateFailureProducerContractTests.cs",
+      "bytes": 10312,
+      "compressedBytes": 2419,
+      "crc32": 883269983,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "b3f738e3cbee48d6855c5d2e600cf63595421a307a9e21f8915138f0722edf48"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/PrivateFailureProvenanceTests.cs",
+      "bytes": 14909,
+      "compressedBytes": 3432,
+      "crc32": 582433584,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "18725af42b4f30af664730b86fd7952ed8ea299d428004c246e9c81e1bab67f6"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/PrivateHttpTransportAcceptanceTests.cs",
+      "bytes": 14603,
+      "compressedBytes": 3669,
+      "crc32": 2745163107,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "595162b8e3d7612dcb4ec209da2016cede1a5afb77a389b42ae5fde9d0b31307"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/PrivateOperationPipelineCompatibilityTests.cs",
+      "bytes": 22088,
+      "compressedBytes": 4725,
+      "crc32": 4283874625,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "5c78f39ba43759b8a06bfa256b5d1d82dca734f4e2a870f2af01c1087f637813"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/PrivateRequestObservationContractTests.cs",
+      "bytes": 32067,
+      "compressedBytes": 5437,
+      "crc32": 665368475,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "01818179949dae6a7938c563d8969d1d699c1767ebebb8b78e8ce6bb8cdf5f4c"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/PrivateRequestObservationHttpFixture.cs",
+      "bytes": 17157,
+      "compressedBytes": 4185,
+      "crc32": 3933770436,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "f8b2f4e241d5f9856de5f2e2df0e1b964dc1ddd43dec7f132c697a7b608748d4"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/PrivateRequestObservationLateRoutingTests.cs",
+      "bytes": 6824,
+      "compressedBytes": 1399,
+      "crc32": 557644339,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "03e99e4e8e31984d4bc02631c80c1a862e16339dc7b4fb8d0202290a1c50d38d"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/PrivateStartupBoundaryContractTests.cs",
+      "bytes": 7259,
+      "compressedBytes": 1784,
+      "crc32": 749089334,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "f2dda79ddee6205152b8e0f6a8fa370ebff266e0c5893de0e87b3ae84a904fb6"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/PrivateTerminalHttpObserverContractTests.cs",
+      "bytes": 18140,
+      "compressedBytes": 4160,
+      "crc32": 1684891559,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "e2d2d4468043abeffa43dbacb890401aeaf34ee5947373498257bcce7b7c9ac4"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/RedisCacheRuntimeBoundaryTests.cs",
+      "bytes": 12715,
+      "compressedBytes": 2970,
+      "crc32": 2860083506,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "c7ff970f930c05a36519cab339dc13dc074d3ffa64fcaebee0ad8621030e927a"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/RedisRegisteredHostBehaviorTests.cs",
+      "bytes": 12087,
+      "compressedBytes": 2428,
+      "crc32": 2821474476,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "3f0e09351702578998d3081478983c2f9f776e314964574bd19914aad573e8cc"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/Resilience/LegacyHttpResilienceTests.cs",
+      "bytes": 5760,
+      "compressedBytes": 1412,
+      "crc32": 4106644227,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "7cfbce003aef17d33c8d8d49ac194e59c63e37379d5ee2bc3642c79aee3e1cfa"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/RetainedTypedHttpResponseTests.cs",
+      "bytes": 10195,
+      "compressedBytes": 2631,
+      "crc32": 2143748184,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "f654ebf4ebccad0758502c2afa2456c4834630c5be5da0a234ed6a03923f93ff"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/ServiceAccountAuthenticationHandlerTests.cs",
+      "bytes": 4047,
+      "compressedBytes": 1271,
+      "crc32": 3184935985,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "fae196beef808ea58e79916a396d844ea7c4a2b1c9a58eec94aa9ce4b4f10acb"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/ServiceAccountTokenRuntimeBoundaryTests.cs",
+      "bytes": 5687,
+      "compressedBytes": 1737,
+      "crc32": 120860557,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "23968a5a554491d5e4b9cedbfa5b276f529e4361029ecdb6cee7e2f3a4a326a0"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/SharedRegistrationBehaviorTests.cs",
+      "bytes": 9146,
+      "compressedBytes": 2356,
+      "crc32": 2003564602,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "db3773b8a3c55586c7e3864f56ad18398edc2923c482e10afb0eeafac49f994c"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/Source5acLoggingRemovalContractTests.cs",
+      "bytes": 2153,
+      "compressedBytes": 745,
+      "crc32": 4081805870,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "7d6a7d528ebb1eb13cda2871d0248f481fd6a48925b72be8b9fe41da0084d501"
+    },
+    {
+      "path": "dependencies/Legacy.Maliev.ServiceDefaults/tests/Legacy.Maliev.ServiceDefaults.Tests/UrlQueryRedactionProcessorTests.cs",
+      "bytes": 3818,
+      "compressedBytes": 929,
+      "crc32": 4051991219,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "cf391568ee5e54eae7135da034dfd155385a49866f8bd6a96fd99053e4157cf7"
+    },
+    {
+      "path": "dependency-manifest.json",
+      "bytes": 44128,
+      "compressedBytes": 9910,
+      "crc32": 2839884823,
+      "createSystem": 0,
+      "externalAttributes": 25165824,
+      "flags": 0,
+      "compression": 8,
+      "dateTime": [
+        2026,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "sha256": "46d25b1c76eaf2d7077af087e432de3e691426d7da1d1a6c5299a679b6e11b53"
+    }
+  ],
+  "bundleBytes": 453103,
+  "bundleSha256": "dccc742a954703532d473b181ea7669ced0ab51ff7ded8f081852c223555e98b",
+  "sharedProducerSha256": "44a8a5accac9da11422d606be02fe28487642215df511b5f1c4284296a453ee2",
+  "capsuleGitBlob": "eab7aced65b19fbb9c76f0464a9e56dda244aaed"
+}
