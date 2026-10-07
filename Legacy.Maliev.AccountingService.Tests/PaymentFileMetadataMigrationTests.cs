@@ -227,10 +227,11 @@ public sealed class PaymentFileMetadataMigrationTests(InvoiceNotificationPhaseFe
 
     private static async Task SeedAsync(DbContext context, string? bucket, string? objectName)
     {
-        context.AddRange(new PaymentDirection { Id = 91, Name = "Synthetic direction" },
-            new PaymentMethod { Id = 91, Name = "Synthetic method" }, new PaymentType { Id = 91, Name = "Synthetic type" });
+        context.AddRange(new PaymentDirection { Id = 91, Name = "Synthetic direction", Description = "Synthetic source-compatible seed" },
+            new PaymentMethod { Id = 91, Name = "Synthetic method", Description = "Synthetic source-compatible seed" }, new PaymentType { Id = 91, Name = "Synthetic type", Description = "Synthetic source-compatible seed" });
         context.Add(new Payment
         {
+            Description = "Synthetic source-compatible seed",
             Id = 91,
             PaymentDirectionId = 91,
             PaymentMethodId = 91,

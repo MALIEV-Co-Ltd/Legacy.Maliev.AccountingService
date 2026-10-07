@@ -24,7 +24,7 @@ public sealed class PaymentSummarySourceWindowHttpTests(AccountingBoundaryHttpFi
         {
             (await database.Directions.SingleAsync(row => row.Id == 100000)).Name = "Income";
             (await database.Types.SingleAsync(row => row.Id == 100000)).Name = "Job";
-            database.Directions.Add(new PaymentDirection { Id = 100001, Name = "Expense" });
+            database.Directions.Add(new PaymentDirection { Id = 100001, Name = "Expense", Description = "Synthetic source-compatible seed" });
             database.Payments.AddRange(
                 Payment(interior, 12, 100m),
                 Payment(lastDay, 0, 10m),
@@ -56,7 +56,7 @@ public sealed class PaymentSummarySourceWindowHttpTests(AccountingBoundaryHttpFi
         {
             (await database.Directions.SingleAsync(row => row.Id == 100000)).Name = "Income";
             (await database.Types.SingleAsync(row => row.Id == 100000)).Name = "Job";
-            database.Types.Add(new PaymentType { Id = 100001, Name = "Other" });
+            database.Types.Add(new PaymentType { Id = 100001, Name = "Other", Description = "Synthetic source-compatible seed" });
             var previous = Payment("2026-09-29", 12, 80m);
             previous.PaymentTypeId = 100001;
             // Keep a real previous currency group: source can compute zero Job income without dereferencing a missing group.
@@ -81,7 +81,7 @@ public sealed class PaymentSummarySourceWindowHttpTests(AccountingBoundaryHttpFi
         await using (var database = fixture.Database())
         {
             (await database.Directions.SingleAsync(row => row.Id == 100000)).Name = "Income";
-            database.Directions.Add(new PaymentDirection { Id = 100001, Name = "Expense" });
+            database.Directions.Add(new PaymentDirection { Id = 100001, Name = "Expense", Description = "Synthetic source-compatible seed" });
             var midnight = Payment("2026-12-31", 0, 10m);
             var noon = Payment("2026-12-31", 12, 20m);
             var otherDirection = Payment("2026-12-31", 0, 10000m);

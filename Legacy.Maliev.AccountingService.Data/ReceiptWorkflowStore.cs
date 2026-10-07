@@ -117,6 +117,8 @@ public sealed class ReceiptWorkflowStore(
             ModifiedDate = now,
         };
 
+        MasterStringConstraints.Validate(receipt);
+
         var options = (DbContextOptions<ReceiptDbContext>)receipts.GetService<IDbContextOptions>();
         Exception? failure = null;
         await receipts.Database.CreateExecutionStrategy().ExecuteAsync(async token =>

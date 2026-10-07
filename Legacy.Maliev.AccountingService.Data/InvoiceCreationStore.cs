@@ -42,6 +42,7 @@ public sealed class InvoiceCreationStore(InvoiceDbContext context, TimeProvider 
                 if (authority is not null)
                     await new InvoiceCreationAdmissionStore(owned).ValidateOriginAsync(authority.OperationId,
                         authority.QuotationId, authority.Origin, true, cancellationToken);
+                MasterStringConstraints.Validate(invoice);
                 owned.Invoices.Add(invoice);
                 await owned.SaveChangesAsync(cancellationToken);
                 foreach (var item in items) item.InvoiceId = invoice.Id;

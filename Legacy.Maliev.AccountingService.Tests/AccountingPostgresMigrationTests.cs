@@ -38,12 +38,13 @@ public sealed class AccountingPostgresMigrationTests : IAsyncLifetime
             receiptContext.Database.MigrateAsync());
 
         var repository = Repository(paymentContext, invoiceContext, receiptContext);
-        var income = await repository.CreateAsync(new PaymentDirection { Name = "Income" }, CancellationToken.None);
-        var expense = await repository.CreateAsync(new PaymentDirection { Name = "Expense" }, CancellationToken.None);
-        var method = await repository.CreateAsync(new PaymentMethod { Name = "Bank" }, CancellationToken.None);
-        var type = await repository.CreateAsync(new PaymentType { Name = "Job" }, CancellationToken.None);
+        var income = await repository.CreateAsync(new PaymentDirection { Name = "Income", Description = "Synthetic source-compatible seed" }, CancellationToken.None);
+        var expense = await repository.CreateAsync(new PaymentDirection { Name = "Expense", Description = "Synthetic source-compatible seed" }, CancellationToken.None);
+        var method = await repository.CreateAsync(new PaymentMethod { Name = "Bank", Description = "Synthetic source-compatible seed" }, CancellationToken.None);
+        var type = await repository.CreateAsync(new PaymentType { Name = "Job", Description = "Synthetic source-compatible seed" }, CancellationToken.None);
         await repository.CreateAsync(new Payment
         {
+            Description = "Synthetic source-compatible seed",
             PaymentDirectionId = income.Id,
             PaymentMethodId = method.Id,
             PaymentTypeId = type.Id,
@@ -52,6 +53,7 @@ public sealed class AccountingPostgresMigrationTests : IAsyncLifetime
         }, CancellationToken.None);
         await repository.CreateAsync(new Payment
         {
+            Description = "Synthetic source-compatible seed",
             PaymentDirectionId = expense.Id,
             PaymentMethodId = method.Id,
             PaymentTypeId = type.Id,
@@ -60,6 +62,7 @@ public sealed class AccountingPostgresMigrationTests : IAsyncLifetime
         }, CancellationToken.None);
         await repository.CreateAsync(new Payment
         {
+            Description = "Synthetic source-compatible seed",
             PaymentDirectionId = income.Id,
             PaymentMethodId = method.Id,
             PaymentTypeId = type.Id,
@@ -79,6 +82,7 @@ public sealed class AccountingPostgresMigrationTests : IAsyncLifetime
 
         var receipt = await repository.CreateAsync(new Receipt
         {
+            Currency = "THB",
             InvoiceNumber = "INV-1",
             PaymentDate = new DateTime(2026, 7, 15, 0, 0, 0, DateTimeKind.Utc),
             Total = 107m,
@@ -112,12 +116,14 @@ public sealed class AccountingPostgresMigrationTests : IAsyncLifetime
         var paymentDate = new DateTime(2026, 7, 15, 0, 0, 0, DateTimeKind.Utc);
         var withoutTax = new Receipt
         {
+            Currency = "THB",
             InvoiceNumber = "NULL-TAX",
             PaymentDate = paymentDate,
             Total = 10.005m,
         };
         var withTax = new Receipt
         {
+            Currency = "THB",
             InvoiceNumber = "DECIMAL-TAX",
             PaymentDate = paymentDate,
             Total = 10.005m,

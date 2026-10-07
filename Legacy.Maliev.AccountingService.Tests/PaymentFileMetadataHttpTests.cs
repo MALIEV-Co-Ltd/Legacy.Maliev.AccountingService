@@ -137,6 +137,7 @@ public sealed class PaymentFileMetadataHttpTests(AccountingBoundaryHttpFixture f
         await using var payment = fixture.Database();
         payment.Payments.Add(new Payment
         {
+            Description = "Synthetic source-compatible seed",
             Id = ParentId,
             PaymentDirectionId = 100000,
             PaymentMethodId = 100000,

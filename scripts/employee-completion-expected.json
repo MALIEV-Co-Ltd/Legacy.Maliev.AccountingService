@@ -1,7 +1,7 @@
 {
   "forecast": 168,
   "baseline": 889,
-  "fullForecast": 1178,
+  "fullForecast": 1652,
   "methods": {
     "Legacy.Maliev.AccountingService.Tests.InvoiceFinancialOwnershipPostgresTests.CommitRetainsActualComputedItemsWithoutNotificationCompletion": 1,
     "Legacy.Maliev.AccountingService.Tests.InvoiceFinancialOwnershipPostgresTests.InvalidRetainedAuthorityLeavesNoInvoiceItemsOrOwnership": 7,

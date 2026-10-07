@@ -22,6 +22,7 @@ public sealed class AccountingRepository(
     public async Task<T> CreateAsync<T>(T item, CancellationToken cancellationToken) where T : class
     {
         var context = ContextFor<T>();
+        MasterStringConstraints.Validate(item);
         PreservePaymentClock(item);
         SetIdentity(item, 0);
         SetDate(item, "CreatedDate", Now());
@@ -83,6 +84,8 @@ public sealed class AccountingRepository(
         {
             return UpdateResult.NotFound;
         }
+
+        MasterStringConstraints.Validate(item);
 
         // Attribution is authoritative at invoice creation and cannot be replaced by a full PUT.
         if (existing is Invoice storedInvoice && item is Invoice suppliedInvoice)
