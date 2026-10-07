@@ -17,6 +17,13 @@ class EntrypointControls(unittest.TestCase):
         cls.baseline = Path(os.environ['COMMERCE_BASELINE'])
         cls.here = Path(entry.__file__).resolve().parent
 
+    def test_every_accepted_baseline_file_has_exact_raw_bytes_with_path_diagnostics(self):
+        value = json.loads((self.here / 'policy.json').read_bytes())
+        for row in value['baseFiles']:
+            with self.subTest(path=row['path']):
+                raw = (self.baseline / row['path']).read_bytes()
+                self.assertEqual(row['sha256'], hashlib.sha256(raw).hexdigest(), row['path'])
+
     def invoke(self, destination, baseline=None):
         stream = io.StringIO()
         with patch('sys.argv', ['intake', '--baseline', str(baseline or self.baseline),
