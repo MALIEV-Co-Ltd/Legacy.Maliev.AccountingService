@@ -46,6 +46,7 @@ public sealed class InvoiceDbContext(DbContextOptions<InvoiceDbContext> options)
     {
         ModelRules.Apply(modelBuilder);
         MasterStringConstraints.Apply(modelBuilder);
+        BillingModelConfiguration.Apply(modelBuilder);
         modelBuilder.Entity<InvoiceCreationAdmission>(entity =>
         {
             entity.HasKey(value => value.OperationId);

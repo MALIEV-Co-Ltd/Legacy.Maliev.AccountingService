@@ -200,7 +200,10 @@ public sealed class AccountingBoundaryHttpFixture : IAsyncLifetime
         await using var payment = Database();
         await using var invoice = new InvoiceDbContext(Options<InvoiceDbContext>("InvoiceDbContext"));
         await using var receipt = new ReceiptDbContext(Options<ReceiptDbContext>("ReceiptDbContext"));
-        return new(await SnapshotRowsAsync(payment, 6), await SnapshotRowsAsync(invoice, 5),
+        Assert.Equal(new[] { "BillingAccount", "BillingIntent", "BillingOperation", "Invoice", "InvoiceCreationAdmission",
+            "InvoiceFile", "InvoiceNotificationCorrelation", "OrderItem" }, invoice.Model.GetEntityTypes()
+            .Select(entity => entity.GetTableName()).OrderBy(name => name, StringComparer.Ordinal));
+        return new(await SnapshotRowsAsync(payment, 6), await SnapshotRowsAsync(invoice, 8),
             await SnapshotRowsAsync(receipt, 3), await host.SnapshotJournalAsync());
     }
 

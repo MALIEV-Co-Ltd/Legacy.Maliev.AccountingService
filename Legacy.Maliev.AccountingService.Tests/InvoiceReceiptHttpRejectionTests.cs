@@ -74,7 +74,7 @@ public sealed class InvoiceReceiptHttpRejectionTests(AccountingBoundaryHttpFixtu
         var outbound = fixture.ReceiptOutboundCalls;
         var before = await fixture.ReceiptSnapshotAsync();
         Assert.Equal(6, before.Payment.Tables);
-        Assert.Equal(5, before.Invoice.Tables);
+        Assert.Equal(8, before.Invoice.Tables);
         Assert.Equal(3, before.Receipt.Tables);
         // Shared Redis may retain earlier cache/memo keys; complete before/after equality below
         // requires zero changes to all retained keys and every hash field.
