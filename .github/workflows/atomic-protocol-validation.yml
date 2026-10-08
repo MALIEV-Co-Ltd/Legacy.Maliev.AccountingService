@@ -126,7 +126,7 @@ jobs:
         run: python3 -B scripts/verify-defaults-cache-compat-results.py defaults-cache-results
       - name: Preserve Defaults cache compatibility evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: defaults-cache-compatibility-${{ github.sha }}
           path: defaults-cache-results
@@ -134,7 +134,7 @@ jobs:
           retention-days: 7
       - name: Preserve joined evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: atomic-protocol-${{ github.sha }}
           path: atomic-results

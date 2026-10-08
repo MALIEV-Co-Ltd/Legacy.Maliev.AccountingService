@@ -51,7 +51,7 @@ jobs:
         run: python3 -B scripts/verify-master-source-strings.py master-source-strings-results
       - name: Preserve source string evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: master-source-strings-${{ github.sha }}
           path: master-source-strings-results
