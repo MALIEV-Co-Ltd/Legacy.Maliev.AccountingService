@@ -64,7 +64,7 @@ $auth = Pinned-Checkout 'Legacy.Maliev.AuthService' 'auth-51afbbd' '51afbbd6e282
 $runtime = Join-Path $boundary 'auth-runtime'
 $null = Pinned-Checkout 'Legacy.Maliev.ServiceDefaults' 'auth-runtime/Legacy.Maliev.ServiceDefaults' '5c5f9479313710fa576f83d3b396442997a2fcf4'
 $null = Pinned-Checkout 'Legacy.Maliev.CompatibilityContracts' 'auth-runtime/Legacy.Maliev.CompatibilityContracts' '78e48ffc4ee000df0510cba5e7c7a3c4c4d539d7'
-$buildOutput = Invoke-Bounded dotnet @('build', (Join-Path $auth 'Legacy.Maliev.AuthService.Api/Legacy.Maliev.AuthService.Api.csproj'), '-c', 'Release', '--nologo', '--no-incremental', '-warnaserror', '-p:UseLocalMalievDependencies=true', "-p:MalievWorkspaceRoot=$runtime")
+$buildOutput = Invoke-Bounded dotnet @('build', (Join-Path $auth 'Legacy.Maliev.AuthService.Api/Legacy.Maliev.AuthService.Api.csproj'), '-c', 'Release', '--nologo', '--no-incremental', '-warnaserror', '-m:1', '-nodeReuse:false', '-p:UseSharedCompilation=false', '-p:UseLocalMalievDependencies=true', "-p:MalievWorkspaceRoot=$runtime")
 Write-Host $buildOutput
 $dll = Join-Path $auth 'Legacy.Maliev.AuthService.Api/bin/Release/net10.0/Legacy.Maliev.AuthService.Api.dll'
 if (!(Test-Path -LiteralPath $dll)) { throw 'Pinned Auth API build did not produce its required proof binary.' }
@@ -141,5 +141,5 @@ foreach ($entry in @{ 'Seed.csproj' = $project; 'Program.cs' = $source }.GetEnum
         if ([IO.File]::ReadAllText($target) -cne $entry.Value) { throw 'Existing different generated utility preserved unchanged.' }
     } else { [IO.File]::WriteAllText($target, $entry.Value) }
 }
-Write-Host (Invoke-Bounded dotnet @('build', (Join-Path $seed 'Seed.csproj'), '-c', 'Release', '--nologo', '-warnaserror', '-p:UseLocalMalievDependencies=true', "-p:MalievWorkspaceRoot=$runtime"))
+Write-Host (Invoke-Bounded dotnet @('build', (Join-Path $seed 'Seed.csproj'), '-c', 'Release', '--nologo', '-warnaserror', '-m:1', '-nodeReuse:false', '-p:UseSharedCompilation=false', '-p:UseLocalMalievDependencies=true', "-p:MalievWorkspaceRoot=$runtime"))
 Write-Host 'Exact-pinned isolated Auth API proof binary prepared; no database or service started.'
