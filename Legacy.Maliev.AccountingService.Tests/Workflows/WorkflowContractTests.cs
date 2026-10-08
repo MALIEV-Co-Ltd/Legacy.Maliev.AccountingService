@@ -13,8 +13,7 @@ public sealed class WorkflowContractTests
     private static readonly string DataProject = File.ReadAllText(
         FindRepositoryFile("Legacy.Maliev.AccountingService.Data", "Legacy.Maliev.AccountingService.Data.csproj"));
 
-    [Fact]
-    public void BuildAndTest_RejectsPreviousUploadArtifactPin()
+    private static void BuildAndTest_RejectsPreviousUploadArtifactPin()
     {
         var previousPin = Workflow.Replace("actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a", "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02", StringComparison.Ordinal);
         Assert.NotEqual(Workflow, previousPin);
@@ -24,6 +23,7 @@ public sealed class WorkflowContractTests
     [Fact]
     public void BuildAndTest_SatisfiesStructuralContract()
     {
+        BuildAndTest_RejectsPreviousUploadArtifactPin();
         WorkflowContractValidator.Validate(Workflow);
         AssertMutationRejected("python3 -B scripts/verify-employee-completion.py runner-results --full", "echo omitted native employee gate");
         AssertMutationRejected("python3 -B scripts/verify-file-metadata.py runner-results --full", "echo omitted native file metadata gate");
