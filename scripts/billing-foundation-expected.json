@@ -1,0 +1,31 @@
+{
+  "forecast": 47,
+  "baseline": 1652,
+  "fullForecast": 1699,
+  "methods": {
+    "Legacy.Maliev.AccountingService.Tests.BillingAmountTests.AllocatesRequestedGrossWithoutDuplicatingQuotation": 3,
+    "Legacy.Maliev.AccountingService.Tests.BillingAmountTests.FinalStageAbsorbsComponentRoundingResidual": 1,
+    "Legacy.Maliev.AccountingService.Tests.BillingAmountTests.RejectsOverbillingOrInvalidIntent": 4,
+    "Legacy.Maliev.AccountingService.Tests.BillingEvidenceHttpTests.ExactConfirmedOrderAssociationIsSufficientWithoutQuotationAssociation": 1,
+    "Legacy.Maliev.AccountingService.Tests.BillingEvidenceHttpTests.PreviewReceiptCannotAuthorizeLaterUnavailableRead": 1,
+    "Legacy.Maliev.AccountingService.Tests.BillingEvidenceHttpTests.ReadsExactImmutableVersionAndVerifiedAssociations": 1,
+    "Legacy.Maliev.AccountingService.Tests.BillingEvidenceHttpTests.RejectsUntrustedWireFormats": 5,
+    "Legacy.Maliev.AccountingService.Tests.BillingEvidenceHttpTests.RejectsUnverifiedOrUnrelatedEvidence": 13,
+    "Legacy.Maliev.AccountingService.Tests.BillingEvidenceHttpTests.UnavailableOrDeniedEvidenceNeverFallsBackToAnEarlierReceipt": 3,
+    "Legacy.Maliev.AccountingService.Tests.BillingLedgerPostgresTests.AdditiveInvoiceMigrationPreservesLegacyRowsAndEnablesBillingLedger": 1,
+    "Legacy.Maliev.AccountingService.Tests.BillingLedgerPostgresTests.CallerMutationWhileWaitingCannotChangeCommittedFingerprintContent": 1,
+    "Legacy.Maliev.AccountingService.Tests.BillingLedgerPostgresTests.ConcurrentRemainingIssuanceCommitsOneStageAndOneIntent": 1,
+    "Legacy.Maliev.AccountingService.Tests.BillingLedgerPostgresTests.ConfiguredRetryStrategySupportsAtomicOpeningAndIssuance": 1,
+    "Legacy.Maliev.AccountingService.Tests.BillingLedgerPostgresTests.DatabaseRejectsFinancialStateBeyondCommercialCap": 1,
+    "Legacy.Maliev.AccountingService.Tests.BillingLedgerPostgresTests.DepositThenRemainingDoesNotDuplicateCommercialBaseOrVat": 1,
+    "Legacy.Maliev.AccountingService.Tests.BillingLedgerPostgresTests.FailedCommitRollsBackStageOperationAndIntent": 1,
+    "Legacy.Maliev.AccountingService.Tests.BillingLedgerPostgresTests.InvalidDigestIsRejectedEvenWhenItHasTheCorrectLength": 1,
+    "Legacy.Maliev.AccountingService.Tests.BillingLedgerPostgresTests.LostResponseReplaysBeforeRevisionCheckAndChangedIntentConflicts": 1,
+    "Legacy.Maliev.AccountingService.Tests.BillingLedgerPostgresTests.MissingTaxCategoryNeverOpensAccount": 1,
+    "Legacy.Maliev.AccountingService.Tests.BillingLedgerPostgresTests.MixedCategoriesRetainEveryIssuedLineAndFinalResidual": 1,
+    "Legacy.Maliev.AccountingService.Tests.BillingLedgerPostgresTests.PublicCommandRejectsAmountAndPercentageTogether": 1,
+    "Legacy.Maliev.AccountingService.Tests.BillingLedgerPostgresTests.SnapshotWithoutCoherentLineTotalsNeverOpensAccount": 1,
+    "Legacy.Maliev.AccountingService.Tests.BillingLedgerPostgresTests.SubPrecisionSourceLinesNeverOpenAccount": 1,
+    "Legacy.Maliev.AccountingService.Tests.BillingLedgerPostgresTests.TransientReadFailureRetriesWithoutDuplicateStageOrIntent": 1
+  }
+}
