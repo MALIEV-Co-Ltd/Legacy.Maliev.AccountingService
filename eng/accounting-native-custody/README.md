@@ -1,6 +1,6 @@
 # Accounting custody source preparation
 
-The workflow executes only 85 source Python source controls. Runtime is disabled;
+The workflow executes only 104 source Python source controls. Runtime is disabled;
 there is no CLI calling the SDK, Docker, cgroup or proxy launchers. No grant is made.
 
 The implementation files are unenabled custody drafts, not validated native code.
@@ -18,3 +18,5 @@ completed execs require actual parent-bound inspection. Full-suite expectations
 require an external reviewed inventory bound to the assembly and V7 source,
 including exact method multiplicities and case names; submitted TRX is not a roster.
 No original migration code, feature overlay or protected intake file is changed.
+
+Fixture creation requires an independently reviewed same-run internal bridge network capability (ID/name/birth/expiry), verified against the actual daemon. Default SDK network selectors are normalized to that exact private ID; foreign selectors are refused. Unknown endpoints preserve the network. Cleanup removes it only after SDK/fixture quiescence and verifies physical ID/name absence. Network creation/admission is not enabled by this source.

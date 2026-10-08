@@ -2,7 +2,7 @@
 from pathlib import Path
 import argparse,hashlib,json,os,unittest
 
-MODULES={'test_accounting_v3_guard_core':39,'test_accounting_fixture_producer_v3_draft':9,
+MODULES={'test_accounting_v3_guard_core':39,'test_accounting_fixture_producer_v3_draft':28,
          'test_accounting_private_proxy_routes_v3_draft':20,'test_accounting_native_trx_v3':17}
 
 def main():
@@ -22,6 +22,6 @@ def main():
              'sdkStarted':False,'dockerStarted':False,'nativeRuntimeProven':False,'nativeAccepted':False}
     destination=Path(args.receipt)
     with destination.open('xb') as stream:stream.write(json.dumps(receipt,indent=2).encode());stream.flush();os.fsync(stream.fileno())
-    if not result.wasSuccessful() or result.skipped or result.testsRun!=85:raise SystemExit(1)
+    if not result.wasSuccessful() or result.skipped or result.testsRun!=104:raise SystemExit(1)
 
 if __name__=='__main__':main()

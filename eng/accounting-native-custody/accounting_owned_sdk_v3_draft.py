@@ -58,6 +58,11 @@ def write_new(path,value):
     try:os.fsync(parent)
     finally:os.close(parent)
 
+def validate_sdk_identity(uid,gid,groups):
+    if type(uid)!=int or uid<=0 or type(gid)!=int or gid<=0 or type(groups)!=list or not groups or len(groups)>32:
+        raise ValueError('Finite nonroot SDK identity required')
+    if any(type(item)!=int or item<=0 for item in groups):raise ValueError('SDK root or invalid groups refused')
+
 def run_owned_sdk(authority,executable,arguments,repository,environment,uid,gid,groups,
                   lease,fixture_custodian,log_sink,cgroup_parent,claim_path,evidence,cancelled=lambda:False):
     """Exclusive stopped-child registration, continuous expiry, exact-unit cleanup.
@@ -68,9 +73,7 @@ def run_owned_sdk(authority,executable,arguments,repository,environment,uid,gid,
     if sys.platform!='linux' or os.geteuid()!=0 or not hasattr(os,'pidfd_open'):
         raise RuntimeError('Reviewed delegated Linux cgroup/pidfd owner required')
     if not isinstance(lease,ImmutableLease):raise ValueError('Immutable Accounting lease required')
-    if type(uid)!=int or uid<=0 or type(gid)!=int or gid<0 or not groups or len(groups)>32:
-        raise ValueError('Finite nonroot SDK identity required')
-    if any(type(item)!=int or item<0 for item in groups):raise ValueError('SDK groups invalid')
+    validate_sdk_identity(uid,gid,groups)
     repository=Path(repository).resolve(strict=True);executable=Path(executable).resolve(strict=True)
     cgroup_parent=Path(cgroup_parent).resolve(strict=True);claim_path=Path(claim_path);evidence=Path(evidence)
     if any(path.is_symlink() for path in (claim_path,evidence,cgroup_parent)):

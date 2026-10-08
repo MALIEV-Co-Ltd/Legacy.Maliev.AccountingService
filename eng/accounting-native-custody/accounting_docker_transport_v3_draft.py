@@ -23,6 +23,24 @@ def attributed_sdk_request(connection,group,group_fd,expected_uid,lease):
         raise ValueError('Actual proxy peer outside exact owned SDK cgroup')
     return {'pid':pid,'birthTicks':started,'uid':uid,'gid':gid}
 
+def verify_owned_network(observed,capability,owner,run,expires,known):
+    if type(capability)!=dict or set(capability)!={'id','name','created','expiresUtc'}:
+        raise ValueError('Exact reviewed network capability required')
+    if not re.fullmatch('[0-9a-f]{64}',capability['id']) or capability['name']!='accounting-'+run or capability['expiresUtc']!=expires.isoformat():
+        raise ValueError('Owned network capability identity differs')
+    expected={'accounting-owner.task':owner,'accounting-owner.run':run,
+              'accounting-owner.expires':capability['expiresUtc'],'accounting-owner.persistent':'false'}
+    if (type(observed)!=dict or observed.get('Id')!=capability['id'] or observed.get('Name')!=capability['name']
+        or observed.get('Created')!=capability['created'] or observed.get('Driver')!='bridge'
+        or observed.get('Scope')!='local' or observed.get('Internal') is not True
+        or observed.get('Attachable') is not False or observed.get('Ingress') is not False
+        or any(observed.get('Labels',{}).get(key)!=value for key,value in expected.items())):
+        raise ValueError('Actual private network ownership/profile differs')
+    containers=observed.get('Containers')
+    if type(containers)!=dict or not set(containers)<=known:
+        raise ValueError('Foreign or unregistered network endpoints; preserve network')
+    return observed
+
 class UnixDockerTransport:
     def __init__(self,path,socket_identity,peer_pid,peer_birth,daemon,run,group,group_fd,lease,cleanup_deadline):
         if sys.platform!='linux' or not hasattr(socket,'SO_PEERCRED'):
@@ -133,3 +151,18 @@ class UnixDockerTransport:
         if status!=204:raise ValueError('Exact backend removal failed')
     def close(self):
         for channel in tuple(self.live):channel.close();self.live.discard(channel)
+
+    def owned_network(self,capability):
+        status,value=self.rpc('GET','/networks/'+quote(capability['id'],safe=''))
+        if status!=200:raise ValueError('Actual owned network unavailable')
+        return verify_owned_network(value,capability,self.owner,self.run,self.lease.expires,self.known)
+    def remove_owned_network(self,capability):
+        if not self.cleanup_mode or not self.sdk_quiescent(self.run):raise ValueError('Network cleanup requires actual SDK quiescence')
+        observed=self.owned_network(capability)
+        if observed['Containers']:raise ValueError('Owned network still has endpoints; preserve it')
+        status,value=self.rpc('DELETE','/networks/'+quote(capability['id'],safe=''))
+        if status!=204:raise ValueError('Owned network removal uncertain')
+        for selector in (capability['id'],capability['name']):
+            status,value=self.rpc('GET','/networks/'+quote(selector,safe=''))
+            if status!=404:raise ValueError('Physical owned network ID/name absence unverified')
+        return True

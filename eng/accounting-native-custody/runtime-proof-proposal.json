@@ -21,8 +21,8 @@
     {
       "phase": "normal-hosted-source-ci",
       "timeoutSeconds": 600,
-      "execution": "Python source85 source controls only; no SDK, Docker, proxy listener, fork or cgroup allocation",
-      "acceptance": "Exact85/85 zero skipped with changed-file hashes; provides no native acceptance"
+      "execution": "Python source104 source controls only; no SDK, Docker, proxy listener, fork or cgroup allocation",
+      "acceptance": "Exact104/104 zero skipped with changed-file hashes; provides no native acceptance"
     },
     {
       "phase": "finite-hosted-linux-process-controls",

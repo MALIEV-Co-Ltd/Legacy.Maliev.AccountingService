@@ -14,17 +14,20 @@ PROFILES={'postgres:18-alpine':{'memory':512*1024**2,'cpu':1_000_000_000,'mount'
 ID=re.compile(r'[0-9a-f]{64}')
 
 class FixtureIntentProducer:
-    def __init__(self,root,run,daemon,images,lease,docker):
+    def __init__(self,root,run,daemon,images,lease,docker,network):
         uuid.UUID(run)
         if not daemon or set(images)!=set(PROFILES) or any(not re.fullmatch(r'.+@sha256:[0-9a-f]{64}',x) for x in images.values()):
             raise ValueError('Reviewed exact Accounting daemon/image digests required')
         if docker.owner!=OWNER or docker.run!=run or docker.daemon!=daemon:
             raise ValueError('Foreign Docker transport ownership refused')
+        self.network=copy.deepcopy(network);docker.owned_network(self.network)
         self.owner=OWNER;self.run=run;self.daemon=daemon;self.images=dict(images);self.lease=lease;self.docker=docker
         self.root=Path(root);self.fd=None;self.intents={};self.publications={};self.uncertain=set()
         self.proxy=None;self.private_endpoint='unix://'+str(self.root/'docker.sock')
         self.fd=os.open(self.root,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
         if list(self.root.iterdir()):self.close();raise ValueError('Exclusive fresh intent directory required')
+        try:write_new(self.root/'network-publication.json',self.network)
+        except BaseException:self.close();raise
     def close(self):
         try:
             if self.proxy is not None:self.proxy.close()
@@ -49,6 +52,7 @@ class FixtureIntentProducer:
         if self.fd is None:raise ValueError('Intent owner handle released')
         same_path(self.root,self.fd);self.lease.check()
         if self.docker.daemon_identity()!=self.daemon:raise ValueError('Actual Docker daemon changed')
+        self.docker.owned_network(self.network)
     def create(self,request):
         self.check()
         if len(self.intents)>=512:raise ValueError('Accounting fixture budget exceeded')
@@ -56,10 +60,12 @@ class FixtureIntentProducer:
         tag=body.get('Image')
         if tag not in PROFILES:raise ValueError('Unapproved Accounting fixture image')
         profile=PROFILES[tag]
+        if body.get('NetworkingConfig'):raise ValueError('Caller network endpoint configuration refused')
+        body.pop('NetworkingConfig',None)
         host=body.setdefault('HostConfig',{})
         if any(host.get(key) for key in ('Binds','Mounts','VolumesFrom','Devices','DeviceRequests')) or body.get('Volumes'):
             raise ValueError('Persistent/foreign fixture storage refused')
-        if host.get('Privileged') or host.get('NetworkMode')=='host' or str(host.get('NetworkMode','')).startswith('container:') or host.get('PidMode'):
+        if host.get('Privileged') or host.get('NetworkMode','') not in ('','default','bridge',self.network['id'],self.network['name']) or host.get('PidMode'):
             raise ValueError('Privileged/shared fixture refused')
         if host.get('CapAdd') or host.get('SecurityOpt'):
             raise ValueError('Foreign fixture capability/security configuration')
@@ -71,6 +77,7 @@ class FixtureIntentProducer:
         port=ports[profile['port']][0]
         if port.get('HostPort') not in ('','0'):raise ValueError('Dynamic fixture port required')
         port['HostIp']='127.0.0.1'
+        host['NetworkMode']=self.network['id']
         host.update(Memory=profile['memory'],MemorySwap=profile['memory'],NanoCpus=profile['cpu'],PidsLimit=128,
                     AutoRemove=False,Privileged=False,Tmpfs={profile['mount']:profile['tmpfs']})
         body['Image']=self.images[tag]
@@ -111,6 +118,16 @@ class FixtureIntentProducer:
             raise ValueError('Actual fixture resource caps differ')
         if host.get('Privileged') or host.get('AutoRemove') or host.get('Binds') or host.get('VolumesFrom') or host.get('Devices') or host.get('DeviceRequests'):
             raise ValueError('Actual fixture persistent/privileged surface differs')
+        if host.get('NetworkMode')!=self.network['id']:raise ValueError('Actual fixture joined foreign network')
+        networks=observed.get('NetworkSettings',{}).get('Networks')
+        if type(networks)!=dict or set(networks)!={self.network['name']}:
+            raise ValueError('Actual fixture has unknown or foreign network attachments')
+        endpoint=networks[self.network['name']]
+        if type(endpoint)!=dict or endpoint.get('NetworkID')!=self.network['id'] or endpoint.get('Links'):
+            raise ValueError('Actual fixture network identity or links differ')
+        aliases=endpoint.get('Aliases')
+        if aliases is not None and (type(aliases)!=list or any(alias not in (intent['name'],container_id,container_id[:12]) for alias in aliases)):
+            raise ValueError('Actual fixture has foreign network alias')
         if host.get('Tmpfs')!={profile['mount']:profile['tmpfs']}:
             raise ValueError('Actual ephemeral storage bound differs')
         if any(row.get('Type')!='tmpfs' or row.get('Destination')!=profile['mount'] for row in observed.get('Mounts',[])):
@@ -148,6 +165,8 @@ class FixtureIntentProducer:
                 with path.open('rb') as stream:raw=stream.read(65537)
                 if len(raw)>65536 or unique_json(raw)!=value:
                     raise ValueError('Actual immutable fixture receipt readback differs')
+        with (self.root/'network-publication.json').open('rb') as stream:raw=stream.read(65537)
+        if len(raw)>65536 or unique_json(raw)!=self.network:raise ValueError('Durable owned network capability differs')
         inventory=self.docker.inventory(OWNER,self.run)
         known={row['id'] for row in self.publications.values()}
         if any(row.get('Id') not in known for row in inventory):raise ValueError('Unregistered actual backend; preserve it')
@@ -170,4 +189,5 @@ class FixtureIntentProducer:
             self.docker.remove(container_id,force=False,volumes=False)
             if self.docker.inspect(container_id)!=404:raise ValueError('Exact backend physical absence unverified')
         rows=[dict(intent,publication=self.publications[child]) for child,intent in self.intents.items()]
-        return registered_fixture_absence(rows,self.docker.inventory(OWNER,self.run),self.docker.inspect,self.daemon,OWNER,self.run)['ownedBackendsAbsent']
+        absent=registered_fixture_absence(rows,self.docker.inventory(OWNER,self.run),self.docker.inspect,self.daemon,OWNER,self.run)['ownedBackendsAbsent']
+        return absent and self.docker.remove_owned_network(self.network) is True
