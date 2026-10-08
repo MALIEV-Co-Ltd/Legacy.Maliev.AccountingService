@@ -1,7 +1,7 @@
 {
-  "forecast": 47,
+  "forecast": 62,
   "baseline": 1652,
-  "fullForecast": 1699,
+  "fullForecast": 1714,
   "methods": {
     "Legacy.Maliev.AccountingService.Tests.BillingAmountTests.AllocatesRequestedGrossWithoutDuplicatingQuotation": 3,
     "Legacy.Maliev.AccountingService.Tests.BillingAmountTests.FinalStageAbsorbsComponentRoundingResidual": 1,
@@ -26,6 +26,11 @@
     "Legacy.Maliev.AccountingService.Tests.BillingLedgerPostgresTests.PublicCommandRejectsAmountAndPercentageTogether": 1,
     "Legacy.Maliev.AccountingService.Tests.BillingLedgerPostgresTests.SnapshotWithoutCoherentLineTotalsNeverOpensAccount": 1,
     "Legacy.Maliev.AccountingService.Tests.BillingLedgerPostgresTests.SubPrecisionSourceLinesNeverOpenAccount": 1,
-    "Legacy.Maliev.AccountingService.Tests.BillingLedgerPostgresTests.TransientReadFailureRetriesWithoutDuplicateStageOrIntent": 1
+    "Legacy.Maliev.AccountingService.Tests.BillingLedgerPostgresTests.TransientReadFailureRetriesWithoutDuplicateStageOrIntent": 1,
+    "Legacy.Maliev.AccountingService.Tests.BillingReadHttpTests.NormalJwtLivePermissionAndDefaultDisabledModuleRefuseBeforeFinancialMutation": 4,
+    "Legacy.Maliev.AccountingService.Tests.BillingReadPostgresTests.EnabledReadModuleWithoutResourceScopeStillRefusesFinancialRead": 2,
+    "Legacy.Maliev.AccountingService.Tests.BillingReadPostgresTests.PreviewUsesPersistedCapWithoutIssuingStageOrAdvancingRevision": 3,
+    "Legacy.Maliev.AccountingService.Tests.BillingReadPostgresTests.WrongCustomerOrStaleOrInvalidPreviewCannotChangeLedger": 5,
+    "Legacy.Maliev.AccountingService.Tests.BillingRegisteredReadHttpTests.RegisteredReadAndPreviewUseRealLedgerAndKeepIssuedHistoryUnchanged": 1
   }
 }

@@ -19,9 +19,13 @@ public sealed class AccountingContractTests
     [Fact]
     public void Api_PreservesAllLegacyActionsAndRouteTemplates()
     {
-        var controllers = typeof(Program).Assembly.GetTypes()
+        var allControllers = typeof(Program).Assembly.GetTypes()
             .Where(type => !type.IsAbstract && typeof(ControllerBase).IsAssignableFrom(type))
             .ToArray();
+        var billingController = typeof(Api.Controllers.Billing.BillingAccountsController);
+        Assert.Equal(17, allControllers.Length);
+        Assert.Contains(billingController, allControllers);
+        var controllers = allControllers.Where(type => type != billingController).ToArray();
         var actions = controllers.SelectMany(type => type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly))
             .Where(method => method.GetCustomAttributes<HttpMethodAttribute>().Any())
             .ToArray();
