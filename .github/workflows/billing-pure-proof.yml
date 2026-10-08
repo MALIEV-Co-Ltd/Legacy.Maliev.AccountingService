@@ -1,0 +1,47 @@
+name: Isolated billing pure proof
+
+on:
+  push:
+    branches: [feature/billing-pure-proof-79]
+
+permissions:
+  contents: read
+
+jobs:
+  pure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - slice: recovery
+            project: tooling/billing-pure-proof/Recovery/Recovery.Tests.csproj
+          - slice: settlement
+            project: tooling/billing-pure-proof/Settlement/Settlement.Tests.csproj
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_NOLOGO: '1'
+      MSBUILDDISABLENODEREUSE: '1'
+    steps:
+      - name: Checkout exact proof source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Set up existing .NET 10 SDK
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68
+        with:
+          dotnet-version: 10.0.401
+      - name: Execute isolated pure candidate
+        run: >-
+          dotnet test "${{ matrix.project }}" --configuration Release
+          -m:1 -nodeReuse:false -p:UseSharedCompilation=false
+          --logger trx --results-directory "proof-results/${{ matrix.slice }}"
+      - name: Retain native evidence even for RED
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: billing-pure-${{ matrix.slice }}-${{ github.sha }}
+          path: proof-results/${{ matrix.slice }}
+          if-no-files-found: error
+          retention-days: 7

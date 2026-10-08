@@ -1,0 +1,7 @@
+# Isolated billing pure proof
+
+Internal test-only preparation for Accounting79 Tasks4/5. These projects are not referenced by the application, solution or production tests and expose no deployed contract. No source authority, renderer/storage/payment producer adapter, runtime registration or schema is included. Synthetic owner observations are test inputs, never user authorization.
+
+Recovery38 and settlement41 cases begin with intentional NotImplemented RED stubs. The feature-only hosted workflow obtains real native RED evidence without taking the original migration's local SDK/PG/browser capacity. Implement only after observing semantic test failures from these exact sources, retain failed artifacts, then require matching native GREEN and independent review. Compilation failure is not accepted as TDD RED. No current production CI inventory or migration pin is modified.
+
+The recovery model proposes one immutable operation/number/snapshot with phase/revision retention and qualified observations, leaving effect dispatch and global coverage uniqueness to separately reviewed persistence/producer work. DocumentService remains a stateless renderer. The cash planner uses current stage net debt and global acknowledged payment consumption, preserving exact source evidence during replay; genuine customer-bound Payment reservations, withholding certificates, reversals and legacy mutation guards remain additional required work.
