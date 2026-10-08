@@ -1,5 +1,5 @@
 """Producer transition controls with fake daemon; not native custody proof."""
-import ast,copy,json,unittest
+import ast,copy,json,secrets,unittest
 from datetime import datetime,timedelta,timezone
 from pathlib import Path
 from types import SimpleNamespace
@@ -27,7 +27,7 @@ class Controls(unittest.TestCase):
                            Created=datetime.now(timezone.utc).isoformat())
             return {'Id':'b'*64}
         producer.docker=SimpleNamespace(create=create,inspect=lambda x:current)
-        request={'Image':'postgres:18-alpine','Env':['POSTGRES_PASSWORD=do-not-record'],
+        request={'Image':'postgres:18-alpine','Env':['POSTGRES_PASSWORD='+secrets.token_hex(24)],
                  'ExposedPorts':{'5432/tcp':{}},'HostConfig':{'PortBindings':{'5432/tcp':[{'HostIp':'','HostPort':''}]}}}
         return producer,request,events,persist
     def test_actual_producer_dispatch_order(self):
@@ -35,7 +35,7 @@ class Controls(unittest.TestCase):
         with patch.object(f,'write_new',persist):producer.create(request)
         self.assertEqual([x[0] for x in events],['persist','dispatch','persist'])
         self.assertFalse(producer.uncertain)
-        self.assertNotIn('do-not-record',json.dumps([x[2] for x in events if x[0]=='persist']))
+        self.assertNotIn(request['Env'][0].partition('=')[2],json.dumps([x[2] for x in events if x[0]=='persist']))
         self.assertEqual(events[-1][2]['childRun'],events[0][2]['childRun'])
     def test_create_uncertainty_retained(self):
         producer,request,events,persist=self.producer('create')
