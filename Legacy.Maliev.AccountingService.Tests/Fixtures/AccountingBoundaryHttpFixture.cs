@@ -36,6 +36,14 @@ public sealed class AccountingBoundaryHttpCollection : ICollectionFixture<Accoun
     public const string Name = "Accounting dedicated HTTP boundary";
 }
 
+// Authority cases retain their own PostgreSQL/receipt Redis fixture rather than
+// observing expiring cache entries accumulated by other boundary test classes.
+[CollectionDefinition(InvoiceEmployeeCompletionAuthorityCollection.Name, DisableParallelization = true)]
+public sealed class InvoiceEmployeeCompletionAuthorityCollection : ICollectionFixture<AccountingBoundaryHttpFixture>
+{
+    public const string Name = "Accounting dedicated invoice completion authority";
+}
+
 /// <summary>Separate disposable contexts, real JWT/live permissions, and two actual API environments.</summary>
 public sealed class AccountingBoundaryHttpFixture : IAsyncLifetime
 {

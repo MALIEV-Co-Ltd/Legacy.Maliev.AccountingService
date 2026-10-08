@@ -42,15 +42,15 @@ jobs:
           use-local-maliev-dependencies: 'true'
       - name: Gate owned production coverage
         run: python3 scripts/verify-runner-coverage.py runner-results
-      - name: Verify full 1714 executions and employee inventory
+      - name: Verify full 1744 executions and employee inventory
         run: python3 -B scripts/verify-employee-completion.py runner-results --full
-      - name: Verify full 1714 executions and file metadata inventory
+      - name: Verify full 1744 executions and file metadata inventory
         run: python3 -B scripts/verify-file-metadata.py runner-results --full
-      - name: Verify full 1714 executions and Payment file metadata inventory
+      - name: Verify full 1744 executions and Payment file metadata inventory
         run: python3 -B scripts/verify-payment-file-metadata.py runner-results --full
-      - name: Verify full 1714 executions and actual PaidInvoice wire provenance
+      - name: Verify full 1744 executions and actual PaidInvoice wire provenance
         run: python3 -B scripts/verify-paid-invoice-wire.py runner-results --full --wire
-      - name: Verify full 1714 executions and exact billing foundation inventory
+      - name: Verify full 1744 executions and exact billing foundation inventory
         run: python3 -B scripts/verify-billing-foundation.py runner-results --full
       - name: Verify billing native evidence mutation controls
         env:
