@@ -45,7 +45,9 @@ The required producer deliverable is immutable version metadata plus authorized 
 
 ## File map and common types
 
-All Accounting paths below are relative to Legacy.Maliev.AccountingService; other repository prefixes identify the owner. New type declarations belong to Application/Models/BillingModels.cs, except persistence entities in Domain/Billing/BillingEntities.cs.
+Paths use the existing project directories. Within Accounting, expand each project label exactly as follows: Application/ means Legacy.Maliev.AccountingService.Application/; Domain/ means Legacy.Maliev.AccountingService.Domain/; Data/ means Legacy.Maliev.AccountingService.Data/; Api/ means Legacy.Maliev.AccountingService.Api/; Tests/ means Legacy.Maliev.AccountingService.Tests/. For example, Application/Models/BillingModels.cs is Legacy.Maliev.AccountingService.Application/Models/BillingModels.cs. Quotation and DocumentService producer paths use the same rule with Legacy.Maliev.QuotationService or Legacy.Maliev.DocumentService respectively. Intranet prefixes are stated in Task 6. Repository-root docs/ and scripts/ are literal paths.
+
+New type declarations belong to Application/Models/BillingModels.cs, except persistence entities in Domain/Billing/BillingEntities.cs. This map gives every proposed file a deterministic full repository path; generated migration filenames are assigned only when the migration is generated.
 
 Contract types:
 - BillingContext(int EmployeeId, Guid OperationId, long ExpectedRevision).
