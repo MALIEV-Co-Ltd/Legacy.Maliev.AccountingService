@@ -1,7 +1,7 @@
 {
   "forecast": 46,
   "acceptedBaseline": 1057,
-  "fullForecast": 1744,
+  "fullForecast": 1823,
   "base": "85e4d574c079f25e0834c7c92b27a6d5bdd7f828",
   "methods": {
     "Legacy.Maliev.AccountingService.Tests.InvoiceReceiptFileMetadataMigrationTests.RuntimeModelMatchesSnapshotAndExactSourceFileMetadata": 2,

@@ -13,7 +13,7 @@ full = '--full' in sys.argv[2:]
 manifest = json.loads((Path(__file__).parent / 'billing-foundation-expected.json').read_text())
 expected = manifest['methods']
 total = manifest['fullForecast'] if full else manifest['forecast']
-assert sum(expected.values()) == manifest['forecast'] == 92
+assert sum(expected.values()) == manifest['forecast'] == 171
 reports = list(root.rglob('*.trx'))
 if len(reports) != 1:
     raise SystemExit('Require one actual TRX')
@@ -115,7 +115,7 @@ packages = coverage.findall('./packages/package')
 for assembly in ['Api', 'Application', 'Data', 'Domain']:
     if not any(p.get('name') == 'Legacy.Maliev.AccountingService.' + assembly and p.findall('.//line') for p in packages):
         raise SystemExit('Missing owned executable coverage inventory: ' + assembly)
-proof = {'actualPassed': total, 'billingActualPassed': 92, 'failed': 0, 'skipped': 0,
+proof = {'actualPassed': total, 'billingActualPassed': 171, 'failed': 0, 'skipped': 0,
  'methods': dict(actual), 'trxSha256': hashlib.sha256(bounded_bytes(reports[0], 32 * 1024 * 1024)).hexdigest(),
  'rawSha256': next(iter(digests)), 'rawCopies': len(raw), 'exclusions': [],
  'actualProducerJoinProven': False, 'fullSuiteCoverageFloor': 'separate existing coverage gate' if full else False}

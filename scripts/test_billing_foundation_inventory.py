@@ -32,7 +32,7 @@ class BillingInventoryControls(unittest.TestCase):
     def test_actual_retained_native_evidence_passes(self):
         self.check(True)
         proof = json.loads((self.root / 'billing-foundation-proof.json').read_text())
-        self.assertEqual((proof['actualPassed'], proof['billingActualPassed'], proof['skipped']), (1744, 92, 0))
+        self.assertEqual((proof['actualPassed'], proof['billingActualPassed'], proof['skipped']), (1823, 171, 0))
 
     def test_nonpassing_billing_result_is_refused(self):
         result = next(r for r in self.doc.findall('./t:Results/t:UnitTestResult', NS)
