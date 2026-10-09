@@ -4,6 +4,7 @@ using Legacy.Maliev.AccountingService.Api.Controllers.Invoice;
 using Legacy.Maliev.AccountingService.Data;
 using Legacy.Maliev.AccountingService.Application.Models;
 using Legacy.Maliev.AccountingService.Domain.Invoice;
+using Legacy.Maliev.AccountingService.Domain.Billing;
 using Legacy.Maliev.AccountingService.Domain.Payment;
 using Legacy.Maliev.AccountingService.Domain.Receipt;
 using Microsoft.AspNetCore.Authorization;
@@ -18,9 +19,13 @@ public sealed class AccountingContractTests
     [Fact]
     public void Api_PreservesAllLegacyActionsAndRouteTemplates()
     {
-        var controllers = typeof(Program).Assembly.GetTypes()
+        var allControllers = typeof(Program).Assembly.GetTypes()
             .Where(type => !type.IsAbstract && typeof(ControllerBase).IsAssignableFrom(type))
             .ToArray();
+        var billingController = typeof(Api.Controllers.Billing.BillingAccountsController);
+        Assert.Equal(17, allControllers.Length);
+        Assert.Contains(billingController, allControllers);
+        var controllers = allControllers.Where(type => type != billingController).ToArray();
         var actions = controllers.SelectMany(type => type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly))
             .Where(method => method.GetCustomAttributes<HttpMethodAttribute>().Any())
             .ToArray();
@@ -79,7 +84,20 @@ public sealed class AccountingContractTests
         using var receipt = new ReceiptDbContext(ReceiptOptions());
 
         Assert.Equal(6, payment.Model.GetEntityTypes().Count());
-        Assert.Equal(5, invoice.Model.GetEntityTypes().Count());
+        Type[] billingTypes = [typeof(BillingAccountRow), typeof(BillingOperationRow), typeof(BillingIntentRow)];
+        Type[] legacyInvoiceTypes = [typeof(Invoice), typeof(InvoiceOrderItem), typeof(InvoiceFile),
+            typeof(InvoiceCreationAdmission), typeof(InvoiceNotificationCorrelationRow)];
+        Assert.Equal(legacyInvoiceTypes.OrderBy(type => type.FullName), invoice.Model.GetEntityTypes()
+            .Select(entity => entity.ClrType).Where(type => !billingTypes.Contains(type)).OrderBy(type => type.FullName));
+        Assert.Equal(billingTypes.OrderBy(type => type.FullName), invoice.Model.GetEntityTypes()
+            .Select(entity => entity.ClrType).Where(billingTypes.Contains).OrderBy(type => type.FullName));
+        foreach (var billingType in billingTypes)
+        {
+            Assert.Null(payment.Model.FindEntityType(billingType));
+            Assert.Null(receipt.Model.FindEntityType(billingType));
+            Assert.All(invoice.Model.FindEntityType(billingType)!.GetForeignKeys(),
+                key => Assert.Contains(key.PrincipalEntityType.ClrType, billingTypes));
+        }
         var correlation = invoice.Model.FindEntityType(typeof(InvoiceNotificationCorrelationRow))!;
         Assert.Equal("InvoiceNotificationCorrelation", correlation.GetTableName());
         Assert.Equal("public", correlation.GetSchema());
