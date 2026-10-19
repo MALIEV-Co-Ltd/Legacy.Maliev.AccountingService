@@ -7,7 +7,7 @@
     },
     {
       "repository": "Legacy.Maliev.AccountingService",
-      "commit": "3d128b6d95d915ccd38323ccd66af4575800f32e"
+      "commit": "d7285611632deae80ab2d723665451464c30f663"
     },
     {
       "repository": "Legacy.Maliev.QuotationService",
@@ -1066,5 +1066,38 @@
     "previousHistoryPreserved": true,
     "producerGuardRelaxed": false,
     "ddlOrDeploymentPerformed": false
+  },
+  "privateObservationOwnProducerSourceAdvance": {
+    "previousAccounting": "3d128b6d95d915ccd38323ccd66af4575800f32e",
+    "reviewedAccounting": "d7285611632deae80ab2d723665451464c30f663",
+    "reviewedParent": "13c90a5b1ba02ad52dae3937ad28b165192af947",
+    "reviewedTree": "78eb372071fba346eae4ba16f09d1b6c9e5abbbc",
+    "inputCount": 122,
+    "changedInputs": [
+      {
+        "path": "Legacy.Maliev.AccountingService.Api/Program.cs",
+        "previousObject": "100644 blob e17b414962227aa90acd5a8223fb6386fa3e0fc1",
+        "reviewedObject": "100644 blob 53ea629fada39fe0877a25cf78f56f38a1a86d35"
+      }
+    ],
+    "unchangedInputCount": 121,
+    "scope": "One explicit existing-SDK private observation host opt-in only; no business/auth/cache/provider/worker/test changes.",
+    "causalBaseline": {
+      "head": "13c90a5b1ba02ad52dae3937ad28b165192af947",
+      "run": 39226978375,
+      "job": 117975521859,
+      "releaseWarnings": 0,
+      "releaseErrors": 0,
+      "priorPassed": 1652,
+      "newFailed": 3,
+      "skipped": 0
+    },
+    "review": "Root exact one-line replay source GO; immutable reviewed producer witness, not accepted protected main.",
+    "nativeAcceptance": "Pending exact successor Release0W0E, observation3/full1655 and all existing public prospective protocol/static/security/raw coverage gates; no passed claim.",
+    "peerPinsAdvanced": false,
+    "previousHistoryPreserved": true,
+    "producerGuardRelaxed": false,
+    "privateEightHostActivated": false,
+    "financialExecutionOrDeploymentPerformed": false
   }
 }
