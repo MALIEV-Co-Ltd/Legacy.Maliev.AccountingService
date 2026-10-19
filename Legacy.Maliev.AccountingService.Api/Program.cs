@@ -9,6 +9,7 @@ using Maliev.Aspire.ServiceDefaults;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddInvoiceNotificationV2(builder.Configuration);
 builder.AddServiceDefaults();
+builder.AddPrivateRequestObservation("accounting");
 builder.AddDefaultApiVersioning();
 builder.AddLegacyAuthServiceTokenExchange();
 builder.AddPostgresDbContext<PaymentDbContext>(connectionName: "PaymentDbContext");
