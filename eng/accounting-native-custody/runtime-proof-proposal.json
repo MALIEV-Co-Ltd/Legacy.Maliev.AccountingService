@@ -1,0 +1,98 @@
+{
+  "status": "PROPOSAL_ONLY_NO_GRANT_OR_RUNTIME_ACCEPTANCE",
+  "approvedMainBaseline": "29a33e4f7815bf5e817264e89b733239edd4935c",
+  "businessPacketSha256": "81f3d42995bcbac1958746d8a80e620c417dfab4fea09351207030ece0e6ef0e",
+  "nativeEnabled": false,
+  "localSdkAuthorized": false,
+  "memoryFloorKiB": 4194304,
+  "waiverAllowed": false,
+  "resourceLimitsProposed": {
+    "sdkMemoryBytes": 8589934592,
+    "sdkCpu": 1,
+    "sdkPids": 512,
+    "proxyWorkers": 2,
+    "rpcMaximumSeconds": 10,
+    "sdkLogBytes": 33554432,
+    "httpResponseBytes": 16777216,
+    "postgresMemoryBytes": 536870912,
+    "redisMemoryBytes": 134217728
+  },
+  "sequence": [
+    {
+      "phase": "normal-hosted-source-ci",
+      "timeoutSeconds": 600,
+      "execution": "Python source104 source controls only; no SDK, Docker, proxy listener, fork or cgroup allocation",
+      "acceptance": "Exact104/104 zero skipped with changed-file hashes; provides no native acceptance"
+    },
+    {
+      "phase": "finite-hosted-linux-process-controls",
+      "proposedExecutionBudgetSeconds": 180,
+      "proposedCleanupBudgetSeconds": 300,
+      "requires": "Independent reviewed controller/grant composer and exact helper executable/argv/source seals; fresh Linux ownership/admission and serialized native slot",
+      "cases": [
+        "stopped-before-cgroup-registration",
+        "retained-pidfd-and-birth",
+        "actual-leaf-and-ancestor-four-GiB-floor",
+        "first-failure-preservation",
+        "immutable-expiry",
+        "SIGINT/SIGTERM-cancellation",
+        "output-overflow",
+        "final-save-uncertainty",
+        "exact-cgroup/claim/handle-absence"
+      ],
+      "acceptance": "Actual retained lifecycle receipts, all six cleanup flags and independent raw review; no Accounting build/test claim"
+    },
+    {
+      "phase": "finite-hosted-docker-protocol-controls",
+      "proposedExecutionBudgetSeconds": 300,
+      "proposedCleanupBudgetSeconds": 300,
+      "requires": "Independent exact OCI digests, daemon socket inode/peer birth/daemon ID, pre-dispatch intent/ACK and loopback/tmpfs profiles; scoped allocation authority",
+      "cases": [
+        "actual-intent-before-Create",
+        "lost-Create-ACK-refuses-success",
+        "lost-publication-save-retains-uncertainty",
+        "already-stopped-removal",
+        "running-graceful-stop-removal",
+        "stop-timeout-refuses-removal",
+        "held-exec-refuses-uncertain-removal",
+        "101-hijacked-binary-output",
+        "foreign-volume/daemon/name/ID/peer-refusal",
+        "actual-active-clients-and-SDK-quiescence",
+        "exact-ID-and-name404-plus-no-volume-deletion"
+      ],
+      "acceptance": "Actual protocol/physical-ID evidence and all six cleanup flags, no native SDK acceptance"
+    },
+    {
+      "phase": "accounting-native-qualification",
+      "proposedAggregateExecutionBudgetSeconds": 2400,
+      "proposedCleanupBudgetSeconds": 300,
+      "requires": "Accepted actual custody controls, fresh Root phase authority, reobserved source/dependency/runtime/admission/other-job state; no grant renewal",
+      "checks": [
+        "Release build zero warnings/errors",
+        "actual Testcontainers4.14 startup/exec/disposal compatibility",
+        "focused12 exact identity/assembly/GUID/all16counters",
+        "fullAccounting1662 zero failures/skips",
+        "format",
+        "typed audit bound to actual five restored assets",
+        "coverage and existing raw floors",
+        "source/dependency postreadback",
+        "all six cleanup flags before durable acceptance"
+      ],
+      "acceptance": "Independent actual raw build/TRX/audit/coverage/source/cleanup review before business commit; dedicated committed-source CLI gate cannot be claimed on uncommitted overlay"
+    }
+  ],
+  "remainingImplementation": [
+    "Actual independently reviewed/discovered full compiled-assembly method/case roster and external review SHA required; no roster generated from submitted TRX",
+    "Independent immutable Root authority/phase/argv/executable/OCI/source binding and native controller entrypoint remain unintegrated; source CI does not call SDK launcher",
+    "Actual Linux/Docker/TC4.14 held-exec/binary/stop-timeout/quiescence/volume semantics unrun",
+    "Uncertain Create with no durable acknowledged ID fails closed and retains exact ownership/recovery evidence; no absence fabricated",
+    "Aggregate lifecycle/receipt durability and SDK-owner failure paths require actual hosted controls"
+  ],
+  "requiredRootInputs": [
+    "Exact independently approved native transport/source commit and grant digest",
+    "Exclusive serialized slot/cgroup parent and finite aggregate bounds",
+    "Actual SDK/helper executable seals and scoped phase argv",
+    "Exact PostgreSQL18/Redis7.4 OCI digests and daemon/peer/socket identity",
+    "Immutable execution and cleanup expiries"
+  ]
+}

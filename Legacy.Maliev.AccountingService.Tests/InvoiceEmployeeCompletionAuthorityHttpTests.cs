@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Legacy.Maliev.AccountingService.Tests;
 
 /// <summary>Normal Accounting HTTP/JWT/live-IAM and actual retained rows; controlled signed proof is not real Auth mint acceptance.</summary>
-[Collection(AccountingBoundaryHttpCollection.Name)]
+[Collection(InvoiceEmployeeCompletionAuthorityCollection.Name)]
 public sealed class InvoiceEmployeeCompletionAuthorityHttpTests(AccountingBoundaryHttpFixture fixture)
 {
     [Theory]

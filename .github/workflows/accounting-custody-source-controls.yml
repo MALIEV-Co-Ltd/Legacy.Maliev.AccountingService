@@ -1,0 +1,38 @@
+name: Accounting custody source controls
+on:
+  pull_request:
+    paths: ['eng/accounting-native-custody/**', '.github/workflows/accounting-custody-source-controls.yml']
+  push:
+    branches: [main]
+    paths: ['eng/accounting-native-custody/**', '.github/workflows/accounting-custody-source-controls.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: accounting-custody-source-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  source-controls:
+    if: github.event_name != 'workflow_dispatch' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      ACCOUNTING_NATIVE_ENABLED: 'false'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.14'
+      - name: Execute only synthetic source controls
+        working-directory: eng/accounting-native-custody
+        run: python -B accounting_source_controls_v3.py --receipt "$RUNNER_TEMP/accounting-custody-source-controls.json"
+      - name: Retain source-only result
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: accounting-custody-source-${{ github.sha }}
+          path: ${{ runner.temp }}/accounting-custody-source-controls.json
+          if-no-files-found: error
+          retention-days: 7
