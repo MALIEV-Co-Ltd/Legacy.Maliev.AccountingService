@@ -35,6 +35,30 @@ jobs:
           ref: 78e48ffc4ee000df0510cba5e7c7a3c4c4d539d7
           path: .dependencies/Legacy.Maliev.CompatibilityContracts
           persist-credentials: false
+      - name: Check out approved original invoice schema source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: MALIEV-Co-Ltd/Legacy.Maliev.AccountingService
+          ref: 7878362fcd563e0bd64f75d29ef5f365c279380d
+          path: .dependencies/ApprovedInvoiceSchema
+          persist-credentials: false
+      - name: Set up .NET for original invoice schema generation
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68
+        with:
+          dotnet-version: 10.0.x
+      - name: Generate original-runtime invoice schema evidence without a database
+        timeout-minutes: 10
+        env:
+          GITHUB_ACTIONS: 'false'
+          DOTNET_CLI_USE_MSBUILD_SERVER: '0'
+          MSBUILDDISABLENODEREUSE: '1'
+        run: |
+          set -euo pipefail
+          original="$GITHUB_WORKSPACE/.dependencies/ApprovedInvoiceSchema"
+          test "$(git -C "$original" rev-parse HEAD)" = 7878362fcd563e0bd64f75d29ef5f365c279380d
+          tool="$GITHUB_WORKSPACE/tools/ApprovedInvoiceSchema/ApprovedInvoiceSchema.csproj"
+          timeout --signal=TERM --kill-after=5s 420s dotnet build "$tool" --configuration Release --disable-build-servers -m:1 -p:ApprovedAccountingRoot="$original"
+          timeout --signal=TERM --kill-after=5s 60s dotnet "$GITHUB_WORKSPACE/tools/ApprovedInvoiceSchema/bin/Release/net10.0/ApprovedInvoiceSchema.dll" "$GITHUB_WORKSPACE/runner-results/approved-invoice-schema"
       - name: Validate .NET solution
         uses: MALIEV-Co-Ltd/Legacy.Maliev.Workflows/actions/dotnet-validate@e3a6093324a24968876782153286f52db8b29fd8
         with:
@@ -52,7 +76,7 @@ jobs:
         run: python3 -B scripts/verify-paid-invoice-wire.py runner-results --full --wire
       - name: Preserve validation evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: accounting-validation-${{ github.sha }}
           path: runner-results
