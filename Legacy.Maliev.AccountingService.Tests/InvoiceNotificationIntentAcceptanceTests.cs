@@ -36,6 +36,28 @@ namespace Legacy.Maliev.AccountingService.Tests;
 /// <summary>New child37 boundary tests; controlled remote transports are not provider/grant proof.</summary>
 public sealed class InvoiceNotificationIntentAcceptanceTests
 {
+    [Fact]
+    public async Task FreshDisposableSchema_RetainsApprovedCorrelationMigrationIdentity()
+    {
+        await using var fixture = await IntentFixture.StartAsync();
+        await using var database = fixture.Database();
+        var history = await database.Database.SqlQueryRaw<string>("""
+            SELECT "MigrationId" || ':' || "ProductVersion" AS "Value"
+            FROM public."__EFMigrationsHistory"
+            WHERE "MigrationId" IN ('20261001105037_AddInvoiceNotificationCorrelation',
+                '20261001133820_RetainInvoiceNotificationReceipt')
+            ORDER BY "MigrationId"
+            """).ToArrayAsync();
+        var pendingModel = database.Database.HasPendingModelChanges();
+        string[] approvedHistory =
+        [
+            "20261001105037_AddInvoiceNotificationCorrelation:10.0.12",
+            "20261001133820_RetainInvoiceNotificationReceipt:10.0.12",
+        ];
+        Assert.True(history.SequenceEqual(approvedHistory, StringComparer.Ordinal) && !pendingModel,
+            $"Disposable correlation readiness: migrations=[{string.Join(", ", history)}]; pendingModelChanges={pendingModel}.");
+    }
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
@@ -378,7 +400,7 @@ public sealed class InvoiceNotificationIntentAcceptanceTests
             {
                 await value.postgres.StartAsync();
                 await value.redis.StartAsync();
-                await using (var database = value.Database()) await database.Database.MigrateAsync();
+                await using (var database = value.Database()) await ApprovedInvoiceSchemaFixture.CreateAsync(database);
                 value.Host = new Factory(value);
                 return value;
             }

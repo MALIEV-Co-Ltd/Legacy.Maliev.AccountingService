@@ -50,7 +50,7 @@ public sealed class InvoiceNotificationCorrelationFoundationTests(ITestOutputHel
         using var scope = host.Services.CreateScope();
         var database = scope.ServiceProvider.GetRequiredService<InvoiceDbContext>();
         Assert.True(database.Database.CreateExecutionStrategy().RetriesOnFailure);
-        await database.Database.MigrateAsync();
+        await ApprovedInvoiceSchemaFixture.CreateAsync(database);
     }
 
     public async Task DisposeAsync()

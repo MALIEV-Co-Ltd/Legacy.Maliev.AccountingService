@@ -240,7 +240,7 @@ public sealed class InvoiceNotificationPhaseFencePostgresFixture : IAsyncLifetim
         using var scope = Host.Services.CreateScope();
         var database = scope.ServiceProvider.GetRequiredService<InvoiceDbContext>();
         Assert.True(database.Database.CreateExecutionStrategy().RetriesOnFailure);
-        await database.Database.MigrateAsync();
+        await ApprovedInvoiceSchemaFixture.CreateAsync(database);
     }
 
     public async Task DisposeAsync()
@@ -260,7 +260,7 @@ public sealed class InvoiceNotificationPhaseFencePostgresFixture : IAsyncLifetim
         }
         var connectionString = new NpgsqlConnectionStringBuilder(postgres.GetConnectionString()) { Database = name }.ConnectionString;
         var database = new InvoiceDbContext(new DbContextOptionsBuilder<InvoiceDbContext>().UseNpgsql(connectionString).Options);
-        if (targetMigration is null) await database.Database.MigrateAsync();
+        if (targetMigration is null) await ApprovedInvoiceSchemaFixture.CreateAsync(database);
         else await database.GetService<Microsoft.EntityFrameworkCore.Migrations.IMigrator>().MigrateAsync(targetMigration);
         return database;
     }

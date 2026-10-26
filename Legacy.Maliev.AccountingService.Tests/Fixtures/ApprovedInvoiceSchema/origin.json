@@ -1,0 +1,14 @@
+{
+  "originalSource": "7878362fcd563e0bd64f75d29ef5f365c279380d",
+  "generatorProposedHead": "a859cc753d8926a00c5b7350b6755260e571fcc9",
+  "generatorTestedMerge": "32a024baf9b401b5f41dc812f8afc2b1d5b47a8b",
+  "generatorTree": "b18a787d4280685cb369c6167a82e372afecf1d2",
+  "run": 40353891608,
+  "job": 121681043383,
+  "artifact": 12664434984,
+  "sqlSha256": "4c0823fceae65be97717c6dce8ba007c437e0e8ea5b64fbbb16e4b25f5a09be7",
+  "manifestSha256": "fa512b0240d7bd7df771181bf8da2b2711152b049b1ad36205b5031a193ed156",
+  "sqlWasGeneratedByOriginalRuntimeNotRewritten": true,
+  "applicationOrProductionAcceptance": false,
+  "scope": "Only existing empty disposable invoice test databases. No production database or financial workflow authority."
+}

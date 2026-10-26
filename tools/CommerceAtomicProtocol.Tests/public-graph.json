@@ -1,5 +1,5 @@
 {
-  "identity": "commerce-atomic-invoice-intent-consumer-public-20261005",
+  "identity": "commerce-atomic-accounting-dependency-compatibility-public-20261026",
   "references": [
     {
       "repository": "Legacy.Maliev.AuthService",
@@ -7,7 +7,7 @@
     },
     {
       "repository": "Legacy.Maliev.AccountingService",
-      "commit": "d7285611632deae80ab2d723665451464c30f663"
+      "commit": "6c668ea8a16cbc14ba92d5a17f9fe04d85826eed"
     },
     {
       "repository": "Legacy.Maliev.QuotationService",
@@ -1099,5 +1099,93 @@
     "producerGuardRelaxed": false,
     "privateEightHostActivated": false,
     "financialExecutionOrDeploymentPerformed": false
+  },
+  "dependencyCompatibilitySuccessor": {
+    "previousAccounting": "d7285611632deae80ab2d723665451464c30f663",
+    "reviewedAccounting": "6c668ea8a16cbc14ba92d5a17f9fe04d85826eed",
+    "acceptedAccountingMainBaseline": "7878362fcd563e0bd64f75d29ef5f365c279380d",
+    "previousManifest": "tools/CommerceAtomicProtocol.Tests/public-graph-before-dependency-20261026.json",
+    "previousManifestSha256": "700406d9c2a1ef32f3fdcbc6f0fa992d510622e0c782b4b5001e6aad9d776a65",
+    "changedInputs": [
+      {
+        "path": "Directory.Build.props",
+        "old": "100644 blob c4d643b640e122a3ab278aa6e7157740511b07d1",
+        "candidate": "100644 blob 048a1e1ec94e4f6c9875563554eb159cc5b6ec41"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Api/Legacy.Maliev.AccountingService.Api.csproj",
+        "old": "100644 blob 4e7f5233754834d09b05bfca3d59ac1c36b5df24",
+        "candidate": "100644 blob 67085e0933e695ddc980a009276827d5dfbe08d3"
+      },
+      {
+        "path": "Legacy.Maliev.AccountingService.Data/Legacy.Maliev.AccountingService.Data.csproj",
+        "old": "100644 blob a3deb51c0d0a75ccb9ddd3d1d3bb69ebb4a6665d",
+        "candidate": "100644 blob 7434ce2db9ecd174d55e8ec50d097a5293c46c83"
+      }
+    ],
+    "unchangedInputCount": 119,
+    "unchangedInputsSha256": "0c7b6effd6b0e039303ee216147c742866f0650e74839ffa8d974ada677fd23a",
+    "digestSerialization": "UTF-8 compact JSON sorted keys mapping path to full git ls-tree metadata",
+    "productionCSharpChanges": 0,
+    "ordinaryDependencyPinsAndOtherProducers": "unchanged",
+    "scope": "Existing dependency PR86 only. Updated EF13 build inputs with original-EF12-created empty disposable invoice fixtures; no business source changes, baseline equivalence or source credit.",
+    "originalSchemaSqlSha256": "4c0823fceae65be97717c6dce8ba007c437e0e8ea5b64fbbb16e4b25f5a09be7",
+    "ordinaryNativeQualification": {
+      "head": "6c668ea8a16cbc14ba92d5a17f9fe04d85826eed",
+      "run": 40359669878,
+      "status": "Complete exact-producer ordinary qualification passed; fresh complete successor-head qualification still required",
+      "fullForecast": 1661,
+      "sourceBaselineCases": 1655,
+      "diagnosticCases": 1,
+      "pureEvidenceCases": 5,
+      "focusedForecast": 324,
+      "primaryJob": 121701405570,
+      "primaryArtifact": 12667936990,
+      "testedMerge": "bb8af2d188b4402d28645b2366239f3e6d500f72",
+      "tree": "0f6100f926afe1319471bba88e15a38cbe8e9220",
+      "releaseWarnings": 0,
+      "releaseErrors": 0,
+      "fullPassed": 1661,
+      "fullFailed": 0,
+      "fullSkipped": 0,
+      "rawCoverageSha256": "48c038d17ef30069b30a7125953be7cf95561891b38b6e83c75afb50e23950a3",
+      "ownedAssemblyRawFloors": [
+        {
+          "assembly": "Legacy.Maliev.AccountingService.Api",
+          "covered": 1510,
+          "valid": 1665,
+          "threshold": 80
+        },
+        {
+          "assembly": "Legacy.Maliev.AccountingService.Application",
+          "covered": 790,
+          "valid": 864,
+          "threshold": 80
+        },
+        {
+          "assembly": "Legacy.Maliev.AccountingService.Data",
+          "covered": 11455,
+          "valid": 11646,
+          "threshold": 80
+        },
+        {
+          "assembly": "Legacy.Maliev.AccountingService.Domain",
+          "covered": 174,
+          "valid": 174,
+          "threshold": 80
+        }
+      ],
+      "focused": {
+        "run": 40359669933,
+        "job": 121701404344,
+        "artifact": 12667707597,
+        "passed": 324,
+        "failed": 0,
+        "skipped": 0
+      }
+    },
+    "prospectiveAcceptance": "All unchanged producer-input mutation controls, exact current-versus-reviewed equality, seventeen graph executions and nine Defaults cache executions must pass fresh on the complete proposed head. No historical/manual six-case phase is dispatched.",
+    "operationalAcceptance": false,
+    "baselineEquivalent": false
   }
 }

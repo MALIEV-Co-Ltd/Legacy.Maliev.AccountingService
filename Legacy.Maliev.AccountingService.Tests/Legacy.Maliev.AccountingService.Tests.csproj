@@ -31,6 +31,11 @@
     <ProjectReference Include="..\Legacy.Maliev.AccountingService.Domain\Legacy.Maliev.AccountingService.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Fixtures/ApprovedInvoiceSchema/approved-invoice-schema.sql" LogicalName="Legacy.Maliev.AccountingService.Tests.ApprovedInvoiceSchema.approved-invoice-schema.sql" />
+    <EmbeddedResource Include="Fixtures/ApprovedInvoiceSchema/approved-invoice-schema.json" LogicalName="Legacy.Maliev.AccountingService.Tests.ApprovedInvoiceSchema.approved-invoice-schema.json" />
+  </ItemGroup>
+
   <Target Name="PrepareInvoiceDelegationAuthProof" BeforeTargets="PrepareForBuild" Condition="'$(DesignTimeBuild)' != 'true'">
     <Exec Command="pwsh -NoProfile -File &quot;$(MSBuildProjectDirectory)/../tooling/prepare-delegation-auth-proof.ps1&quot;" Timeout="1000000" />
   </Target>
