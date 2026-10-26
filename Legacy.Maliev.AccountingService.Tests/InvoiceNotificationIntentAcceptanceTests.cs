@@ -400,7 +400,7 @@ public sealed class InvoiceNotificationIntentAcceptanceTests
             {
                 await value.postgres.StartAsync();
                 await value.redis.StartAsync();
-                await using (var database = value.Database()) await database.Database.MigrateAsync();
+                await using (var database = value.Database()) await ApprovedInvoiceSchemaFixture.CreateAsync(database);
                 value.Host = new Factory(value);
                 return value;
             }
