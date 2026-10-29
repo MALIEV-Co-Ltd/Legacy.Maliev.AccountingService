@@ -30,7 +30,7 @@ jobs:
         working-directory: eng/accounting-native-custody
         run: python -B accounting_source_controls_v3.py --receipt "$RUNNER_TEMP/accounting-custody-source-controls.json"
       - name: Retain source-only result
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           name: accounting-custody-source-${{ github.sha }}
           path: ${{ runner.temp }}/accounting-custody-source-controls.json
