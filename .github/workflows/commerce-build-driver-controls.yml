@@ -31,7 +31,7 @@ jobs:
         run: python -B eng/commerce-build-driver/prove_linux_command_lifecycle_v1.py --results "$RUNNER_TEMP/commerce-build-driver-proof-$GITHUB_RUN_ID"
       - name: Retain actual lifecycle evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           name: commerce-build-driver-proof-${{ github.sha }}
           path: ${{ runner.temp }}/commerce-build-driver-proof-${{ github.run_id }}
