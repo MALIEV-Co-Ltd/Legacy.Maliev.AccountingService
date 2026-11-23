@@ -22,7 +22,7 @@ builder.AddAccountingIamClient();
 builder.AddStandardMiddleware(options => options.EnableRequestLogging = true);
 builder.AddStandardOpenApi(
     title: "Legacy MALIEV Accounting Service API",
-    description: "Temporary .NET 10 compatibility API for historical payment, invoice, and receipt records. It does not execute payments.");
+    description: "Temporary .NET 11 compatibility API for historical payment, invoice, and receipt records. It does not execute payments.");
 builder.Services.AddOpenApi("v1");
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
